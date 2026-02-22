@@ -42,8 +42,10 @@ public class EmailController {
         
         try {
             resend.emails().send(params);
+            System.out.println("Sending Email");
             return "Success!!";
         } catch (Exception e) {
+            System.out.println("Error while sending email!!");
             return e.getMessage();
         }
     }
