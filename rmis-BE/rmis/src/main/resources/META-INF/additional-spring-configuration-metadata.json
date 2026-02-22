@@ -1,0 +1,29 @@
+{
+  "properties": [
+    {
+      "name": "app.jwt.secret",
+      "type": "java.lang.String",
+      "description": "A description for 'app.jwt.secret'"
+    },
+    {
+      "name": "app.jwt.expiration",
+      "type": "java.lang.String",
+      "description": "A description for 'app.jwt.expiration'"
+    },
+    {
+      "name": "app.jwt.refresh-expiration",
+      "type": "java.lang.String",
+      "description": "A description for 'app.jwt.refresh-expiration'"
+    },
+    {
+      "name": "app.cors.allowed-origins",
+      "type": "java.lang.String",
+      "description": "A description for 'app.cors.allowed-origins'"
+    },
+    {
+      "name": "app.mail.resend.api",
+      "type": "java.lang.String",
+      "description": "A description for 'app.mail.resend.api'"
+    }
+  ]
+}
