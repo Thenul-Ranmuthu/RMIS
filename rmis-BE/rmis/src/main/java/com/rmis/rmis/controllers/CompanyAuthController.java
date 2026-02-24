@@ -3,7 +3,7 @@ package com.rmis.rmis.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rmis.rmis.domain.dtos.CompanyLoginDto;
+import com.rmis.rmis.domain.dtos.LoginDto;
 import com.rmis.rmis.domain.dtos.CompanyRegisterDto;
 import com.rmis.rmis.domain.dtos.JwtAuthResponse;
 import com.rmis.rmis.exceptions.RegisterUserAlreadyExistsException;
@@ -31,8 +31,8 @@ public class CompanyAuthController {
     private CodeGeneratorService codeGeneratorService;
 
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthResponse> login(@RequestBody CompanyLoginDto companyLoginDto) {
-        String token = companyAuthService.login(companyLoginDto);
+    public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto loginDto) {
+        String token = companyAuthService.login(loginDto);
 
         JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
         jwtAuthResponse.setAccessToken(token);
