@@ -1,3 +1,20 @@
 rmis-FE/rmis-fe/node_modules
 rmis-BE/rmis/src/main/resources/application.properties
 rmis-BE/rmis/target
+# Logs
+logs/
+*.log
+
+# Uploads
+uploads/
+
+# Build
+target/
+
+# IDE
+.idea/
+*.iml
+
+# JVM crash logs
+hs_err_pid*
+replay_pid*
