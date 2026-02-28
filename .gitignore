@@ -1,2 +1,6 @@
 rmis-FE/rmis-fe/node_modules
 rmis-BE/rmis/src/main/resources/application.properties
+node_modules/
+New FE/node_modules/
+.next/
+.env
