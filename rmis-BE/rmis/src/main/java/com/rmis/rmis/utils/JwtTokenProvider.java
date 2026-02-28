@@ -23,7 +23,7 @@ public class JwtTokenProvider {
     private long jwtExpirationDate;
 
     // generate JWT token
-    public String generateToken(Authentication authentication){
+    public String generateToken(Authentication authentication, String userType){
 
         String username = authentication.getName();
         Collection<?> authorities = authentication.getAuthorities();
@@ -38,6 +38,7 @@ public class JwtTokenProvider {
         String token = Jwts.builder()
                 .subject(username)
                 .claim("roles", roles)
+                .claim("userType", userType) 
                 .issuedAt(new Date())
                 .expiration(expireDate)
                 .signWith(key())
@@ -70,4 +71,13 @@ public class JwtTokenProvider {
             return true;
 
     }
+        
+        public String getUserType(String token) {
+                return Jwts.parser()
+                .verifyWith((SecretKey) key())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("userType", String.class);
+        }
 }

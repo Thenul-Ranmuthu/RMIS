@@ -1,14 +1,18 @@
 package com.rmis.rmis.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -31,6 +35,37 @@ public class SecurityConfig {
 
     @Value("${app.cors.allowed-origins}")//http://localhost:3000
     private String allowedOriginsProperty;
+    
+
+    // ---- Inject both UserDetailsService implementations ----
+
+    private final UserDetailsService companyDetailsService;
+    // private final UserDetailsService publicUserDetailsService;
+
+    public SecurityConfig(
+            @Qualifier("applicationCompanyDetailsService") UserDetailsService companyDetailsService
+            // @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService
+    ) {
+        this.companyDetailsService = companyDetailsService;
+        // this.publicUserDetailsService = publicUserDetailsService;
+    }
+
+    // ---- Authentication Providers ----
+
+    @Bean
+    public AuthenticationProvider companyAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(companyDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    // @Bean
+    // public AuthenticationProvider publicUserAuthenticationProvider() {
+    //     DaoAuthenticationProvider provider = new DaoAuthenticationProvider(publicUserDetailsService);
+    //     provider.setPasswordEncoder(passwordEncoder());
+    //     return provider;
+    // }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
