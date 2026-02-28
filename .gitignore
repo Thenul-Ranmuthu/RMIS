@@ -12,3 +12,6 @@ replay_pid*
 # IntelliJ
 .idea/
 *.iml
+.next
+node_modules
+.env
