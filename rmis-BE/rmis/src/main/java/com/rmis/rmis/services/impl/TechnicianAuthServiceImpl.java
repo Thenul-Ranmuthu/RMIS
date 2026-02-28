@@ -8,6 +8,7 @@ import com.rmis.rmis.exceptions.RegisterUserAlreadyExistsException;
 import com.rmis.rmis.exceptions.ResourceNotFoundException;
 import com.rmis.rmis.exceptions.UnauthorizedException;
 import com.rmis.rmis.repositories.CertificationRepository;
+import com.rmis.rmis.repositories.CompanyRepository;
 import com.rmis.rmis.repositories.RoleRepository;
 import com.rmis.rmis.repositories.TechnicianRepository;
 import com.rmis.rmis.services.interfaces.TechnicianAuthService;
@@ -37,6 +38,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
     private static final Logger log = LoggerFactory.getLogger(TechnicianAuthServiceImpl.class);
 
     private final TechnicianRepository technicianRepository;
+    private final CompanyRepository companyRepository;
     private final CertificationRepository certificationRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -46,6 +48,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
 
     public TechnicianAuthServiceImpl(
             TechnicianRepository technicianRepository,
+            CompanyRepository companyRepository,
             CertificationRepository certificationRepository,
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
@@ -53,6 +56,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
             JwtTokenProvider jwtTokenProvider,
             FileStorageService fileStorageService) {
         this.technicianRepository = technicianRepository;
+        this.companyRepository = companyRepository;
         this.certificationRepository = certificationRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -67,7 +71,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
         log.info("Attempting to register technician with email: {}", registerDto.getEmail());
 
         // Check if email already exists
-        if (technicianRepository.existsByEmail(registerDto.getEmail())) {
+        if (technicianRepository.existsByEmail(registerDto.getEmail()) || companyRepository.findByEmail(registerDto.getEmail()).isPresent()) {
             log.warn("Registration failed - email already exists: {}", registerDto.getEmail());
             throw new RegisterUserAlreadyExistsException("Email already registered!");
         }
@@ -106,37 +110,18 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
                     certification.setCertificationName(certDto.getCertificationName());
                     certification.setIssuingAuthority(certDto.getIssuingAuthority());
 
-                    // Parse dates if provided
-                    if (certDto.getIssueDate() != null && !certDto.getIssueDate().isEmpty()) {
-                        try {
-                            certification.setIssueDate(LocalDate.parse(certDto.getIssueDate(), DateTimeFormatter.ISO_DATE));
-                        } catch (DateTimeParseException e) {
-                            log.warn("Invalid issue date format: {}", certDto.getIssueDate());
-                        }
-                    }
-
-                    if (certDto.getExpiryDate() != null && !certDto.getExpiryDate().isEmpty()) {
-                        try {
-                            certification.setExpiryDate(LocalDate.parse(certDto.getExpiryDate(), DateTimeFormatter.ISO_DATE));
-                        } catch (DateTimeParseException e) {
-                            log.warn("Invalid expiry date format: {}", certDto.getExpiryDate());
-                        }
-                    }
-
-                    certification.setCertificateNumber(certDto.getCertificateNumber());
-
                     // Store file
                     if (certDto.getFile() == null || certDto.getFile().isEmpty()) {
                         throw new RuntimeException("Certification file is required");
                     }
-                        String fileName = fileStorageService.storeFile(certDto.getFile());
-                        certification.setFilePath(fileName);
-                        certification.setOriginalFileName(certDto.getFile().getOriginalFilename());
-                        certification.setFileType(certDto.getFile().getContentType());
-                        certification.setFileSize(certDto.getFile().getSize());
 
-
+                    String fileName = fileStorageService.storeFile(certDto.getFile());
+                    certification.setFilePath(fileName);
+                    certification.setOriginalFileName(certDto.getFile().getOriginalFilename());
+                    certification.setFileType(certDto.getFile().getContentType());
+                    certification.setFileSize(certDto.getFile().getSize());
                     certification.setTechnician(savedTechnician);
+
                     certifications.add(certificationRepository.save(certification));
                     log.info("Certification saved for technician: {}", savedTechnician.getId());
 
@@ -154,7 +139,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
     }
 
     @Override
-    public String login(TechnicianLoginDto loginDto) {
+    public String login(LoginDto loginDto) {
         log.info("Login attempt for technician: {}", loginDto.getEmail());
 
         try {
@@ -308,9 +293,9 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
         dto.setId(certification.getId());
         dto.setCertificationName(certification.getCertificationName());
         dto.setIssuingAuthority(certification.getIssuingAuthority());
-        dto.setIssueDate(certification.getIssueDate() != null ? certification.getIssueDate().toString() : null);
-        dto.setExpiryDate(certification.getExpiryDate() != null ? certification.getExpiryDate().toString() : null);
-        dto.setCertificateNumber(certification.getCertificateNumber());
+        //dto.setIssueDate(certification.getIssueDate() != null ? certification.getIssueDate().toString() : null);
+        //dto.setExpiryDate(certification.getExpiryDate() != null ? certification.getExpiryDate().toString() : null);
+        //dto.setCertificateNumber(certification.getCertificateNumber());
         dto.setFileType(certification.getFileType());
         dto.setFileUrl("/uploads/" + certification.getFilePath());
         dto.setOriginalFileName(certification.getOriginalFileName());

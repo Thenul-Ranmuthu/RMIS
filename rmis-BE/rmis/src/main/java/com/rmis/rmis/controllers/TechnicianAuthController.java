@@ -64,7 +64,7 @@ public class TechnicianAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody TechnicianLoginDto loginDto) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginDto loginDto) {
         log.info("Received login request for technician: {}", loginDto.getEmail());
 
         try {
@@ -88,7 +88,7 @@ public class TechnicianAuthController {
     }
 
     @GetMapping("/profile")
-    @PreAuthorize("hasRole('TECHNITIAN')")
+    @PreAuthorize("hasRole('TECHNICIAN')")
     public ResponseEntity<?> getProfile(Authentication authentication) {
         try {
             String email = authentication.getName();
@@ -109,7 +109,7 @@ public class TechnicianAuthController {
     }
 
     @PutMapping("/profile")
-    @PreAuthorize("hasRole('TECHNITIAN')")
+    @PreAuthorize("hasRole('TECHNICIAN')")
     public ResponseEntity<?> updateProfile(Authentication authentication,
                                            @Valid @RequestBody TechnicianRegisterDto updateDto) {
         try {

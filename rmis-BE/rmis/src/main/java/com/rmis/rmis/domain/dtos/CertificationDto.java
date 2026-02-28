@@ -20,12 +20,12 @@ public class CertificationDto {
     @NotBlank(message = "Issuing authority is required")
     private String issuingAuthority;
 
-    private String issueDate;
+    //private String issueDate;
 
-    private String expiryDate;
+    //private String expiryDate;
 
-    @NotBlank(message = "Certificate number is required")
-    private String certificateNumber;
+    //@NotBlank(message = "Certificate number is required")
+    //private String certificateNumber;
 
     @NotNull(message = "Certification file is required")
     private MultipartFile file;

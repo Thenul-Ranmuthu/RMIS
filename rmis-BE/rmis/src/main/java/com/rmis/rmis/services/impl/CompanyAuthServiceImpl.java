@@ -1,5 +1,6 @@
 package com.rmis.rmis.services.impl;
 
+import com.rmis.rmis.domain.dtos.LoginDto;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -7,7 +8,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.rmis.rmis.domain.dtos.CompanyLoginDto;
 import com.rmis.rmis.domain.dtos.CompanyRegisterDto;
 import com.rmis.rmis.domain.entities.Company;
 import com.rmis.rmis.exceptions.RegisterUserAlreadyExistsException;
@@ -30,11 +30,11 @@ public class CompanyAuthServiceImpl implements CompanyAuthService{
 
 
     @Override
-    public String login(CompanyLoginDto companyLoginDto) {
+    public String login(LoginDto loginDto) {
         
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-            companyLoginDto.getEmail(), 
-            companyLoginDto.getPassword()
+            loginDto.getEmail(),
+            loginDto.getPassword()
         ));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);

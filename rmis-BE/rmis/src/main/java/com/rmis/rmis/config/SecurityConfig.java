@@ -41,7 +41,7 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
-    // 🔹 JWT FILTER BEAN (NO @Component in filter class)
+    // JWT FILTER BEAN (NO @Component in filter class)
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(
             JwtTokenProvider jwtTokenProvider,
@@ -49,7 +49,7 @@ public class SecurityConfig {
         return new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService);
     }
 
-    // 🔹 SECURITY FILTER CHAIN
+    // SECURITY FILTER CHAIN
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JwtAuthenticationFilter jwtAuthenticationFilter)
@@ -77,7 +77,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 🔹 AUTH PROVIDER (uses CustomUserDetailsService automatically)
+    // AUTH PROVIDER (uses CustomUserDetailsService automatically)
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider =
@@ -86,7 +86,7 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    // 🔹 AUTHENTICATION MANAGER
+    // AUTHENTICATION MANAGER
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration)
@@ -94,13 +94,13 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // 🔹 PASSWORD ENCODER
+    // PASSWORD ENCODER
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 🔹 CORS CONFIG
+    // CORS CONFIG
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

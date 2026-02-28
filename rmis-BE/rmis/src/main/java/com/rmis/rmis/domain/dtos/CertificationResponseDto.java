@@ -13,9 +13,9 @@ public class CertificationResponseDto {
     private Long id;
     private String certificationName;
     private String issuingAuthority;
-    private String issueDate;
-    private String expiryDate;
-    private String certificateNumber;
+    //private String issueDate;
+    //private String expiryDate;
+    //private String certificateNumber;
     private String fileType;
     private String fileUrl;
     private String originalFileName;

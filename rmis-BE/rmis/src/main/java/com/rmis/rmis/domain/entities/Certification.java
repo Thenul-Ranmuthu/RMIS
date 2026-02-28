@@ -25,12 +25,12 @@ public class Certification {
     @Column(nullable = false)
     private String issuingAuthority;
 
-    private LocalDate issueDate;
+    //private LocalDate issueDate;
 
-    private LocalDate expiryDate;
+    //private LocalDate expiryDate;
 
-    @Column(nullable = false)
-    private String certificateNumber;
+    //@Column(nullable = false)
+    //private String certificateNumber;
 
     @Column(nullable = false)
     private String filePath;

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface TechnicianAuthService {
     TechnicianResponseDto register(TechnicianRegisterDto registerDto);
-    String login(TechnicianLoginDto loginDto);
+    String login(LoginDto loginDto);
     TechnicianResponseDto approveTechnician(Long technicianId);
     TechnicianResponseDto rejectTechnician(Long technicianId, String reason);
     TechnicianResponseDto getTechnicianById(Long id);
