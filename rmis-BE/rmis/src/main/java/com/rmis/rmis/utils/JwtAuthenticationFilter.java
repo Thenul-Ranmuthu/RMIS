@@ -71,13 +71,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private UserDetails loadUser(String token, String username) {
         // Route to correct service based on JWT userType claim
-        // String userType = jwtTokenProvider.getUserType(token);
+        String userType = jwtTokenProvider.getUserType(token);
 
-        // if ("COMPANY".equals(userType)) {
+        if ("COMPANY".equals(userType)) {
             return applicationCompanyDetailsService.loadUserByUsername(username);
-        // } else {
-        //     return applicationPublicUserDetailsService.loadUserByUsername(username);
-        // }
+        } else {
+            return applicationPublicUserDetailsService.loadUserByUsername(username);
+        }
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {

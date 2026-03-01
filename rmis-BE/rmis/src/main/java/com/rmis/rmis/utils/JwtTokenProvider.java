@@ -70,4 +70,13 @@ public class JwtTokenProvider {
             return true;
 
     }
+
+    public String getUserType(String token) {
+        return Jwts.parser()
+                .verifyWith((SecretKey) key())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("userType", String.class);
+    }
 }

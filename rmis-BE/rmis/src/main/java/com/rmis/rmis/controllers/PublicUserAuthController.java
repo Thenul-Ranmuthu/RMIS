@@ -4,6 +4,7 @@ import com.rmis.rmis.domain.dtos.JwtAuthResponse;
 import com.rmis.rmis.domain.dtos.LoginDto;
 import com.rmis.rmis.domain.dtos.PublicUserRegisterDto;
 import com.rmis.rmis.exceptions.RegisterUserAlreadyExistsException;
+import com.rmis.rmis.exceptions.UnregisteredUserException;
 import com.rmis.rmis.services.impl.CodeGeneratorService;
 import com.rmis.rmis.services.interfaces.PublicUserAuthService;
 import lombok.AllArgsConstructor;
@@ -26,12 +27,12 @@ public class PublicUserAuthController {
 
     @RequestMapping("/login")
     public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto userLoginDto) {
-        String token = publicUserAuthService.publicUserLogin(userLoginDto);
+            String token = publicUserAuthService.publicUserLogin(userLoginDto);
 
-        JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
-        jwtAuthResponse.setAccessToken(token);
+            JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
+            jwtAuthResponse.setAccessToken(token);
 
-        return new ResponseEntity<>(jwtAuthResponse,HttpStatus.OK);
+            return new ResponseEntity<>(jwtAuthResponse, HttpStatus.OK);
     }
 
     @RequestMapping("/register/{code}")
