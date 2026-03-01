@@ -68,8 +68,7 @@ public class JwtTokenProvider {
                     .verifyWith((SecretKey) key())
                     .build()
                     .parse(token);
-            return true;
-
+        return true;
     }
         
         public String getUserType(String token) {
