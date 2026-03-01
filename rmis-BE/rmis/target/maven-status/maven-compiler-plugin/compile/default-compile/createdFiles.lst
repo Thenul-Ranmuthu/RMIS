@@ -4,7 +4,6 @@ com/rmis/rmis/utils/JwtAuthenticationFilter.class
 com/rmis/rmis/controllers/CompanyAuthController.class
 com/rmis/rmis/exceptions/RegisterUserAlreadyExistsException.class
 com/rmis/rmis/config/DataInitializer.class
-com/rmis/rmis/domain/dtos/CompanyLoginDto.class
 com/rmis/rmis/utils/JwtTokenProvider.class
 com/rmis/rmis/controllers/EmailController.class
 com/rmis/rmis/services/impl/CompanyAuthServiceImpl.class

@@ -3,12 +3,13 @@
 /mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/config/SecurityConfig.java
 /mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/controllers/CompanyAuthController.java
 /mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/controllers/EmailController.java
-/mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/domain/dtos/CompanyLoginDto.java
 /mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/domain/dtos/CompanyRegisterDto.java
 /mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/domain/dtos/JwtAuthResponse.java
+/mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/domain/dtos/LoginDto.java
 /mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/domain/entities/Company.java
 /mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/domain/entities/Role.java
 /mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/exceptions/RegisterUserAlreadyExistsException.java
+/mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/exceptions/UnregisteredUserException.java
 /mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/repositories/CompanyRepository.java
 /mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/repositories/RoleRepository.java
 /mnt/d/Languages and Develoment/my_projects/RMIS/RMIS-01/RMIS/RMIS/rmis-BE/rmis/src/main/java/com/rmis/rmis/services/impl/ApplicationCompanyDetailsService.java
