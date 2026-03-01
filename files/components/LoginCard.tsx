@@ -45,14 +45,14 @@ export default function LoginCard() {
   const getLoginEndpoint = (role: string): string => {
     switch (role) {
       case "Technician":
-        return "http://localhost:8080/auth/technician/login";
+        return "http://localhost:5050/auth/technician/login";
       case "Company":
-        return "http://localhost:8080/auth/company/login";
+        return "http://localhost:5050/auth/company/login";
       case "Public User":
         // Return a placeholder - you'll need to implement this endpoint
-        return "http://localhost:8080/auth/public/login";
+        return "http://localhost:5050/auth/user/login";
       default:
-        return "http://localhost:8080/auth/technician/login";
+        return "http://localhost:5050/auth/technician/login";
     }
   };
 
@@ -106,26 +106,26 @@ export default function LoginCard() {
           localStorage.setItem('token', data.accessToken);
           localStorage.setItem('user', JSON.stringify({
             email: data.email,
-            role: data.role
+            role: role
           }));
         } else {
           // Use sessionStorage if not remember me
           sessionStorage.setItem('token', data.accessToken);
           sessionStorage.setItem('user', JSON.stringify({
             email: data.email,
-            role: data.role
+            role: role
           }));
         }
       }
 
       // Redirect based on role
-      const userRole = data.role || role;
-      if (userRole.includes("ADMIN")) {
-        router.push("/admin/dashboard");
-      } else if (userRole.includes("TECHNICIAN")) {
-        router.push("/technician/dashboard");
-      } else if (userRole.includes("COMPANY")) {
+      // Use the selected tab role since backend doesn't return role in response
+      if (role === "Company") {
         router.push("/company/dashboard");
+      } else if (role === "Technician") {
+        router.push("/technician/dashboard");
+      } else if (role === "Public User") {
+        router.push("/dashboard");
       } else {
         router.push("/dashboard");
       }
