@@ -4,18 +4,23 @@ import LoginCard from "../components/LoginCard";
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen w-full overflow-hidden">
+    <div className="relative h-screen w-screen overflow-hidden">
       {/* Background Image */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/background.png')" }}
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `url('/background.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
       />
+      
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/40" />
 
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-black/10" />
-
-      {/* Content */}
-      <div className="relative z-10 flex min-h-screen items-center justify-between px-10 py-16 max-w-7xl mx-auto">
+      {/* Main Content - Full height, no scroll */}
+      <div className="relative h-full w-full flex items-center justify-between px-10 py-16 max-w-7xl mx-auto">
         {/* Left Side Text */}
         <div className="max-w-lg text-white flex-1">
           {/* Logo */}
@@ -36,17 +41,17 @@ export default function Home() {
                 />
               </svg>
             </div>
-            <span className="text-base font-semibold tracking-wide">
+            <span className="text-base font-semibold tracking-wide text-white drop-shadow-lg">
               Ministry of Environment
             </span>
           </div>
 
-          <h1 className="text-5xl font-black leading-tight text-gray-900 drop-shadow-sm">
+          <h1 className="text-5xl font-black leading-tight text-white drop-shadow-lg">
             Preserving our natural heritage for a{" "}
-            <span className="text-emerald-600">sustainable tomorrow.</span>
+            <span className="text-emerald-300">sustainable tomorrow.</span>
           </h1>
 
-          <p className="mt-6 text-base text-gray-800 font-medium leading-relaxed">
+          <p className="mt-6 text-base text-white/90 font-medium leading-relaxed drop-shadow">
             Unified Access Portal for public users, technicians, and partner
             companies. Together for a greener planet.
           </p>
@@ -58,24 +63,23 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Bottom Footer */}
-      <div className="absolute bottom-6 left-0 right-0 text-center text-sm text-gray-200 font-medium z-10 flex items-center justify-center gap-6">
-        {/* <span>© 2024 Ministry of Environment</span> */}
-        <p className="text-white-400 text-sm">
+      {/* Bottom Footer - Fixed at bottom */}
+      <div className="absolute bottom-6 left-0 right-0 text-center text-sm text-white/80 font-medium flex items-center justify-center gap-6">
+        <p>
           &copy; {new Date().getFullYear()} RMIS. All rights reserved.
         </p>
-        <span className="text-gray-400">·</span>
-        <a href="#" className="hover:text-emerald-400 transition">
+        <span className="text-white/40">·</span>
+        <a href="#" className="hover:text-emerald-300 transition">
           Privacy Policy
         </a>
-        <span className="text-gray-400">·</span>
-        <a href="#" className="hover:text-emerald-400 transition">
+        <span className="text-white/40">·</span>
+        <a href="#" className="hover:text-emerald-300 transition">
           Accessibility
         </a>
       </div>
 
       {/* Floating Profile Button */}
-      <div className="absolute bottom-8 right-8 bg-emerald-600 hover:bg-emerald-700 transition text-white h-14 w-14 rounded-full flex items-center justify-center shadow-xl cursor-pointer z-10">
+      <div className="absolute bottom-8 right-8 bg-emerald-600 hover:bg-emerald-700 transition text-white h-14 w-14 rounded-full flex items-center justify-center shadow-xl cursor-pointer">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-6 w-6"
@@ -91,6 +95,6 @@ export default function Home() {
           />
         </svg>
       </div>
-    </main>
+    </div>
   );
 }

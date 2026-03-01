@@ -1,6 +1,6 @@
 "use client";
 
-import SignupCard from "../components/SignupCard";
+import SignupCard from "@/components/SignupCard";
 
 export default function SignupPage() {
   return (
