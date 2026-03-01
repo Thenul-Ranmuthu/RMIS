@@ -35,38 +35,6 @@ public class SecurityConfig {
 
     @Value("${app.cors.allowed-origins}")//http://localhost:3000
     private String allowedOriginsProperty;
-    
-
-    // ---- Inject both UserDetailsService implementations ----
-
-    private final UserDetailsService companyDetailsService;
-    // private final UserDetailsService publicUserDetailsService;
-
-    public SecurityConfig(
-            @Qualifier("applicationCompanyDetailsService") UserDetailsService companyDetailsService
-            // @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService
-    ) {
-        this.companyDetailsService = companyDetailsService;
-        // this.publicUserDetailsService = publicUserDetailsService;
-    }
-
-    // ---- Authentication Providers ----
-
-    @Bean
-    public AuthenticationProvider companyAuthenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(companyDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
-
-    // @Bean
-    // public AuthenticationProvider publicUserAuthenticationProvider() {
-    //     DaoAuthenticationProvider provider = new DaoAuthenticationProvider(publicUserDetailsService);
-    //     provider.setPasswordEncoder(passwordEncoder());
-    //     return provider;
-    // }
-
-
 
     // ---- Inject both UserDetailsService implementations ----
 

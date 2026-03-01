@@ -29,7 +29,7 @@ public class PublicUserAuthServiceImpl implements PublicUserAuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RoleRepository roleRepository;
     private final AuthenticationProvider authenticationProvider;
-    private final LoginAttemptService loginAttemptService;
+    private final LoginAttemptService<PublicUser> loginAttemptService;
 
     public PublicUserAuthServiceImpl(
             PublicUserRepository userRepo,
@@ -75,44 +75,33 @@ public class PublicUserAuthServiceImpl implements PublicUserAuthService {
         ));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtTokenProvider.generateToken(authentication);
+        String token = jwtTokenProvider.generateToken(authentication, "PUBLIC");
 
         return token;
     }
 
     @Override
-    //@Transactional
     public String publicUserLogin(LoginDto userDTO){
-        // 1) Find user (needed to update attempts/lockedUntil)
         PublicUser user = userRepo.findByEmail(userDTO.getEmail())
-                // 2) don’t reveal existence
                 .orElseThrow(() -> new BadCredentialsException("Bad credentials"));
-        System.out.println("User: " + user.toString());
 
-        // 3 + 4) check lock / reset if lock expired
         loginAttemptService.preAuthenticateCheck(user);
-        System.out.println("pre authenticated");
-
         try {
-            // 5) authenticate
-            Authentication authentication = authenticationProvider.authenticate(
+                    Authentication authentication = authenticationProvider.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             userDTO.getEmail(),
                             userDTO.getPassword()
                     )
             );
 
-            // 6) success -> reset attempts
             loginAttemptService.onSuccess(user);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String token =  jwtTokenProvider.generateToken(authentication);
-            System.out.println("Authentication successful");
+            String token =  jwtTokenProvider.generateToken(authentication, "PUBLIC");
             return token;
 
         } catch (BadCredentialsException ex) {
 
-            // 7) failure -> increment attempts + lock if needed
             loginAttemptService.onFailure(user);
 
             int remaining = loginAttemptService.remainingAttempts(user);
