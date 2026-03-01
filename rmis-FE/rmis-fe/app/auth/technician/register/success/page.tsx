@@ -1,62 +1,47 @@
-// app/auth/technician/register/success/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import AuthLayout from "@/components/auth/AuthLayout";
+import { useSearchParams } from "next/navigation";
 
-const CheckIcon = () => (
-  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2">
-    <circle cx="12" cy="12" r="10"/>
-    <path d="M8 12l3 3 6-6"/>
-  </svg>
-);
-
-export default function TechnicianRegisterSuccessPage() {
-  const [email, setEmail] = useState("");
-
-  useEffect(() => {
-    const stored = sessionStorage.getItem("registered_tech_email");
-    if (stored) setEmail(stored);
-  }, []);
+export default function RegistrationSuccessPage() {
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email");
 
   return (
-    <AuthLayout>
-      <div className="auth-form-container" style={{ textAlign: "center" }}>
-        <div style={{ marginBottom: 24 }}>
-          <CheckIcon />
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50">
+      <div className="bg-white rounded-3xl shadow-2xl w-[500px] p-12 text-center">
+        <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
         </div>
-
-        <h1>Registration Submitted!</h1>
-        <p className="subtitle" style={{ marginBottom: 16 }}>
-          Thank you for registering as a technician.
-        </p>
-
-        <div className="alert alert-info" style={{ textAlign: "left", marginBottom: 24 }}>
-          <strong>Next Steps:</strong>
-          <ul style={{ marginTop: 8, paddingLeft: 20 }}>
-            <li>Your application is now pending admin review</li>
-            <li>You will receive an email notification once your certifications are verified</li>
-            <li>After approval, you will be visible in the public technician directory</li>
-            <li>You can then log in and start receiving service requests</li>
-          </ul>
-        </div>
-
-        {email && (
-          <p style={{ marginBottom: 24, color: "var(--text-light)" }}>
-            A confirmation has been sent to: <strong>{email}</strong>
+        
+        <h1 className="text-3xl font-black text-gray-900 mb-4">Registration Submitted!</h1>
+        
+        <div className="bg-emerald-50 rounded-xl p-4 mb-6">
+          <p className="text-emerald-800 text-sm">
+            A verification email has been sent to <span className="font-bold">{email}</span>
           </p>
-        )}
-
-        <div style={{ display: "flex", gap: 16, justifyContent: "center" }}>
-          <Link href="/" className="btn-secondary">
-            Go to Homepage
+        </div>
+        
+        <p className="text-gray-600 mb-8">
+          Your technician account is now <span className="font-semibold text-amber-600">Pending Approval</span>. 
+          We'll notify you once an admin reviews and verifies your certifications.
+        </p>
+        
+        <div className="space-y-3">
+          <Link
+            href="/"
+            className="block w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl text-base font-bold shadow-lg shadow-emerald-100 transition-all duration-200"
+          >
+            Return to Home
           </Link>
-          <Link href="/auth/login?role=technician" className="btn-primary">
-            Sign In →
-          </Link>
+          
+          <p className="text-sm text-gray-500">
+            Need help? <Link href="/contact" className="text-emerald-600 font-semibold hover:underline">Contact Support</Link>
+          </p>
         </div>
       </div>
-    </AuthLayout>
+    </main>
   );
 }
