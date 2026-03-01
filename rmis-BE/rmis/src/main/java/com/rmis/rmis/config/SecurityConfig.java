@@ -74,10 +74,8 @@ public class SecurityConfig {
                 .cors(cors -> {}) // enables CORS support using corsConfigurationSource bean
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/company/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/sendMail/**").permitAll()
-                        .requestMatchers("/auth/user/**").permitAll()
-                        // .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
