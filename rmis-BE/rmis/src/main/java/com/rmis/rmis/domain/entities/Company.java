@@ -45,7 +45,7 @@ public class Company implements LockableAccount {
     @JoinColumn(name = "role_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user_role"))
     private Role role;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "integer default 0")
     private Integer failedLoginAttempts = 0;
 
     private LocalDateTime lockedUntil = null;

@@ -33,7 +33,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${app.cors.allowed-origins}")//http://localhost:3000
+    @Value("${app.cors.allowed-origins}") // http://localhost:3000
     private String allowedOriginsProperty;
 
     // ---- Inject both UserDetailsService implementations ----
@@ -43,8 +43,7 @@ public class SecurityConfig {
 
     public SecurityConfig(
             @Qualifier("applicationCompanyDetailsService") UserDetailsService companyDetailsService,
-            @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService
-    ) {
+            @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService) {
         this.companyDetailsService = companyDetailsService;
         this.publicUserDetailsService = publicUserDetailsService;
     }
@@ -67,20 +66,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   JwtAuthenticationFilter jwtAuthenticationFilter,
-                                                   JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) throws Exception {
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {}) // enables CORS support using corsConfigurationSource bean
+                .cors(cors -> {
+                }) // enables CORS support using corsConfigurationSource bean
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/sendMail/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .requestMatchers("/api/password-reset/**").permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         // Register our JWT filter before the UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -95,8 +94,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(
                 Arrays.stream(allowedOriginsProperty.split(","))
                         .map(String::trim)
-                        .collect(Collectors.toList())
-        );
+                        .collect(Collectors.toList()));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
@@ -112,7 +110,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }

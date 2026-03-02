@@ -1,3 +1,5 @@
 rmis-FE/rmis-fe/node_modules
 rmis-BE/rmis/src/main/resources/application.properties
 rmis-BE/rmis/target
+rmis-FE/rmis-fe/.next
+rmis-FE/rmis-fe/.env
