@@ -9,4 +9,6 @@ import com.rmis.rmis.domain.entities.Company;
 @Repository
 public interface CompanyRepository extends CrudRepository<Company, Long>{
     Optional<Company> findByEmail(String email);
+
+    boolean existsByEmail(String email);
 } 

@@ -29,7 +29,9 @@ public class AdminAuthController {
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String token = jwtTokenProvider.generateToken(authentication);
+
+            // Generate token with userType "ADMIN"
+            String token = jwtTokenProvider.generateToken(authentication, "ADMIN");
 
             JwtAuthResponse response = new JwtAuthResponse();
             response.setAccessToken(token);
@@ -39,6 +41,7 @@ public class AdminAuthController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            log.error("Login failed for admin: {}", loginDto.getEmail(), e);
             return ResponseEntity.status(401).body("{\"error\": \"Invalid credentials\"}");
         }
     }

@@ -9,10 +9,7 @@ import com.resend.Resend;
 import com.resend.services.emails.model.CreateEmailOptions;
 import com.rmis.rmis.services.impl.CodeGeneratorService;
 
-// import lombok.AllArgsConstructor;
-
 @RestController
-// @AllArgsConstructor
 public class EmailController {
     
     @Value("${app.mail.resend.api}")
@@ -29,7 +26,7 @@ public class EmailController {
         Resend resend = new Resend(resendApiKey);
 
         CreateEmailOptions params = CreateEmailOptions.builder()
-            .from("Acme <onboarding@resend.dev>")
+            .from("RMIS <rmis.verify@rmis.space>")
             .to(email)
             .subject("RMIS verification code")
             .html("""

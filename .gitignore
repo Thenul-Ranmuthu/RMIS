@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 rmis-FE/rmis-fe/node_modules
 rmis-BE/rmis/src/main/resources/application.properties
 rmis-BE/rmis/target
@@ -15,3 +16,7 @@ replay_pid*
 .next
 node_modules
 .env
+rmis-FE/node_modules
+rmis-BE/rmis/src/main/resources/application.properties
+rmis-BE/rmis/target
+

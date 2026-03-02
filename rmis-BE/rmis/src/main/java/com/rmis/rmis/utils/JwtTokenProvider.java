@@ -24,7 +24,7 @@ public class JwtTokenProvider {
     private long jwtExpirationDate;
 
     // generate JWT token
-    public String generateToken(Authentication authentication){
+    public String generateToken(Authentication authentication, String userType){
         String username = authentication.getName();
         Collection<?> authorities = authentication.getAuthorities();
         List<String> roles = authorities.stream()
@@ -37,6 +37,7 @@ public class JwtTokenProvider {
         String token = Jwts.builder()
                 .subject(username)
                 .claim("roles", roles)
+                .claim("userType", userType)
                 .issuedAt(new Date())
                 .expiration(expireDate)
                 .signWith(key())
@@ -64,7 +65,7 @@ public class JwtTokenProvider {
         }
     }
 
-    // validate JWT token - FIXED with proper error handling
+    // validate JWT token - with comprehensive error handling
     public boolean validateToken(String token){
         try {
             Jwts.parser()
@@ -84,5 +85,19 @@ public class JwtTokenProvider {
             System.err.println("JWT claims string is empty: " + e.getMessage());
         }
         return false;
+    }
+
+    public String getUserType(String token) {
+        try {
+            return Jwts.parser()
+                    .verifyWith((SecretKey) key())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .get("userType", String.class);
+        } catch (Exception e) {
+            System.err.println("Error getting userType from token: " + e.getMessage());
+            return null;
+        }
     }
 }
