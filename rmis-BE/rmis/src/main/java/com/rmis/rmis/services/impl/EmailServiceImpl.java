@@ -17,7 +17,7 @@ public class EmailServiceImpl implements EmailService {
         Resend resend = new Resend(resendApiKey);
 
         CreateEmailOptions params = CreateEmailOptions.builder()
-                .from("RMIS Support <rmis.verify@rmis.space>")
+                .from("RMIS Support <onboarding@resend.dev>")
                 .to(email)
                 .subject("Password Reset Request - RMIS")
                 .html("""
@@ -40,8 +40,9 @@ public class EmailServiceImpl implements EmailService {
         try {
             resend.emails().send(params);
         } catch (Exception e) {
-            // In a real app, you'd log this properly
+            // Log the error and rethrow to allow the caller (Controller) to handle it
             System.err.println("Failed to send password reset email to " + email + ": " + e.getMessage());
+            throw new RuntimeException("Failed to send email: " + e.getMessage(), e);
         }
     }
 }

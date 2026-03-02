@@ -11,7 +11,7 @@ import com.rmis.rmis.services.impl.CodeGeneratorService;
 
 @RestController
 public class EmailController {
-    
+
     @Value("${app.mail.resend.api}")
     private String resendApiKey;
 
@@ -22,21 +22,21 @@ public class EmailController {
     }
 
     @RequestMapping(path = "/sendMail/{email}")
-    public String sendEmail(@PathVariable("email") String email){
+    public String sendEmail(@PathVariable("email") String email) {
         Resend resend = new Resend(resendApiKey);
 
         CreateEmailOptions params = CreateEmailOptions.builder()
-            .from("RMIS <rmis.verify@rmis.space>")
-            .to(email)
-            .subject("RMIS verification code")
-            .html("""
-                <h1>Welcome to RMIS!</h1>
-                <p>Thank you for registering.</p>
-                </br>
-                <p>Verification code: %s</p>
-            """.formatted(codeGeneratorService.generateCode(email, 5)))
-            .build();
-        
+                .from("Acme <onboarding@resend.dev>")
+                .to(email)
+                .subject("RMIS verification code")
+                .html("""
+                            <h1>Welcome to RMIS!</h1>
+                            <p>Thank you for registering.</p>
+                            </br>
+                            <p>Verification code: %s</p>
+                        """.formatted(codeGeneratorService.generateCode(email, 5)))
+                .build();
+
         try {
             resend.emails().send(params);
             System.out.println("Sending Email");
@@ -46,10 +46,5 @@ public class EmailController {
             return e.getMessage();
         }
     }
-
-    
-
-
-
 
 }
