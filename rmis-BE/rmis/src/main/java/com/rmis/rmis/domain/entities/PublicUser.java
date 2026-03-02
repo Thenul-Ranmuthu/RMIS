@@ -1,5 +1,6 @@
 package com.rmis.rmis.domain.entities;
 
+import com.rmis.rmis.security.interfaces.LockableAccount;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,13 +9,14 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "PublicUser")
+
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class PublicUser {
+@NoArgsConstructor
+@Entity
+@Table(name = "PublicUser")
+public class PublicUser implements LockableAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,5 +48,5 @@ public class PublicUser {
     @Column(nullable = false)
     private Integer failedLoginAttempts = 0;
 
-    private LocalDateTime lockedUntil;
+    private LocalDateTime lockedUntil = null;
 }

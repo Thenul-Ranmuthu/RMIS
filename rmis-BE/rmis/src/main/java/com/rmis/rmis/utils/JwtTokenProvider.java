@@ -38,7 +38,7 @@ public class JwtTokenProvider {
         String token = Jwts.builder()
                 .subject(username)
                 .claim("roles", roles)
-                .claim("userType", userType) 
+                .claim("userType", userType)
                 .issuedAt(new Date())
                 .expiration(expireDate)
                 .signWith(key())
@@ -70,7 +70,7 @@ public class JwtTokenProvider {
                     .parse(token);
         return true;
     }
-        
+
         public String getUserType(String token) {
                 return Jwts.parser()
                 .verifyWith((SecretKey) key())

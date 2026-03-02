@@ -29,11 +29,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     UserDetailsService applicationCompanyDetailsService;
 
     @Autowired
-    @Qualifier("applicationPublicUserDetailsService") 
+    @Qualifier("applicationPublicUserDetailsService")
     UserDetailsService applicationPublicUserDetailsService;
 
     @Autowired
-    @Qualifier("applicationTechnicianDetailsService") 
+    @Qualifier("applicationTechnicianDetailsService")
     UserDetailsService applicationTechnicianUserDetailsService;
 
     public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {

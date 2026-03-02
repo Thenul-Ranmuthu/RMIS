@@ -22,31 +22,29 @@ import java.util.Map;
 @AllArgsConstructor
 @RequestMapping("auth/user")
 public class PublicUserAuthController {
-
     private PublicUserAuthService publicUserAuthService;
-
     private CodeGeneratorService codeGeneratorService;
 
 
 
     @RequestMapping("/login")
     public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto userLoginDto) {
-        String token = publicUserAuthService.publicUserLogin(userLoginDto);
+            String token = publicUserAuthService.publicUserLogin(userLoginDto);
 
-        JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
-        jwtAuthResponse.setAccessToken(token);
+            JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
+            jwtAuthResponse.setAccessToken(token);
 
-        return new ResponseEntity<>(jwtAuthResponse,HttpStatus.OK);
+            return new ResponseEntity<>(jwtAuthResponse, HttpStatus.OK);
     }
 
     @RequestMapping("/register/{code}")
-    public ResponseEntity<?> register(@RequestBody PublicUserRegisterDto publicUserRegisterDto, @PathVariable("code") String code) {
+    public ResponseEntity<?> register(@RequestBody PublicUserRegisterDto userRegDTO, @PathVariable("code") String code) {
         String token;
 
-        if (codeGeneratorService.validateCode(publicUserRegisterDto.getEmail(), code)) {
+        if (codeGeneratorService.validateCode(userRegDTO.getEmail(), code)) {
 
             try {
-                token = publicUserAuthService.publicUserRegistration(publicUserRegisterDto);
+                token = publicUserAuthService.publicUserRegistration(userRegDTO);
             } catch (RegisterUserAlreadyExistsException e) {
                 Map<String,String> errorResponse = new HashMap<>();
                 errorResponse.put("error", e.getMessage());
