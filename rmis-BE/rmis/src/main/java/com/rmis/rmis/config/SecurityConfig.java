@@ -40,14 +40,14 @@ public class SecurityConfig {
     // ---- Inject both UserDetailsService implementations ----
 
     private final UserDetailsService companyDetailsService;
-    // private final UserDetailsService publicUserDetailsService;
+    private final UserDetailsService publicUserDetailsService;
 
     public SecurityConfig(
-            @Qualifier("applicationCompanyDetailsService") UserDetailsService companyDetailsService
-            // @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService
+            @Qualifier("applicationCompanyDetailsService") UserDetailsService companyDetailsService,
+            @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService
     ) {
         this.companyDetailsService = companyDetailsService;
-        // this.publicUserDetailsService = publicUserDetailsService;
+        this.publicUserDetailsService = publicUserDetailsService;
     }
 
     // ---- Authentication Providers ----
@@ -59,12 +59,12 @@ public class SecurityConfig {
         return provider;
     }
 
-    // @Bean
-    // public AuthenticationProvider publicUserAuthenticationProvider() {
-    //     DaoAuthenticationProvider provider = new DaoAuthenticationProvider(publicUserDetailsService);
-    //     provider.setPasswordEncoder(passwordEncoder());
-    //     return provider;
-    // }
+    @Bean
+    public AuthenticationProvider publicUserAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(publicUserDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
 
 
     @Bean
@@ -77,6 +77,7 @@ public class SecurityConfig {
             .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/company/**").permitAll()
+                .requestMatchers("/auth/user/**").permitAll()
                 .requestMatchers("/sendMail/**").permitAll()
                 .anyRequest().authenticated()
             )
