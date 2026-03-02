@@ -35,18 +35,22 @@ public class SecurityConfig {
 
     @Value("${app.cors.allowed-origins}")//http://localhost:3000
     private String allowedOriginsProperty;
+    
 
     // ---- Inject both UserDetailsService implementations ----
 
     private final UserDetailsService companyDetailsService;
     private final UserDetailsService publicUserDetailsService;
+    private final UserDetailsService technicianDetailsService;
 
     public SecurityConfig(
             @Qualifier("applicationCompanyDetailsService") UserDetailsService companyDetailsService,
-            @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService
+            @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService,
+            @Qualifier("applicationTechnicianDetailsService") UserDetailsService technicianDetailsService
     ) {
         this.companyDetailsService = companyDetailsService;
         this.publicUserDetailsService = publicUserDetailsService;
+        this.technicianDetailsService = technicianDetailsService;
     }
 
     // ---- Authentication Providers ----
@@ -66,21 +70,32 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationProvider technicianAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(technicianDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JwtAuthenticationFilter jwtAuthenticationFilter,
                                                    JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> {}) // enables CORS support using corsConfigurationSource bean
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/sendMail/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> {}) // enables CORS support using corsConfigurationSource bean
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/auth/company/**").permitAll()
+                .requestMatchers("/auth/user/**").permitAll()
+                .requestMatchers("/auth/technician/**").permitAll()
+                .requestMatchers("/sendMail/**").permitAll()
+                .requestMatchers("/admin/**").permitAll()
+                .anyRequest().authenticated()
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            );
 
         // Register our JWT filter before the UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -93,9 +108,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // allow multiple origins via comma-separated property
         configuration.setAllowedOrigins(
-                Arrays.stream(allowedOriginsProperty.split(","))
-                        .map(String::trim)
-                        .collect(Collectors.toList())
+            Arrays.stream(allowedOriginsProperty.split(","))
+                  .map(String::trim)
+                  .collect(Collectors.toList())
         );
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));

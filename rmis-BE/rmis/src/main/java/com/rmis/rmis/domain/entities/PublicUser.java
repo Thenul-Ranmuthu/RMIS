@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -40,6 +41,7 @@ public class PublicUser implements LockableAccount {
     @Column(nullable = false)
     private Boolean isVerified = false;
 
+    // For future use - if client wants to implement account deactivation
     @Column(nullable = false)
     private Boolean isActive = true;
 

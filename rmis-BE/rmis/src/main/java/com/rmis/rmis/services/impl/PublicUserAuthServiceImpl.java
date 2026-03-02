@@ -15,7 +15,6 @@ import com.rmis.rmis.utils.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +25,7 @@ import org.springframework.stereotype.Service;
 public class PublicUserAuthServiceImpl implements PublicUserAuthService {
     private final PublicUserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationProvider authenticationProvider;
     private final JwtTokenProvider jwtTokenProvider;
     private final RoleRepository roleRepository;
     private final AuthenticationProvider authenticationProvider;

@@ -7,6 +7,7 @@ import com.rmis.rmis.exceptions.RegisterUserAlreadyExistsException;
 import com.rmis.rmis.exceptions.UnregisteredUserException;
 import com.rmis.rmis.services.impl.CodeGeneratorService;
 import com.rmis.rmis.services.interfaces.PublicUserAuthService;
+
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,8 @@ import java.util.Map;
 public class PublicUserAuthController {
     private PublicUserAuthService publicUserAuthService;
     private CodeGeneratorService codeGeneratorService;
+
+
 
     @RequestMapping("/login")
     public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto userLoginDto) {

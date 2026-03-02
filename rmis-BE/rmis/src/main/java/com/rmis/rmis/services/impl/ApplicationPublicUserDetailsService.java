@@ -16,14 +16,15 @@ import java.util.Set;
 
 @Service
 @AllArgsConstructor
-public class ApplicationPublicUserDetailsService implements UserDetailsService {
+public class ApplicationPublicUserDetailsService implements UserDetailsService{
     private PublicUserRepository publicUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         PublicUser publicUser = publicUserRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not exists with this email."));
 
-        Set<GrantedAuthority> authorities = new HashSet<>();
+        //Set<GrantedAuthority> authorities = new HashSet<>();
+        Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
         authorities.add(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
 
         return new User(
@@ -32,4 +33,6 @@ public class ApplicationPublicUserDetailsService implements UserDetailsService {
                 authorities
         );
     }
+
+
 }
