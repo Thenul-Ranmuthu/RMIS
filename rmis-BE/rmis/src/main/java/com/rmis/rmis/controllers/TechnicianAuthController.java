@@ -15,6 +15,7 @@ import com.rmis.rmis.domain.dtos.TechnicianRegisterResponseDto;
 import com.rmis.rmis.domain.entities.Technician;
 import com.rmis.rmis.exceptions.FileStorageException;
 import com.rmis.rmis.exceptions.RegisterUserAlreadyExistsException;
+import com.rmis.rmis.exceptions.UnverifiedTechnicianException;
 import com.rmis.rmis.services.impl.CodeGeneratorService;
 import com.rmis.rmis.services.interfaces.TechnicianAuthService;
 
@@ -70,9 +71,13 @@ public class TechnicianAuthController {
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
 
         Technician technician = technicianAuthService.getPendingTechnicians(loginDto);
+        
         if(technician == null){
-            return new ResponseEntity<>("Technician not verified!!",HttpStatus.NOT_FOUND);
+            // return new ResponseEntity<>("Technician not verified!!",HttpStatus.NOT_FOUND);
+            throw new UnverifiedTechnicianException("Technician not verified!!");
         }
+        
+        
 
         String token = technicianAuthService.login(loginDto);
 

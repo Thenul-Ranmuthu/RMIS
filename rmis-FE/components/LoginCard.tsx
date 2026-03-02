@@ -25,14 +25,14 @@ export default function LoginCard() {
   const [error, setError] = useState<string>("");
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
-    password: ""
+    password: "",
   });
 
   const roles: string[] = ["Public User", "Technician", "Company"];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     // Clear error when user starts typing
     setError("");
   };
@@ -58,7 +58,7 @@ export default function LoginCard() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validation
     if (!validateEmail(formData.email)) {
       setError("Please enter a valid email address");
@@ -75,9 +75,9 @@ export default function LoginCard() {
 
     try {
       const endpoint = getLoginEndpoint(role);
-      
+
       console.log(`Attempting login for ${role} at:`, endpoint);
-      
+
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
@@ -85,7 +85,7 @@ export default function LoginCard() {
         },
         body: JSON.stringify({
           email: formData.email,
-          password: formData.password
+          password: formData.password,
         }),
       });
 
@@ -93,7 +93,8 @@ export default function LoginCard() {
 
       if (!response.ok) {
         // Handle different error responses
-        const errorMessage = data.error || data.message || `Login failed: ${response.status}`;
+        const errorMessage =
+          data.error || data.message || `Login failed: ${response.status}`;
         throw new Error(errorMessage);
       }
 
@@ -103,18 +104,24 @@ export default function LoginCard() {
       // Store the token
       if (data.accessToken) {
         if (rememberMe) {
-          localStorage.setItem('token', data.accessToken);
-          localStorage.setItem('user', JSON.stringify({
-            email: data.email,
-            role: role
-          }));
+          localStorage.setItem("token", data.accessToken);
+          localStorage.setItem(
+            "user",
+            JSON.stringify({
+              email: data.email,
+              role: role,
+            }),
+          );
         } else {
           // Use sessionStorage if not remember me
-          sessionStorage.setItem('token', data.accessToken);
-          sessionStorage.setItem('user', JSON.stringify({
-            email: data.email,
-            role: role
-          }));
+          sessionStorage.setItem("token", data.accessToken);
+          sessionStorage.setItem(
+            "user",
+            JSON.stringify({
+              email: data.email,
+              role: role,
+            }),
+          );
         }
       }
 
@@ -129,10 +136,13 @@ export default function LoginCard() {
       } else {
         router.push("/dashboard");
       }
-
     } catch (error) {
       console.error("Login failed:", error);
-      setError(error instanceof Error ? error.message : "Login failed. Please check your credentials.");
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Login failed. Please check your credentials.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -228,8 +238,7 @@ export default function LoginCard() {
         </div>
 
         {/* Password Field */}
-        <div className="mb-5">
-          <div className="flex items-center justify-between mb-1.5">
+        {/* <div className="flex items-center justify-between mb-1.5">
             <label className="block text-sm font-semibold text-gray-700">
               Password
             </label>
@@ -244,6 +253,18 @@ export default function LoginCard() {
             >
               Forgot Password?
             </a>
+          </div> */}
+        <div className="mb-5">
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-sm font-semibold text-gray-700">
+              Password
+            </label>
+            <Link
+              href="/forgot-password"
+              className="text-sm text-emerald-600 font-medium hover:text-emerald-700 transition"
+            >
+              Forgot Password?
+            </Link>
           </div>
           <div className="relative">
             <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
@@ -366,9 +387,25 @@ export default function LoginCard() {
         >
           {isLoading ? (
             <>
-              <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                className="animate-spin h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
               Signing In...
             </>

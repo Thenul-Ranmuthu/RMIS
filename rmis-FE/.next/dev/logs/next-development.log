@@ -1,0 +1,16 @@
+[00:00:25.296] Server  LOG     ✓ Ready in 15.9s
+[00:00:25.419] Browser LOG     Attempting login for Public User at: http://localhost:5050/auth/user/login
+[00:00:25.419] Browser ERROR   Login failed: {}
+[00:00:28.505] Server  LOG     ○ Compiling / ...
+[00:00:29.536] Browser LOG     Attempting login for Public User at: http://localhost:5050/auth/user/login
+[00:00:30.299] Browser LOG     Login successful: {"accessToken":"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0aGVudWwucmFubXV0aHVAZ21haWwuY29tIiwicm9sZXMiOlsiUk9MRV9DVVNUT01FUiIsIkZhY3RvckdyYW50ZWRBdXRob3JpdHkgW2F1dGhvcml0eT1GQUNUT1JfUEFTU1dPUkQsIGlzc3VlZEF0PTIwMjYtMDMtMDJUMjE6MjA6NDguNDkyNDcyNjk3Wl0iXSwidXNlclR5cGUiOiJQVUJMSUMiLCJpYXQiOjE3NzI0ODY0NDgsImV4cCI6MTc3MjU3Mjg0OH0.6kFS3n8Na_QXjSCB4sYIeBAvBJF3YKk9mZ1br8VrDsgwm6P8o7y0XR5pFMwryEws1uqKo1vHV6f22b57Tocx_A","tokenType":"Bearer"}
+[00:00:41.152] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:41.302] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:44.838] Browser LOG     Attempting login for Public User at: http://localhost:5050/auth/user/login
+[00:00:44.991] Browser ERROR   Login failed: {}
+[00:00:51.166] Browser LOG     Attempting login for Public User at: http://localhost:5050/auth/user/login
+[00:00:51.320] Browser LOG     Login successful: {"accessToken":"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0aGVudWwucmFubXV0aHVAZ21haWwuY29tIiwicm9sZXMiOlsiUk9MRV9DVVNUT01FUiIsIkZhY3RvckdyYW50ZWRBdXRob3JpdHkgW2F1dGhvcml0eT1GQUNUT1JfUEFTU1dPUkQsIGlzc3VlZEF0PTIwMjYtMDMtMDJUMjE6MjE6MTAuMTE2ODc1NTAzWl0iXSwidXNlclR5cGUiOiJQVUJMSUMiLCJpYXQiOjE3NzI0ODY0NzAsImV4cCI6MTc3MjU3Mjg3MH0.bQvTJ-sMQKy7gy1HkGhb2wuHfBaBt02T0R1W4R7Fz8a3RX8q6Zkjz-FQEVIY_HRQo6UwRE5gz9dRdPYTbim7qw","tokenType":"Bearer"}
+[00:01:36.360] Browser LOG     Attempting login for Company at: http://localhost:5050/auth/company/login
+[00:01:36.612] Browser LOG     Login successful: {"accessToken":"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0aGVudWwucmFubXV0aHVAZ21haWwuY29tIiwicm9sZXMiOlsiUk9MRV9DT01QQU5ZIiwiRmFjdG9yR3JhbnRlZEF1dGhvcml0eSBbYXV0aG9yaXR5PUZBQ1RPUl9QQVNTV09SRCwgaXNzdWVkQXQ9MjAyNi0wMy0wMlQyMToyMTo1NS40MTQ4ODUyODhaXSJdLCJ1c2VyVHlwZSI6IkNPTVBBTlkiLCJpYXQiOjE3NzI0ODY1MTUsImV4cCI6MTc3MjU3MjkxNX0.ot10SGNWPvP3k2PuA5fYO5-yBdfmdyl_uCFmKOByEAxHXzCu0xWr9AIlMZALR8FECUg3UiCeWkhjXaB0mRHOSQ","tokenType":"Bearer"}
+[00:01:55.126] Browser LOG     Attempting login for Technician at: http://localhost:5050/auth/technician/login
+[00:01:55.391] Browser LOG     Login successful: {"accessToken":"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtZXRod2FucmFubXV0aHVAZ21haWwuY29tIiwicm9sZXMiOlsiUk9MRV9URUNITklUSUFOIiwiRmFjdG9yR3JhbnRlZEF1dGhvcml0eSBbYXV0aG9yaXR5PUZBQ1RPUl9QQVNTV09SRCwgaXNzdWVkQXQ9MjAyNi0wMy0wMlQyMToyMjoxNC4xOTk3MzcyMjdaXSJdLCJ1c2VyVHlwZSI6IlRFQ0hOSUNJQU4iLCJpYXQiOjE3NzI0ODY1MzQsImV4cCI6MTc3MjU3MjkzNH0.Mfeo5E2XCCeSQ-pIJXXODflNn-ZjvdWZnAr8snmkCWjFe8DdnZ-sdNxAMyHseUhHO8bocM_y_WtK1PHibQrUTg","tokenType":"Bearer"}

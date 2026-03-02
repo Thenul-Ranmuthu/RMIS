@@ -11,7 +11,7 @@ public class PublicUserLoginAttemptService extends AbstractLoginAttemptService<P
     private final PublicUserRepository userRepo;
 
     public PublicUserLoginAttemptService(PublicUserRepository userRepo) {
-        super(3, 5);
+        super(5, 5);
         this.userRepo = userRepo;
     }
 

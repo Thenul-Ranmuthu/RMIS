@@ -4,6 +4,7 @@ import com.rmis.rmis.exceptions.AccountLockedException;
 import com.rmis.rmis.security.interfaces.LockableAccount;
 import com.rmis.rmis.security.interfaces.LoginAttemptService;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 public abstract class AbstractLoginAttemptService<T extends LockableAccount>
@@ -24,9 +25,17 @@ public abstract class AbstractLoginAttemptService<T extends LockableAccount>
     public void preAuthenticateCheck(T user) {
         LocalDateTime now = LocalDateTime.now();
 
+        // if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(now)) {
+        //     throw new AccountLockedException(
+        //             "Account locked. Try again after " + user.getLockedUntil().toLocalTime()
+        //     );
+        // }
         if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(now)) {
+            long minutes = Duration
+            .between(LocalDateTime.now(), user.getLockedUntil())
+            .toMinutes();
             throw new AccountLockedException(
-                    "Account locked. Try again after " + user.getLockedUntil().toLocalTime()
+                    "Account locked. Try again after " + minutes + " minutes."
             );
         }
 
@@ -56,6 +65,7 @@ public abstract class AbstractLoginAttemptService<T extends LockableAccount>
         System.out.println("failed login attempts " + attempts);
 
         if (attempts >= maxFailedAttempts) {
+            
             user.setLockedUntil(now.plusMinutes(lockMinutes));
             save(user);
             throw new AccountLockedException(

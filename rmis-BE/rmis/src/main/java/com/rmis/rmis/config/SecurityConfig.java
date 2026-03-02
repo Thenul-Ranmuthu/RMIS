@@ -91,6 +91,7 @@ public class SecurityConfig {
                 .requestMatchers("/auth/technician/**").permitAll()
                 .requestMatchers("/sendMail/**").permitAll()
                 .requestMatchers("/admin/**").permitAll()
+                .requestMatchers("/api/password-reset/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
