@@ -32,6 +32,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Qualifier("applicationPublicUserDetailsService") 
     UserDetailsService applicationPublicUserDetailsService;
 
+    @Autowired
+    @Qualifier("applicationTechnicianDetailsService") 
+    UserDetailsService applicationTechnicianUserDetailsService;
+
     public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
     }
@@ -75,8 +79,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if ("COMPANY".equals(userType)) {
             return applicationCompanyDetailsService.loadUserByUsername(username);
-        } else {
+        } else if("PUBLIC".equals(userType)){
             return applicationPublicUserDetailsService.loadUserByUsername(username);
+        }else{
+            return applicationTechnicianUserDetailsService.loadUserByUsername(username);
         }
     }
 

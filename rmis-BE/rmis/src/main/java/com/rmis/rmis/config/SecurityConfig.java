@@ -41,13 +41,16 @@ public class SecurityConfig {
 
     private final UserDetailsService companyDetailsService;
     private final UserDetailsService publicUserDetailsService;
+    private final UserDetailsService technicianDetailsService;
 
     public SecurityConfig(
             @Qualifier("applicationCompanyDetailsService") UserDetailsService companyDetailsService,
-            @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService
+            @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService,
+            @Qualifier("applicationTechnicianDetailsService") UserDetailsService technicianDetailsService
     ) {
         this.companyDetailsService = companyDetailsService;
         this.publicUserDetailsService = publicUserDetailsService;
+        this.technicianDetailsService = technicianDetailsService;
     }
 
     // ---- Authentication Providers ----
@@ -66,6 +69,13 @@ public class SecurityConfig {
         return provider;
     }
 
+    @Bean
+    public AuthenticationProvider technicianAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(technicianDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -78,7 +88,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/company/**").permitAll()
                 .requestMatchers("/auth/user/**").permitAll()
+                .requestMatchers("/auth/technician/**").permitAll()
                 .requestMatchers("/sendMail/**").permitAll()
+                .requestMatchers("/admin/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

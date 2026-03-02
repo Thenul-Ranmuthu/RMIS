@@ -1,3 +1,4 @@
 rmis-FE/node_modules
 rmis-BE/rmis/src/main/resources/application.properties
 rmis-BE/rmis/target
+rmis-BE/rmis/src/main/java/com/rmis/rmis/uploads
