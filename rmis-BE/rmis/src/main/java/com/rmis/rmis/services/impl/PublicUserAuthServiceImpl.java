@@ -5,8 +5,6 @@ import com.rmis.rmis.domain.dtos.PublicUserRegisterDto;
 import com.rmis.rmis.domain.entities.PublicUser;
 import com.rmis.rmis.domain.entities.Role;
 import com.rmis.rmis.exceptions.RegisterUserAlreadyExistsException;
-import com.rmis.rmis.exceptions.UnregisteredUserException;
-import com.rmis.rmis.repositories.CompanyRepository;
 import com.rmis.rmis.repositories.PublicUserRepository;
 import com.rmis.rmis.repositories.RoleRepository;
 import com.rmis.rmis.security.interfaces.LoginAttemptService;
@@ -15,6 +13,7 @@ import com.rmis.rmis.utils.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +27,6 @@ public class PublicUserAuthServiceImpl implements PublicUserAuthService {
     private final AuthenticationProvider authenticationProvider;
     private final JwtTokenProvider jwtTokenProvider;
     private final RoleRepository roleRepository;
-    private final AuthenticationProvider authenticationProvider;
     private final LoginAttemptService<PublicUser> loginAttemptService;
 
     public PublicUserAuthServiceImpl(
