@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -31,6 +32,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+//@EnableMethodSecurity
 public class SecurityConfig {
 
     @Value("${app.cors.allowed-origins}")//http://localhost:3000
@@ -92,6 +94,7 @@ public class SecurityConfig {
                 .requestMatchers("/sendMail/**").permitAll()
                 .requestMatchers("/admin/**").permitAll()
                 .requestMatchers("/api/password-reset/**").permitAll()
+                    .requestMatchers("/api/quota-requests").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
