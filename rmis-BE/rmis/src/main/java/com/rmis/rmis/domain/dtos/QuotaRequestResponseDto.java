@@ -20,7 +20,7 @@ import java.util.UUID;
 public class QuotaRequestResponseDto {
 
     @JsonProperty("request_id")
-    private UUID requestId;
+    private String requestId;
 
     @JsonProperty("company_name")
     private String companyName;

@@ -33,6 +33,9 @@ public class QuotaRequest {
     @Column(name = "request_id", updatable = false, nullable = false)
     private UUID requestId;
 
+    @Column(name = "request_number", nullable = false, unique = true, updatable = false)
+    private Long requestNumber;
+
     // Company Reference
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -68,9 +71,6 @@ public class QuotaRequest {
 
     @Column(name = "reviewed_at")
     private LocalDateTime reviewedAt;
-
-//    @Column(name = "review_notes", columnDefinition = "TEXT")
-//    private String reviewNotes;
 
     // Audit Fields
 

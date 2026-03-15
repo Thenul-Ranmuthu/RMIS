@@ -12,13 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/quota-requests")
+@RequestMapping("/ministry/quota-requests")
 @RequiredArgsConstructor
 public class QuotaRequestsController {
     private final QuotaRequestService quotaRequestService;
 
     @GetMapping
-    //@PreAuthorize("hasRole('MINISTRY_OFFICER')")
     public ResponseEntity<List<QuotaRequestResponseDto>> getAllRequests() {
         if (quotaRequestService.getAllRequests().isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
