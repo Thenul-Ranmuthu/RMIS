@@ -95,6 +95,7 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").permitAll()
                 .requestMatchers("/api/password-reset/**").permitAll()
                     .requestMatchers("/ministry/quota-requests").permitAll()
+                    .requestMatchers("/ministry/quota-requests/paginated").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
