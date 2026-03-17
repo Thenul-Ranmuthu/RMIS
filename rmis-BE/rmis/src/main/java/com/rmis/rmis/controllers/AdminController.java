@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
@@ -25,4 +26,9 @@ public class AdminController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
+    @PatchMapping("/companyQouta/{email}/{quota}")
+    public ResponseEntity<?> addCompanyQouata(@PathVariable("email") String email, @PathVariable("quota") Long quota){
+        String response = adminService.addCompanyQouata(email, quota);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
 }

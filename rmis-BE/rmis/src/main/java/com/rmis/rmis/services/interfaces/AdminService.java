@@ -4,4 +4,6 @@ public interface AdminService {
 
     String updateTechnicianStatus(String email);
 
+    String addCompanyQouata(String email, Long quota);
+
 }

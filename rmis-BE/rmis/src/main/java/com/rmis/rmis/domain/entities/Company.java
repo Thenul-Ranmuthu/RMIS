@@ -45,6 +45,9 @@ public class Company implements LockableAccount {
     @JoinColumn(name = "role_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user_role"))
     private Role role;
 
+    @Column(nullable = true)
+    private Long quota;
+
     @Column(nullable = false)
     private Integer failedLoginAttempts = 0;
 
