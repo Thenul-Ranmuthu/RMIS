@@ -94,8 +94,7 @@ public class SecurityConfig {
                 .requestMatchers("/sendMail/**").permitAll()
                 .requestMatchers("/admin/**").permitAll()
                 .requestMatchers("/api/password-reset/**").permitAll()
-                    .requestMatchers("/ministry/quota-requests").permitAll()
-                    .requestMatchers("/ministry/quota-requests/paginated").permitAll()
+                    .requestMatchers("/ministry/quota-requests/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
