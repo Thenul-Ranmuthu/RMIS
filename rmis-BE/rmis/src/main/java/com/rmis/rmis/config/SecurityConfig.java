@@ -32,7 +32,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-//@EnableMethodSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Value("${app.cors.allowed-origins}")//http://localhost:3000
@@ -44,15 +44,18 @@ public class SecurityConfig {
     private final UserDetailsService companyDetailsService;
     private final UserDetailsService publicUserDetailsService;
     private final UserDetailsService technicianDetailsService;
+    private final UserDetailsService ministryOfficerDetailsService;
 
     public SecurityConfig(
             @Qualifier("applicationCompanyDetailsService") UserDetailsService companyDetailsService,
             @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService,
-            @Qualifier("applicationTechnicianDetailsService") UserDetailsService technicianDetailsService
+            @Qualifier("applicationTechnicianDetailsService") UserDetailsService technicianDetailsService,
+            @Qualifier("applicationMinistryOfficerDetailsService")  UserDetailsService ministryOfficerDetailsService
     ) {
         this.companyDetailsService = companyDetailsService;
         this.publicUserDetailsService = publicUserDetailsService;
         this.technicianDetailsService = technicianDetailsService;
+        this.ministryOfficerDetailsService = ministryOfficerDetailsService;
     }
 
     // ---- Authentication Providers ----
@@ -78,6 +81,13 @@ public class SecurityConfig {
         return provider;
     }
 
+    @Bean
+    public AuthenticationProvider ministryOfficerAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(ministryOfficerDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -93,8 +103,9 @@ public class SecurityConfig {
                 .requestMatchers("/auth/technician/**").permitAll()
                 .requestMatchers("/sendMail/**").permitAll()
                 .requestMatchers("/admin/**").permitAll()
+                    .requestMatchers("/ministry/auth/**").permitAll()
                 .requestMatchers("/api/password-reset/**").permitAll()
-                    .requestMatchers("/ministry/quota-requests/**").permitAll()
+                    .requestMatchers("/ministry/quota-requests/**").hasRole("MINISTRY_OFFICER")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

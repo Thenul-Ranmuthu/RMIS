@@ -1,5 +1,6 @@
 package com.rmis.rmis.utils;
 
+import com.rmis.rmis.services.impl.ApplicationMinistryOfficerDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,6 +36,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     @Qualifier("applicationTechnicianDetailsService")
     UserDetailsService applicationTechnicianUserDetailsService;
+    @Autowired
+    private ApplicationMinistryOfficerDetailsService applicationMinistryOfficerDetailsService;
 
     public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
@@ -81,6 +84,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return applicationCompanyDetailsService.loadUserByUsername(username);
         } else if("PUBLIC".equals(userType)){
             return applicationPublicUserDetailsService.loadUserByUsername(username);
+        } else if("MINISTRY_OFFICER".equals(userType)){
+            return applicationMinistryOfficerDetailsService.loadUserByUsername(username);
         }else{
             return applicationTechnicianUserDetailsService.loadUserByUsername(username);
         }

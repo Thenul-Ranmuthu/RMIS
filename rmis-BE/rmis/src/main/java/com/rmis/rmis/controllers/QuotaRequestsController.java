@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +24,7 @@ public class QuotaRequestsController {
     private final QuotaRequestService quotaRequestService;
 
     @GetMapping
+    @PreAuthorize("hasRole('MINISTRY_OFFICER')")
     public ResponseEntity<List<QuotaRequestResponseDto>> getAllRequests() {
         if (quotaRequestService.getAllRequests().isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -31,7 +33,7 @@ public class QuotaRequestsController {
     }
 
     @GetMapping("/paginated")
-    //@PreAuthorize("hasRole('MINISTRY_OFFICER')")
+    @PreAuthorize("hasRole('MINISTRY_OFFICER')")
     public ResponseEntity<PagedResponseDto<QuotaRequestResponseDto>> getQuotaRequestsPaginated(
             @RequestParam(defaultValue = "1")  int page,    // defaults to page 1
             @RequestParam(defaultValue = "5")  int limit    // defaults to 5 per page
@@ -42,6 +44,7 @@ public class QuotaRequestsController {
     }
 
     @GetMapping("/filter")
+    @PreAuthorize("hasRole('MINISTRY_OFFICER')")
     public ResponseEntity<PagedResponseDto<QuotaRequestResponseDto>> getQuotaRequestsFiltered(
             @RequestParam(required = false)
             QuotaRequestStatus status,
