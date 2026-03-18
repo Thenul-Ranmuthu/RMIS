@@ -30,18 +30,42 @@ export interface CompanyRegisterPayload {
     confirmPassword: string;
 }
 
-export interface RegisterResponse {
+export interface AuthResponse {
     token: string;
-    user: {
-        id: string;
-        email: string;
-        role: string;
-    };
+    tokenType: string;
 }
 
 // ─── Helper ───────────────────────────────────────────────────
+// Add a helper to decode the role from the JWT token
+export const getRoleFromToken = (token: string): string | null => {
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.userType || null; // ← backend puts role in 'userType'
+    } catch {
+        return null;
+    }
+};
 
-const post = async (url: string, payload: object): Promise<RegisterResponse> => {
+// Add helpers to store and retrieve token
+export const saveToken = (token: string) => {
+    localStorage.setItem('accessToken', token);
+};
+
+export const getToken = (): string | null => {
+    return localStorage.getItem('accessToken');
+};
+
+export const getRole = (): string | null => {
+    const token = getToken();
+    if (!token) return null;
+    return getRoleFromToken(token);
+};
+
+export const logout = () => {
+    localStorage.removeItem('accessToken');
+};
+
+const post = async (url: string, payload: object): Promise<AuthResponse> => {
     const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

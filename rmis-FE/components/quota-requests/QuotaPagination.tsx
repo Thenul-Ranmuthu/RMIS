@@ -3,17 +3,21 @@
 interface QuotaPaginationProps {
     currentPage: number;
     totalCount: number;
+    totalPages: number;
     pageSize: number;
     onPageChange: (page: number) => void;
+    onPageSizeChange: (pageSize: number) => void;
 }
 
 export default function QuotaPagination({
     currentPage,
     totalCount,
+    totalPages,
     pageSize,
     onPageChange,
+    onPageSizeChange,
 }: QuotaPaginationProps) {
-    const totalPages = Math.ceil(totalCount / pageSize);
+    //const totalPages = pageSize > 0 ? Math.ceil(totalCount / pageSize) : 1;
     const from = (currentPage - 1) * pageSize + 1;
     const to = Math.min(currentPage * pageSize, totalCount);
 
@@ -35,6 +39,22 @@ export default function QuotaPagination({
                 <span className="font-semibold text-slate-900 dark:text-white">{totalCount}</span>
                 {' '}requests
             </p>
+
+            {/* Page size selector */}
+            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                <label htmlFor="pageSize">Records per page:</label>
+                <select
+                    id="pageSize"
+                    value={pageSize}
+                    onChange={(e) => onPageSizeChange(Number(e.target.value))}
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-slate-900 dark:text-slate-100"
+                >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                </select>
+            </div>
 
             {/* Page controls */}
             <div className="flex items-center gap-1">

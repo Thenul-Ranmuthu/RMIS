@@ -61,7 +61,7 @@ export default function QuotaTable({ data, isLoading }: QuotaTableProps) {
             <table className="w-full text-left border-collapse">
                 <thead>
                     <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
-                        {['Request ID', 'Company Name', 'Requested Quota', 'Submission Date', 'Status', 'Actions'].map((col) => (
+                        {['Request ID', 'Company Name', 'Requested Quota (Tons)', 'Submission Date', 'Status', 'Actions'].map((col) => (
                             <th
                                 key={col}
                                 className={`px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ${col === 'Actions' ? 'text-right' : ''}`}

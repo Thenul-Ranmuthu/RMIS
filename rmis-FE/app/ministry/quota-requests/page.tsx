@@ -2,18 +2,32 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-//import { useRouter } from 'next/navigation';
+import { useState, useEffect, useMemo } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { getToken, getRole } from '@/services/authService';
 import Link from 'next/link';
-//import { useQuotaRequests, useQuotaStats } from '@/hooks/useQuotaRequests';
+import {
+    LayoutDashboard,
+    Files,
+    BarChart2,
+    Settings,
+    LogOut,
+    Search,
+    Calendar,
+    ChevronRight,
+    ChevronDown,
+    Filter,
+    Leaf,
+    FileText,
+    CheckCircle,
+    RefreshCw,
+    ChevronLeft
+} from 'lucide-react';
 import QuotaTable from '@/components/quota-requests/QuotaTable';
 import QuotaFiltersPanel from '@/components/quota-requests/QuotaFilters';
 import QuotaPagination from '@/components/quota-requests/QuotaPagination';
-//import UnauthorisedMessage from '@/components/quota-requests/UnauthorisedMessage';
-import { QuotaFilters, QuotaPaginatedResponse } from '@/types/quota';
-import { getQuotaRequests} from '@/services/quotaService';
-
-const PAGE_SIZE = 20;
+import { QuotaFilters, QuotaPaginatedResponse, QuotaStatus } from '@/types/quota';
+import { getQuotaRequests } from '@/services/quotaService';
 
 const EMPTY_FILTERS: QuotaFilters = {
     companyName: '',
@@ -22,21 +36,49 @@ const EMPTY_FILTERS: QuotaFilters = {
 };
 
 export default function QuotaRequestsPage() {
-    const [filters, setFilters] = useState<QuotaFilters>(EMPTY_FILTERS);
-    const [page, setPage] = useState(1);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // Derive state from URL params
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const pageSize = parseInt(searchParams.get('pageSize') || '5', 10);
+    const companyName = searchParams.get('companyName') || '';
+    const status = (searchParams.get('status') || '') as QuotaStatus | '';
+    const submissionDate = searchParams.get('submissionDate') || '';
+    const filters = useMemo(() => ({
+    companyName,
+    status,
+    submissionDate,
+}), [companyName, status, submissionDate]);
+
+    // ── Auth guard ────────────────────────────────────────────────
+    useEffect(() => {
+        const token = getToken();
+        const role = getRole();
+
+        if (!token) {
+            // Not logged in — redirect to login
+            router.push('/ministry');
+            return;
+        }
+
+        if (role !== 'MINISTRY_OFFICER' && role !== 'ADMIN') {
+            // Logged in but wrong role — redirect to unauthorised page
+            router.push('/unauthorised');
+        }
+    }, []);
+
+    // ── State ──────────────────────────────────────────────────────────────
+    const [activeTab, setActiveTab] = useState('quota_requests');
     const [data, setData] = useState<QuotaPaginatedResponse | null>(null);
-    //const [stats, setStats] = useState<QuotaStats | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Fetch requests whenever filters or page changes
+    // ── Fetch data whenever filters, page, or pageSize changes ────────────
     useEffect(() => {
-        console.log('useEffect triggered, filters:', filters);
         const load = async () => {
             setIsLoading(true);
             try {
-                // const result = await getQuotaRequests(filters, page);
-                const result = await getQuotaRequests(filters);
-                console.log('result:', result); // ← add this to see the full response
+                const result = await getQuotaRequests(filters, page, pageSize);
                 setData(result);
             } catch (err) {
                 console.error(err);
@@ -45,189 +87,191 @@ export default function QuotaRequestsPage() {
             }
         };
         load();
-    }, [filters]);
+}, [companyName, status, submissionDate, page, pageSize]); 
 
-    // Fetch stats once on mount
-    // useEffect(() => {
-    //     getQuotaStats().then(setStats).catch(console.error);
-    // }, []);
+    // ── Handlers ───────────────────────────────────────────────────────────
+    const handleFilterChange = (newFilters: QuotaFilters) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('companyName', newFilters.companyName);
+        params.set('status', newFilters.status);
+        params.set('submissionDate', newFilters.submissionDate);
+        params.set('page', '1'); // Reset to page 1 on filter change
+        router.push(`?${params.toString()}`, { scroll: false });
+    };
+
+    const handlePageSizeChange = (newSize: number) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('pageSize', newSize.toString());
+        params.set('page', '1'); // Reset to page 1 on page size change
+        router.push(`?${params.toString()}`, { scroll: false });
+    };
+
+    const handlePageChange = (newPage: number) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('page', newPage.toString());
+        router.push(`?${params.toString()}`, { scroll: false });
+    };
+
+    // ── Stats derived from current page data ───────────────────────────────
     const rows = data?.data ?? [];
-
     const approvedTons = rows
         .filter(r => r.status === 'APPROVED')
-        .reduce((sum, r) => sum + parseFloat(r.requested_quota.toString()), 0);
-
+        .reduce((sum, r) => sum + r.requested_quota, 0);
     const pendingCount = rows.filter(r => r.status === 'PENDING').length;
+    const totalCount = data?.totalRecords ?? 0;
 
-    const totalCount = rows.length;
-    const complianceRate = totalCount > 0
-        ? ((rows.filter(r => r.status !== 'REJECTED').length / totalCount) * 100).toFixed(1)
-        : '—';
+    const handleLogout = () => {
+        // Clear token from both storages
+        localStorage.removeItem('accessToken');
+        sessionStorage.removeItem('accessToken');
 
-    // const handleFilterChange = (newFilters: QuotaFilters) => {
-    //     setFilters(newFilters);
-    //     setPage(1);
-    // };
-
-    // // ── 401 / 403 check ──────────────────────────────────────────────────────
-    // const isUnauthorised =
-    //     error &&
-    //     'response' in (error as any) &&
-    //     [401, 403].includes((error as any).response?.status);
-
-    // // ── Render guards ─────────────────────────────────────────────────────────
-    // if (isAuthorised === null) return null; // still checking token, render nothing
-    // if (isUnauthorised) return <UnauthorisedMessage />;
+        // Redirect to ministry login
+        router.push('/ministry/auth/login');
+    };
 
     return (
-        <div className="flex flex-col min-h-screen font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+        <div style={{
+            display: 'flex',
+            minHeight: '100vh',
+            backgroundImage: `url('/bg.png')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed',
+            backgroundRepeat: 'no-repeat',
+        }}>
+            
 
-            {/* ── Header ────────────────────────────────────────────────────── */}
-            <header className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
-
-                        {/* Logo */}
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center justify-center size-10 rounded-lg bg-primary/10 text-primary">
-                                <span className="material-symbols-outlined text-3xl">eco</span>
-                            </div>
-                            <div className="flex flex-col">
-                                <h2 className="text-slate-900 dark:text-white text-lg font-bold leading-tight">
-                                    Ministry of Environment
-                                </h2>
-                                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                                    Environmental Quota Division
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Nav */}
-                        <nav className="hidden md:flex items-center gap-6">
-                            <Link href="/ministry/dashboard" className="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors">
-                                Dashboard
-                            </Link>
-                            <Link href="/ministry/quota-requests" className="text-primary text-sm font-semibold border-b-2 border-primary pb-1">
-                                Quota Requests
-                            </Link>
-                            <Link href="/ministry/reports" className="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors">
-                                Reports
-                            </Link>
-                            <Link href="/ministry/settings" className="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors">
-                                Settings
-                            </Link>
-                        </nav>
-
-                        {/* Right side */}
-                        <div className="flex items-center gap-4">
-                            <button className="bg-primary text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-primary/90 transition-all flex items-center gap-2">
-                                <span className="material-symbols-outlined text-sm">admin_panel_settings</span>
-                                Admin Dashboard
-                            </button>
-                            <div className="size-10 rounded-full border-2 border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
-                                <span className="material-symbols-outlined text-slate-400">person</span>
-                            </div>
-                        </div>
+            {/* ── Sidebar ───────────────────────────────────────────────── */}
+            <aside className="sidebar">
+                <div className="sidebar-header">
+                    <div className="logo-icon">
+                        <RefreshCw size={24} color="#2ecc71" />
+                    </div>
+                    <div className="logo-text">
+                        <h1>Ministry of Environment</h1>
+                        <span>Environmental Quota Division</span>
                     </div>
                 </div>
-            </header>
 
-            {/* ── Main ──────────────────────────────────────────────────────── */}
-            <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex flex-col gap-8">
+                <ul className="nav-links">
+                    <li
+                        className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('dashboard')}
+                    >
+                        <LayoutDashboard size={18} />
+                        <span>Dashboard</span>
+                    </li>
+                    <li
+                        className={`nav-item ${activeTab === 'quota_requests' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('quota_requests')}
+                    >
+                        <Files size={18} />
+                        <span>Quota Requests</span>
+                    </li>
+                    <li
+                        className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('reports')}
+                    >
+                        <BarChart2 size={18} />
+                        <span>Reports</span>
+                    </li>
+                    <li
+                        className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('settings')}
+                    >
+                        <Settings size={18} />
+                        <span>Settings</span>
+                    </li>
+                </ul>
 
-                    {/* Page title */}
-                    <div className="flex flex-col gap-1">
-                        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                            Quota Requests Management
-                        </h1>
-                        <p className="text-slate-500 dark:text-slate-400">
-                            Review, approve, or reject industrial environmental quota applications.
-                        </p>
+                <div className="sidebar-footer">
+                    <div className="user-profile">
+                        <div
+                            className="avatar"
+                            style={{ backgroundImage: "url('https://i.pravatar.cc/150?img=11')" }}
+                        />
+                        <div className="user-info">
+                            <h4>Admin Dashboard</h4>
+                            <span>Recs: {totalCount}</span>
+                        </div>
+                        <div style={{ marginLeft: 'auto' }}>
+                            <CheckCircle size={16} color="rgba(255,255,255,0.5)" />
+                        </div>
                     </div>
+                    <div className="logout-btn" onClick={handleLogout}>
+                        <LogOut size={18} />
+                        <span>Logout</span>
+                    </div>
+                </div>
+            </aside>
 
-                    {/* Filters
-                    <QuotaFiltersPanel onFilterChange={handleFilterChange} /> */}
+            {/* ── Main Content ──────────────────────────────────────────── */}
+            <main className="main-content">
+                <div className="page-header">
+                    <h2>Quota Requests Management</h2>
+                    <p>Review, approve, or reject industrial environmental quota applications.</p>
+                </div>
 
-                    {/* Table + Pagination */}
-                    <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                {/* Master Table Card */}
+                <div className="master-table-card">
+
+                    {/* Filters — using our working QuotaFiltersPanel */}
+                    <QuotaFiltersPanel filters={filters} onFilterChange={handleFilterChange} />
+
+                    {/* Table — using our working QuotaTable */}
+                    <div className="table-section">
                         <QuotaTable
-                            data={data?.data ?? []}
+                            data={rows}
                             isLoading={isLoading}
                         />
-                        {/* {data && (
-                            <QuotaPagination
-                                currentPage={page}
-                                totalCount={data.total}
-                                pageSize={PAGE_SIZE}
-                                onPageChange={setPage}
-                            />
-                        )} */}
-                    </section>
+                    </div>
 
-                    {/* Stats cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 p-4 rounded-xl flex items-center gap-4">
-                            <div className="size-12 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                                <span className="material-symbols-outlined text-3xl">check_circle</span>
-                            </div>
-                            <div>
-                                <p className="text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-wider">
-                                    Approved Quotas
-                                </p>
-                                <h4 className="text-2xl font-black text-slate-900 dark:text-white">
-                                    {approvedTons.toLocaleString()}{' '}
-                                    <span className="text-sm font-normal text-slate-400">Tons</span>
-                                </h4>
+                    {/* Pagination — using our working QuotaPagination */}
+                    {data && (
+                        <QuotaPagination
+                            currentPage={data.currentPage}
+                            totalCount={data.totalRecords}
+                            totalPages={data.totalPages}
+                            pageSize={pageSize}
+                            onPageChange={handlePageChange}
+                            onPageSizeChange={handlePageSizeChange}
+                        />
+                    )}
+                </div>
+
+                {/* Summary Cards */}
+                <div className="summary-cards-container" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                    <div className="summary-card">
+                        <div className="summary-icon green">
+                            <Leaf size={20} />
+                        </div>
+                        <div className="summary-info">
+                            <h3>Approved Quotas</h3>
+                            <div className="summary-value">
+                                {approvedTons.toLocaleString()} <span>Tons</span>
                             </div>
                         </div>
+                    </div>
 
-                        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 p-4 rounded-xl flex items-center gap-4">
-                            <div className="size-12 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-400">
-                                <span className="material-symbols-outlined text-3xl">pending_actions</span>
-                            </div>
-                            <div>
-                                <p className="text-xs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-wider">
-                                    Pending Review
-                                </p>
-                                <h4 className="text-2xl font-black text-slate-900 dark:text-white">
-                                    {pendingCount}{' '}
-                                    <span className="text-sm font-normal text-slate-400">Requests</span>
-                                </h4>
-                            </div>
+                    <div className="summary-card">
+                        <div className="summary-icon yellow">
+                            <FileText size={20} />
                         </div>
-
-                        <div className="bg-primary/5 border border-primary/20 p-4 rounded-xl flex items-center gap-4">
-                            <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                <span className="material-symbols-outlined text-3xl">monitoring</span>
-                            </div>
-                            <div>
-                                <p className="text-xs font-bold text-primary uppercase tracking-wider">
-                                    Total Compliance
-                                </p>
-                                <h4 className="text-2xl font-black text-slate-900 dark:text-white">
-                                    {complianceRate}%
-                                </h4>
+                        <div className="summary-info">
+                            <h3>Pending Review</h3>
+                            <div className="summary-value">
+                                {pendingCount} <span>Requests</span>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <footer className="app-footer">
+                    <span>&copy; 2024 Ministry of Environment</span>
+                    <Link href="#">All Rights Reserved.</Link>
+                    <Link href="#">Help Center</Link>
+                </footer>
             </main>
-
-            {/* ── Footer ────────────────────────────────────────────────────── */}
-            <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 mt-12 py-8">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
-                        <span className="material-symbols-outlined text-lg">policy</span>
-                        © 2024 Ministry of Environment. All Rights Reserved.
-                    </div>
-                    <div className="flex gap-6">
-                        <Link href="#" className="text-slate-500 hover:text-primary text-sm transition-colors">Privacy Policy</Link>
-                        <Link href="#" className="text-slate-500 hover:text-primary text-sm transition-colors">Terms of Service</Link>
-                        <Link href="#" className="text-slate-500 hover:text-primary text-sm transition-colors">Help Center</Link>
-                    </div>
-                </div>
-            </footer>
         </div>
     );
 }

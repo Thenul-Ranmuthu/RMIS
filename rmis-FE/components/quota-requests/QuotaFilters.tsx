@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { QuotaFilters, QuotaStatus } from '@/types/quota';
 
 interface QuotaFiltersProps {
+    filters: QuotaFilters;
     onFilterChange: (filters: QuotaFilters) => void;
 }
 
@@ -15,9 +16,15 @@ const EMPTY_FILTERS: QuotaFilters = {
     submissionDate: '',
 };
 
-export default function QuotaFiltersPanel({ onFilterChange }: QuotaFiltersProps) {
-    const [local, setLocal] = useState<QuotaFilters>(EMPTY_FILTERS);
+export default function QuotaFiltersPanel({ filters, onFilterChange }: QuotaFiltersProps) {
+    const [local, setLocal] = useState<QuotaFilters>(filters);
     const [debouncedName, setDebouncedName] = useState('');
+
+    // Sync local state with props
+    useEffect(() => {
+        setLocal(filters);
+        setDebouncedName(filters.companyName);
+    }, [filters]);
 
     // Debounce company name — waits 400ms after user stops typing before firing
     useEffect(() => {
@@ -31,9 +38,10 @@ export default function QuotaFiltersPanel({ onFilterChange }: QuotaFiltersProps)
     }, [debouncedName, local.status, local.submissionDate]);
 
     const handleClear = () => {
-        setLocal(EMPTY_FILTERS);
+        const cleared = EMPTY_FILTERS;
+        setLocal(cleared);
         setDebouncedName('');
-        onFilterChange(EMPTY_FILTERS);
+        onFilterChange(cleared);
     };
 
     return (
@@ -76,9 +84,9 @@ export default function QuotaFiltersPanel({ onFilterChange }: QuotaFiltersProps)
                             className="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white appearance-none"
                         >
                             <option value="">All Statuses</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Approved">Approved</option>
-                            <option value="Rejected">Rejected</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="APPROVED">Approved</option>
+                            <option value="REJECTED">Rejected</option>
                         </select>
                     </div>
 

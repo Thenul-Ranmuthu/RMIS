@@ -237,23 +237,6 @@ export default function LoginCard() {
           </div>
         </div>
 
-        {/* Password Field */}
-        {/* <div className="flex items-center justify-between mb-1.5">
-            <label className="block text-sm font-semibold text-gray-700">
-              Password
-            </label>
-            <a
-              href="#"
-              className="text-sm text-emerald-600 font-medium hover:text-emerald-700 transition"
-              onClick={(e) => {
-                e.preventDefault();
-                // Handle forgot password
-                alert("Please contact support to reset your password");
-              }}
-            >
-              Forgot Password?
-            </a>
-          </div> */}
         <div className="mb-5">
           <div className="flex items-center justify-between mb-1.5">
             <label className="block text-sm font-semibold text-gray-700">

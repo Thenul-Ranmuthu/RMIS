@@ -1,58 +1,37 @@
 // RMIS/files/services/quotaService.ts
 
 import { QuotaFilters, QuotaPaginatedResponse} from '@/types/quota';
+import { getToken } from '@/services/authService';
+
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
-//const PAGE_SIZE = 20;
-
-// export const getQuotaRequests = async (
-//     filters: QuotaFilters,
-//     //page: number
-// ): Promise<QuotaPaginatedResponse> => {
-//     const params = new URLSearchParams({
-//         //page: String(page),
-//         //pageSize: String(PAGE_SIZE),
-//     });
-
-//     if (filters.companyName)    params.set('companyName',    filters.companyName);
-//     if (filters.status)         params.set('status',         filters.status);
-//     if (filters.submissionDate) params.set('submissionDate', filters.submissionDate);
-
-//     //const response = await fetch(`${BASE_URL}/ministry/quota-requests?${params}`);
-//     const response = await fetch(`${BASE_URL}/ministry/quota-requests?`);
-
-//     if (!response.ok) throw new Error('Failed to fetch quota requests');
-
-//     return response.json();
-// };
 
 export const getQuotaRequests = async (
     filters: QuotaFilters,
+    page: number = 1,
+    pageSize: number = 5,
 ): Promise<QuotaPaginatedResponse> => {
     const params = new URLSearchParams();
+    params.set('page', String(page));
+    params.set('limit', String(pageSize));
 
-    if (filters.companyName)    params.set('companyName',    filters.companyName);
-    if (filters.status)         params.set('status',         filters.status);
-    if (filters.submissionDate) params.set('submissionDate', filters.submissionDate);
+    if (filters.companyName)    params.set('company_name',    filters.companyName);
+    if (filters.status)         params.set('status',          filters.status);
+    if (filters.submissionDate) params.set('submission_date', filters.submissionDate);
 
-    const url = `${BASE_URL}/ministry/quota-requests?${params}`;
-    const response = await fetch(url);
+    const hasFilters = filters.companyName || filters.status || filters.submissionDate;
+    const endpoint = hasFilters ? 'filter' : 'paginated';
+    const url = `${BASE_URL}/ministry/quota-requests/${endpoint}?${params}`;
+
+    // ← attach token to every request
+    const token = getToken();
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
 
     if (!response.ok) throw new Error('Failed to fetch quota requests');
-
-    const array = await response.json();
-
-    // Backend returns a plain array — wrap it into the shape the frontend expects
-    return {
-        data: array,
-        total: array.length,
-    };
+    return response.json();
 };
-
-// export const getQuotaStats = async (): Promise<QuotaStats> => {
-//     const response = await fetch(`${BASE_URL}/ministry/quota-requests/stats`);
-
-//     if (!response.ok) throw new Error('Failed to fetch quota stats');
-
-//     return response.json();
-// };
