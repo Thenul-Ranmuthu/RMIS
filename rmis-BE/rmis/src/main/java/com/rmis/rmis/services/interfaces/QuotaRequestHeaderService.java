@@ -5,5 +5,4 @@ import com.rmis.rmis.domain.dtos.QuotaRequestHeaderDto;
 public interface QuotaRequestHeaderService {
 
     String addQuotaRequest(QuotaRequestHeaderDto quotaRequestHeaderDto);
-
 }

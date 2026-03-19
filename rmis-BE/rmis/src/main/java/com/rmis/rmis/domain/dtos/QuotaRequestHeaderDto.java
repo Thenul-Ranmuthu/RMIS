@@ -10,6 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuotaRequestHeaderDto {
-    private String companyEmail;
+    // private String companyEmail;
     private Long requestQuata;
 }

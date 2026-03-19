@@ -1,5 +1,6 @@
 package com.rmis.rmis.services.impl;
 
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -32,12 +33,11 @@ public class QuotaRequestHeaderServiceImpl implements QuotaRequestHeaderService{
             return "Error: Insuffitient quota balance!!";
         }
         
-        // company.setQuota(company.getQuota()-quotaRequestHeaderDto.getRequestQuata());
-        // companyRepository.save(company);
 
         QuotaRequestHeader entity = new QuotaRequestHeader();
 
-        entity.setCompanyEmail(quotaRequestHeaderDto.getCompanyEmail());
+        // entity.setCompanyEmail(quotaRequestHeaderDto.getCompanyEmail());
+        entity.setCompany(company);
         entity.setRequestQuata(quotaRequestHeaderDto.getRequestQuata());
 
         quotaRequestHeaderRepository.save(entity);

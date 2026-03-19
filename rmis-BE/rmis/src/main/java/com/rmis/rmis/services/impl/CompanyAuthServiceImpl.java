@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.rmis.rmis.domain.dtos.LoginDto;
 import com.rmis.rmis.domain.dtos.CompanyRegisterDto;
 import com.rmis.rmis.domain.entities.Company;
+import com.rmis.rmis.enums.CompanyStatus;
 import com.rmis.rmis.exceptions.RegisterUserAlreadyExistsException;
 import com.rmis.rmis.repositories.CompanyRepository;
 import com.rmis.rmis.repositories.RoleRepository;
@@ -106,6 +107,15 @@ public class CompanyAuthServiceImpl implements CompanyAuthService{
         String token = jwtTokenProvider.generateToken(authentication, "COMPANY");
 
         return token;
+    }
+
+
+    @Override
+    public CompanyStatus getStatusByEmail(String email) {
+        Company company = companyRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("No company with email: " + email));
+
+        return company.getStatus();
     }
 
 }
