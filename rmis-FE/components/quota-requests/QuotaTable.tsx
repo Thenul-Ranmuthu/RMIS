@@ -1,27 +1,28 @@
-// RMIS/files/components/quota-requests/QuotaTable.tsx
+// RMIS-FE/components/quota-requests/QuotaTable.tsx
 
 import { QuotaRequest, QuotaStatus } from '@/types/quota';
 
 interface QuotaTableProps {
     data: QuotaRequest[];
     isLoading: boolean;
+    onReview: (id: string, requestId: string) => void; // ← new prop
 }
 
 const StatusBadge = ({ status }: { status: QuotaStatus }) => {
     const styles: Record<QuotaStatus, { badge: string; dot: string; label: string }> = {
         PENDING: {
             badge: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-            dot: 'bg-amber-500',
+            dot:   'bg-amber-500',
             label: 'Pending',
         },
         APPROVED: {
             badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-            dot: 'bg-emerald-500',
+            dot:   'bg-emerald-500',
             label: 'Approved',
         },
         REJECTED: {
             badge: 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400',
-            dot: 'bg-rose-500',
+            dot:   'bg-rose-500',
             label: 'Rejected',
         },
     };
@@ -32,15 +33,6 @@ const StatusBadge = ({ status }: { status: QuotaStatus }) => {
             <span className={`size-1.5 rounded-full ${s.dot} mr-1.5`} />
             {s.label}
         </span>
-    );
-};
-
-const ActionButton = ({ status }: { status: QuotaStatus }) => {
-    const label = status === 'PENDING' ? 'Review' : status === 'APPROVED' ? 'Details' : 'View Log';
-    return (
-        <button className="text-primary hover:text-primary/80 font-semibold text-sm transition-colors">
-            {label}
-        </button>
     );
 };
 
@@ -55,13 +47,19 @@ const SkeletonRow = () => (
     </tr>
 );
 
-export default function QuotaTable({ data, isLoading }: QuotaTableProps) {
+export default function QuotaTable({ data, isLoading, onReview }: QuotaTableProps) {
+    const getActionLabel = (status: QuotaStatus) => {
+        if (status === 'PENDING') return 'Review';
+        if (status === 'APPROVED') return 'Details';
+        return 'View Log';
+    };
+
     return (
         <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
                 <thead>
                     <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
-                        {['Request ID', 'Company Name', 'Requested Quota (Tons)', 'Submission Date', 'Status', 'Actions'].map((col) => (
+                        {['Request ID', 'Company Name', 'Requested Quota', 'Submission Date', 'Status', 'Actions'].map((col) => (
                             <th
                                 key={col}
                                 className={`px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ${col === 'Actions' ? 'text-right' : ''}`}
@@ -81,7 +79,6 @@ export default function QuotaTable({ data, isLoading }: QuotaTableProps) {
                         <tr>
                             <td colSpan={6} className="px-6 py-16 text-center">
                                 <div className="flex flex-col items-center gap-3 text-slate-400">
-                                    <span className="material-symbols-outlined text-5xl">inbox</span>
                                     <p className="font-semibold text-slate-500 dark:text-slate-400">No quota requests found</p>
                                     <p className="text-sm">Try adjusting your filters or check back later.</p>
                                 </div>
@@ -93,7 +90,8 @@ export default function QuotaTable({ data, isLoading }: QuotaTableProps) {
                     {!isLoading && data.map((row) => (
                         <tr
                             key={row.request_id}
-                            className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
+                            className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
+                            onClick={() => onReview(row.id, row.request_id)}
                         >
                             <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-slate-100">
                                 #{row.request_id}
@@ -102,7 +100,7 @@ export default function QuotaTable({ data, isLoading }: QuotaTableProps) {
                                 {row.company_name}
                             </td>
                             <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
-                                {row.requested_quota}
+                                {row.requested_quota.toLocaleString()} Tons
                             </td>
                             <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
                                 {new Date(row.submission_date).toLocaleDateString('en-US', {
@@ -113,10 +111,19 @@ export default function QuotaTable({ data, isLoading }: QuotaTableProps) {
                                 <StatusBadge status={row.status} />
                             </td>
                             <td className="px-6 py-4 text-right">
-                                <ActionButton status={row.status} />
+                                {/* ← calls onReview with UUID and display ID */}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onReview(row.id, row.request_id);
+                                    }}
+                                    className="text-primary hover:text-primary/80 font-semibold text-sm transition-colors"
+                                >
+                                    {getActionLabel(row.status)}
+                                </button>
                             </td>
                         </tr>
-                    ))}
+                    ))} 
                 </tbody>
             </table>
         </div>

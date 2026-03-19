@@ -236,14 +236,14 @@ export default function MinistryLoginCard() {
 
                 <p className="text-center text-sm text-gray-500 mt-6">
                     Need an account?{" "}
-                    <Link href="/ministry/register" className="text-emerald-600 font-semibold hover:text-emerald-700 transition">
+                    <Link href="/ministry/auth/register" className="text-emerald-600 font-semibold hover:text-emerald-700 transition">
                         Register as Officer →
                     </Link>
                 </p>
 
                 <p className="text-center text-sm text-gray-500 mt-3">
                     Not a ministry officer?{" "}
-                    <Link href="/login" className="text-gray-400 font-medium hover:text-gray-600 transition">
+                    <Link href="/" className="text-gray-400 font-medium hover:text-gray-600 transition">
                         Back to main login
                     </Link>
                 </p>

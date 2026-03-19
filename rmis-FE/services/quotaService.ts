@@ -1,11 +1,17 @@
-// RMIS/files/services/quotaService.ts
+// RMIS-FE/services/quotaService.ts
 
-import { QuotaFilters, QuotaPaginatedResponse} from '@/types/quota';
+import { QuotaFilters, QuotaPaginatedResponse, QuotaRequestDetail } from '@/types/quota';
 import { getToken } from '@/services/authService';
-
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
 
+// ── Helper: build auth headers ─────────────────────────────────────────────
+const authHeaders = () => ({
+    'Authorization': `Bearer ${getToken()}`,
+    'Content-Type': 'application/json',
+});
+
+// ── Get paginated/filtered list ────────────────────────────────────────────
 export const getQuotaRequests = async (
     filters: QuotaFilters,
     page: number = 1,
@@ -23,15 +29,15 @@ export const getQuotaRequests = async (
     const endpoint = hasFilters ? 'filter' : 'paginated';
     const url = `${BASE_URL}/ministry/quota-requests/${endpoint}?${params}`;
 
-    // ← attach token to every request
-    const token = getToken();
-    const response = await fetch(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        },
-    });
-
+    const response = await fetch(url, { headers: authHeaders() });
     if (!response.ok) throw new Error('Failed to fetch quota requests');
+    return response.json();
+};
+
+// ── Get single request detail by UUID ─────────────────────────────────────
+export const getQuotaRequestById = async (id: string): Promise<QuotaRequestDetail> => {
+    const url = `${BASE_URL}/ministry/quota-requests/${id}`;
+    const response = await fetch(url, { headers: authHeaders() });
+    if (!response.ok) throw new Error('Failed to fetch quota request detail');
     return response.json();
 };

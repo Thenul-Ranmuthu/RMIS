@@ -1,4 +1,4 @@
-// RMIS/files/app/ministry/quota-requests/page.tsx
+// RMIS-FE/app/ministry/quota-requests/page.tsx
 
 'use client';
 
@@ -12,20 +12,15 @@ import {
     BarChart2,
     Settings,
     LogOut,
-    Search,
-    Calendar,
-    ChevronRight,
-    ChevronDown,
-    Filter,
     Leaf,
     FileText,
-    CheckCircle,
     RefreshCw,
-    ChevronLeft
+    CheckCircle,
 } from 'lucide-react';
 import QuotaTable from '@/components/quota-requests/QuotaTable';
 import QuotaFiltersPanel from '@/components/quota-requests/QuotaFilters';
 import QuotaPagination from '@/components/quota-requests/QuotaPagination';
+import QuotaReviewModal from '@/components/quota-requests/QuotaReviewModal';
 import { QuotaFilters, QuotaPaginatedResponse, QuotaStatus } from '@/types/quota';
 import { getQuotaRequests } from '@/services/quotaService';
 
@@ -39,41 +34,42 @@ export default function QuotaRequestsPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // Derive state from URL params
+    // ── URL-derived state ──────────────────────────────────────────────────
     const page = parseInt(searchParams.get('page') || '1', 10);
     const pageSize = parseInt(searchParams.get('pageSize') || '5', 10);
     const companyName = searchParams.get('companyName') || '';
     const status = (searchParams.get('status') || '') as QuotaStatus | '';
     const submissionDate = searchParams.get('submissionDate') || '';
     const filters = useMemo(() => ({
-    companyName,
-    status,
-    submissionDate,
-}), [companyName, status, submissionDate]);
+        companyName,
+        status,
+        submissionDate,
+    }), [companyName, status, submissionDate]);
 
-    // ── Auth guard ────────────────────────────────────────────────
-    useEffect(() => {
-        const token = getToken();
-        const role = getRole();
-
-        if (!token) {
-            // Not logged in — redirect to login
-            router.push('/ministry');
-            return;
-        }
-
-        if (role !== 'MINISTRY_OFFICER' && role !== 'ADMIN') {
-            // Logged in but wrong role — redirect to unauthorised page
-            router.push('/unauthorised');
-        }
-    }, []);
-
-    // ── State ──────────────────────────────────────────────────────────────
+    // ── Component state ────────────────────────────────────────────────────
     const [activeTab, setActiveTab] = useState('quota_requests');
     const [data, setData] = useState<QuotaPaginatedResponse | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // ── Fetch data whenever filters, page, or pageSize changes ────────────
+    // ── Modal state ────────────────────────────────────────────────────────
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedId, setSelectedId] = useState<string | null>(null);       // UUID
+    const [selectedRequestId, setSelectedRequestId] = useState<string>('');  // REQ-0001
+
+    // ── Auth guard ─────────────────────────────────────────────────────────
+    useEffect(() => {
+        const token = getToken();
+        const role = getRole();
+        if (!token) {
+            router.push('/ministry');
+            return;
+        }
+        if (role !== 'MINISTRY_OFFICER' && role !== 'ADMIN') {
+            router.push('/unauthorised');
+        }
+    }, []);
+
+    // ── Fetch data ─────────────────────────────────────────────────────────
     useEffect(() => {
         const load = async () => {
             setIsLoading(true);
@@ -87,7 +83,7 @@ export default function QuotaRequestsPage() {
             }
         };
         load();
-}, [companyName, status, submissionDate, page, pageSize]); 
+    }, [companyName, status, submissionDate, page, pageSize]);
 
     // ── Handlers ───────────────────────────────────────────────────────────
     const handleFilterChange = (newFilters: QuotaFilters) => {
@@ -95,14 +91,14 @@ export default function QuotaRequestsPage() {
         params.set('companyName', newFilters.companyName);
         params.set('status', newFilters.status);
         params.set('submissionDate', newFilters.submissionDate);
-        params.set('page', '1'); // Reset to page 1 on filter change
+        params.set('page', '1');
         router.push(`?${params.toString()}`, { scroll: false });
     };
 
     const handlePageSizeChange = (newSize: number) => {
         const params = new URLSearchParams(searchParams);
         params.set('pageSize', newSize.toString());
-        params.set('page', '1'); // Reset to page 1 on page size change
+        params.set('page', '1');
         router.push(`?${params.toString()}`, { scroll: false });
     };
 
@@ -112,22 +108,59 @@ export default function QuotaRequestsPage() {
         router.push(`?${params.toString()}`, { scroll: false });
     };
 
-    // ── Stats derived from current page data ───────────────────────────────
+    // ── Modal handlers ─────────────────────────────────────────────────────
+    const handleReview = (id: string, requestId: string) => {
+        console.log('handleReview called:', id, requestId); // Debug log
+        setSelectedId(id);
+        setSelectedRequestId(requestId);
+        setModalOpen(true);
+        window.history.pushState({ modalOpen: true }, '', `/ministry/quota-requests/${id}`);
+    };
+
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        setSelectedId(null);
+        setSelectedRequestId('');
+        if (window.location.pathname.match(/\/quota-requests\/([^\/?]+)/)) {
+            window.history.pushState(null, '', '/ministry/quota-requests');
+        }
+    };
+
+    // Handle history back button and initial direct loads
+    useEffect(() => {
+        const handlePopState = () => {
+            const currentMatch = window.location.pathname.match(/\/quota-requests\/([^\/?]+)/);
+            if (!currentMatch) {
+                setModalOpen(false);
+            } else {
+                setSelectedId(currentMatch[1]);
+                setModalOpen(true);
+            }
+        };
+        window.addEventListener('popstate', handlePopState);
+
+        const match = window.location.pathname.match(/\/quota-requests\/([^\/?]+)/);
+        if (match) {
+            setSelectedId(match[1]);
+            setModalOpen(true);
+        }
+
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('accessToken');
+        sessionStorage.removeItem('accessToken');
+        router.push('/ministry');
+    };
+
+    // ── Stats ──────────────────────────────────────────────────────────────
     const rows = data?.data ?? [];
     const approvedTons = rows
         .filter(r => r.status === 'APPROVED')
         .reduce((sum, r) => sum + r.requested_quota, 0);
     const pendingCount = rows.filter(r => r.status === 'PENDING').length;
     const totalCount = data?.totalRecords ?? 0;
-
-    const handleLogout = () => {
-        // Clear token from both storages
-        localStorage.removeItem('accessToken');
-        sessionStorage.removeItem('accessToken');
-
-        // Redirect to ministry login
-        router.push('/ministry/auth/login');
-    };
 
     return (
         <div style={{
@@ -139,7 +172,15 @@ export default function QuotaRequestsPage() {
             backgroundAttachment: 'fixed',
             backgroundRepeat: 'no-repeat',
         }}>
-            
+
+            {/* ── Modal ─────────────────────────────────────────────────── */}
+            {modalOpen && selectedId && (
+                <QuotaReviewModal
+                    id={selectedId}
+                    requestId={selectedRequestId}
+                    onClose={handleCloseModal}
+                />
+            )}
 
             {/* ── Sidebar ───────────────────────────────────────────────── */}
             <aside className="sidebar">
@@ -154,31 +195,19 @@ export default function QuotaRequestsPage() {
                 </div>
 
                 <ul className="nav-links">
-                    <li
-                        className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('dashboard')}
-                    >
+                    <li className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
                         <LayoutDashboard size={18} />
                         <span>Dashboard</span>
                     </li>
-                    <li
-                        className={`nav-item ${activeTab === 'quota_requests' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('quota_requests')}
-                    >
+                    <li className={`nav-item ${activeTab === 'quota_requests' ? 'active' : ''}`} onClick={() => setActiveTab('quota_requests')}>
                         <Files size={18} />
                         <span>Quota Requests</span>
                     </li>
-                    <li
-                        className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('reports')}
-                    >
+                    <li className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`} onClick={() => setActiveTab('reports')}>
                         <BarChart2 size={18} />
                         <span>Reports</span>
                     </li>
-                    <li
-                        className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('settings')}
-                    >
+                    <li className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
                         <Settings size={18} />
                         <span>Settings</span>
                     </li>
@@ -186,12 +215,9 @@ export default function QuotaRequestsPage() {
 
                 <div className="sidebar-footer">
                     <div className="user-profile">
-                        <div
-                            className="avatar"
-                            style={{ backgroundImage: "url('https://i.pravatar.cc/150?img=11')" }}
-                        />
+                        <div className="avatar" style={{ backgroundImage: "url('https://i.pravatar.cc/150?img=11')" }} />
                         <div className="user-info">
-                            <h4>Admin Dashboard</h4>
+                            <h4>Ministry Officer</h4>
                             <span>Recs: {totalCount}</span>
                         </div>
                         <div style={{ marginLeft: 'auto' }}>
@@ -212,21 +238,17 @@ export default function QuotaRequestsPage() {
                     <p>Review, approve, or reject industrial environmental quota applications.</p>
                 </div>
 
-                {/* Master Table Card */}
                 <div className="master-table-card">
-
-                    {/* Filters — using our working QuotaFiltersPanel */}
                     <QuotaFiltersPanel filters={filters} onFilterChange={handleFilterChange} />
 
-                    {/* Table — using our working QuotaTable */}
                     <div className="table-section">
                         <QuotaTable
                             data={rows}
                             isLoading={isLoading}
+                            onReview={handleReview}  // ← pass handler
                         />
                     </div>
 
-                    {/* Pagination — using our working QuotaPagination */}
                     {data && (
                         <QuotaPagination
                             currentPage={data.currentPage}
