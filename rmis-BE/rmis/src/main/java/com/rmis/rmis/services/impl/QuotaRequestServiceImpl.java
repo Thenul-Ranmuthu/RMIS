@@ -1,9 +1,11 @@
 package com.rmis.rmis.services.impl;
 
 import com.rmis.rmis.domain.dtos.PagedResponseDto;
+import com.rmis.rmis.domain.dtos.QuotaRequestDetailDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestResponseDto;
 import com.rmis.rmis.domain.entities.QuotaRequest;
 import com.rmis.rmis.domain.enums.QuotaRequestStatus;
+import com.rmis.rmis.exceptions.QuotaRequestNotFoundException;
 import com.rmis.rmis.repositories.QuotaRequestRepository;
 import com.rmis.rmis.services.QuotaRequestsSpecification;
 import com.rmis.rmis.services.interfaces.QuotaRequestService;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -95,6 +98,7 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
 
     private QuotaRequestResponseDto toDto(QuotaRequest entity) {
         return QuotaRequestResponseDto.builder()
+                .id(entity.getRequestId())
                 .requestId(formatRequestId(entity.getRequestNumber()))
                 .companyName(entity.getCompanyName())
                 .requestedQuota(entity.getRequestedQuota())
@@ -105,5 +109,29 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
 
     private String formatRequestId(Long requestNumber) {
         return String.format("REQ-%04d", requestNumber);
+    }
+
+    public QuotaRequestDetailDto getRequestById(UUID requestId) {
+        QuotaRequest entity = quotaRequestRepository.findById(requestId)
+                .orElseThrow(() -> new QuotaRequestNotFoundException("Quota request not found: " + requestId));
+
+        return toDetailDto(entity);
+    }
+
+    private QuotaRequestDetailDto toDetailDto(QuotaRequest entity) {
+        return QuotaRequestDetailDto.builder()
+                .id(entity.getRequestId())
+                .requestId(formatRequestId(entity.getRequestNumber()))
+                .companyName(entity.getCompanyName())
+                .companyEmail(entity.getCompany().getEmail())
+                .companyIdentifier(entity.getCompany().getCompanyid())
+                .requestedQuota(entity.getRequestedQuota())
+                .submissionDate(entity.getSubmissionDate())
+                .status(entity.getStatus())
+                .reviewedBy(entity.getReviewedBy() != null
+                        ? entity.getReviewedBy().getName()
+                        : null)
+                .reviewedAt(entity.getReviewedAt())
+                .build();
     }
 }
