@@ -10,6 +10,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -45,17 +46,20 @@ public class SecurityConfig {
     private final UserDetailsService publicUserDetailsService;
     private final UserDetailsService technicianDetailsService;
     private final UserDetailsService ministryOfficerDetailsService;
+    private final UserDetailsService adminDetailsService;
 
     public SecurityConfig(
             @Qualifier("applicationCompanyDetailsService") UserDetailsService companyDetailsService,
             @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService,
             @Qualifier("applicationTechnicianDetailsService") UserDetailsService technicianDetailsService,
-            @Qualifier("applicationMinistryOfficerDetailsService")  UserDetailsService ministryOfficerDetailsService
+            @Qualifier("applicationMinistryOfficerDetailsService")  UserDetailsService ministryOfficerDetailsService,
+            @Qualifier("applicationAdminDetailsService") UserDetailsService adminDetailsService
     ) {
         this.companyDetailsService = companyDetailsService;
         this.publicUserDetailsService = publicUserDetailsService;
         this.technicianDetailsService = technicianDetailsService;
         this.ministryOfficerDetailsService = ministryOfficerDetailsService;
+        this.adminDetailsService = adminDetailsService;
     }
 
     // ---- Authentication Providers ----
@@ -84,6 +88,13 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider ministryOfficerAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(ministryOfficerDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    @Bean
+    public AuthenticationProvider adminAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(adminDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
