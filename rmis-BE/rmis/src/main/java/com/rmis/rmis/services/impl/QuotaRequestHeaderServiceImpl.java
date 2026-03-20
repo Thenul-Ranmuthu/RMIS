@@ -4,6 +4,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.rmis.rmis.domain.dtos.QuotaDetailsResponseDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestHeaderDto;
 import com.rmis.rmis.domain.entities.Company;
 import com.rmis.rmis.domain.entities.QuotaRequestHeader;
@@ -32,17 +33,31 @@ public class QuotaRequestHeaderServiceImpl implements QuotaRequestHeaderService{
             return "Error: Insuffitient quota balance!!";
         }
         
-        // company.setQuota(company.getQuota()-quotaRequestHeaderDto.getRequestQuata());
-        // companyRepository.save(company);
 
         QuotaRequestHeader entity = new QuotaRequestHeader();
 
-        entity.setCompanyEmail(quotaRequestHeaderDto.getCompanyEmail());
+        // entity.setCompanyEmail(quotaRequestHeaderDto.getCompanyEmail());
+        entity.setCompany(company);
         entity.setRequestQuata(quotaRequestHeaderDto.getRequestQuata());
 
         quotaRequestHeaderRepository.save(entity);
         return "Quota saved succefully!!";
         
+    }
+
+    @Override
+    public QuotaDetailsResponseDto getQuotaDetails() {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        Company company = companyRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Company not found with email: " + email));
+
+        QuotaDetailsResponseDto quotaDetailsResponseDto = new QuotaDetailsResponseDto();
+        quotaDetailsResponseDto.setQuota(company.getQuota());
+
+        return quotaDetailsResponseDto;
     }
 
 

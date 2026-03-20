@@ -8,10 +8,12 @@ import com.rmis.rmis.services.interfaces.QuotaRequestHeaderService;
 
 import lombok.AllArgsConstructor;
 
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RestController
@@ -24,7 +26,11 @@ public class QuotaRequestHeaderController {
     @PostMapping(path = "/addQuota")
     public ResponseEntity<String> addQuotaRequest(@RequestBody QuotaRequestHeaderDto quotaRequestHeaderDto) {
         String response = quotaRequestHeaderService.addQuotaRequest(quotaRequestHeaderDto);
+        if(response.equalsIgnoreCase("Error: Insuffitient quota balance!!")){
+            return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
+    
     
 }
