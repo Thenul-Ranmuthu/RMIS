@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -36,8 +37,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     @Qualifier("applicationTechnicianDetailsService")
     UserDetailsService applicationTechnicianUserDetailsService;
+
     @Autowired
-    private ApplicationMinistryOfficerDetailsService applicationMinistryOfficerDetailsService;
+    @Qualifier("applicationAdminDetailsService")
+    UserDetailsService applicationAdminDetailsService;
+
+    @Autowired
+    @Qualifier("applicationMinistryOfficerDetailsService")
+    UserDetailsService applicationMinistryOfficerDetailsService;
 
     public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
@@ -84,8 +91,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return applicationCompanyDetailsService.loadUserByUsername(username);
         } else if("PUBLIC".equals(userType)){
             return applicationPublicUserDetailsService.loadUserByUsername(username);
-        } else if("MINISTRY_OFFICER".equals(userType)){
+        } else if("MINISTRY_OFFICER".equals(userType)) {
             return applicationMinistryOfficerDetailsService.loadUserByUsername(username);
+        } else if("ADMIN".equals(userType)) {
+            return applicationAdminDetailsService.loadUserByUsername(username);
         }else{
             return applicationTechnicianUserDetailsService.loadUserByUsername(username);
         }

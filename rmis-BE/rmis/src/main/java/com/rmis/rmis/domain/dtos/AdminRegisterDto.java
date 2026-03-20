@@ -1,0 +1,16 @@
+package com.rmis.rmis.domain.dtos;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class AdminRegisterDto {
+    private String adminName;
+    private String adminEmail;
+    private String adminPassword;
+}
