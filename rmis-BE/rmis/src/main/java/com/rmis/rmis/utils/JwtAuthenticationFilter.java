@@ -15,6 +15,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.rmis.rmis.services.impl.ApplicationMinistryOfficerDetailsService;
+
 import java.io.IOException;
 
 // Execute Before Executing Spring Security Filters
@@ -35,6 +38,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     @Qualifier("applicationTechnicianDetailsService")
     UserDetailsService applicationTechnicianUserDetailsService;
+
+    @Autowired
+    @Qualifier("applicationMinistryOfficerDetailsService")
+    private ApplicationMinistryOfficerDetailsService applicationMinistryOfficerDetailsService;
 
     public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
@@ -81,6 +88,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return applicationCompanyDetailsService.loadUserByUsername(username);
         } else if("PUBLIC".equals(userType)){
             return applicationPublicUserDetailsService.loadUserByUsername(username);
+        } else if("MINISTRY_OFFICER".equals(userType)){
+            return applicationMinistryOfficerDetailsService.loadUserByUsername(username);
         }else{
             return applicationTechnicianUserDetailsService.loadUserByUsername(username);
         }

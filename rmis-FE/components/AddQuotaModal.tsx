@@ -39,7 +39,7 @@ export default function AddQuotaModal({
     try {
       await addQuota(token, {
         companyEmail,
-        requestQuata: parsed,
+        requestedQuota: parsed,
       });
       onSuccess();
     } catch (err) {

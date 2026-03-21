@@ -26,7 +26,7 @@ export interface QuotaListResponse {
 
 export interface AddQuotaPayload {
   companyEmail: string;
-  requestQuata: number;
+  requestedQuota: number;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────

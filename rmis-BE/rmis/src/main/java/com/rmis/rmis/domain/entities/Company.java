@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -50,7 +51,7 @@ public class Company implements LockableAccount {
     private Role role;
 
     @Column(nullable = true)
-    private Double quota;
+    private BigDecimal quota;
 
     @Enumerated(EnumType.STRING)
     private CompanyStatus status;
@@ -62,7 +63,7 @@ public class Company implements LockableAccount {
 
     @PrePersist
     protected void onCreate(){
-        this.quota = 0.00;
+        this.quota = BigDecimal.ZERO;
         this.status = CompanyStatus.PENDING;
     }
 
