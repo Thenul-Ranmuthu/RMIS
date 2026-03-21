@@ -1,5 +1,6 @@
 package com.rmis.rmis.utils;
 
+import com.rmis.rmis.services.impl.ApplicationMinistryOfficerDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,6 +39,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     @Qualifier("applicationTechnicianDetailsService")
     UserDetailsService applicationTechnicianUserDetailsService;
+    @Autowired
+    private ApplicationMinistryOfficerDetailsService applicationMinistryOfficerDetailsService;
 
     @Autowired
     @Qualifier("applicationMinistryOfficerDetailsService")

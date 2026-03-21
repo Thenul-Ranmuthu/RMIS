@@ -197,7 +197,7 @@ export default function SignupCard() {
 
   const validatePassword = (password: string): boolean => {
     const passwordRegex =
-      /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%#?&])[A-Za-z\d@$!%#?&]{6,}$/;
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%#?&])[A-Za-z\d@$!%#?&]{6,}$/;
     return passwordRegex.test(password);
   };
 
