@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.rmis.rmis.services.impl.ApplicationMinistryOfficerDetailsService;
 
 import java.io.IOException;
 
@@ -39,8 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     @Qualifier("applicationTechnicianDetailsService")
     UserDetailsService applicationTechnicianUserDetailsService;
-    @Autowired
-    private ApplicationMinistryOfficerDetailsService applicationMinistryOfficerDetailsService;
 
     @Autowired
     @Qualifier("applicationMinistryOfficerDetailsService")

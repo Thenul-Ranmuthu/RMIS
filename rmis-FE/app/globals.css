@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -37,7 +39,8 @@ body {
 }
 
 /* Allow scrolling on all pages */
-html, body {
+html,
+body {
   height: auto !important;
   min-height: 100vh;
   overflow-y: auto !important;
@@ -51,7 +54,7 @@ html, body {
   min-height: 100vh;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"); */
 
 :root {
   --glass-bg: rgba(255, 255, 255, 0.4);
@@ -79,7 +82,7 @@ html, body {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   color: var(--text-main);
   background-color: #e5e7eb;
   min-height: 100vh;
@@ -91,7 +94,7 @@ body {
   display: flex;
   height: 100vh;
   width: 100vw;
-  background-image: url('/bg.png');
+  background-image: url("/bg.png");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -333,7 +336,7 @@ body {
   width: 100%;
   font-size: 14px;
   color: var(--text-main);
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 500;
 }
 
@@ -344,7 +347,7 @@ body {
   width: 100%;
   font-size: 14px;
   color: var(--text-main);
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 500;
   appearance: none;
   -webkit-appearance: none;

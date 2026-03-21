@@ -1,13 +1,14 @@
-// services/quotaService.ts
+import { QuotaFilters, QuotaPaginatedResponse } from "@/types/quota";
+import { getToken } from "@/services/authService";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
-// ─── Interfaces ───────────────────────────────────────────────
+// ─── Interfaces (company-side) ────────────────────────────────
 
 export interface QuotaRequest {
   id?: number | string;
   companyEmail?: string;
-  requestQuata: number;
+  requestedQuota: number;
   status?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -36,21 +37,15 @@ const authHeaders = (token: string) => ({
   Authorization: `Bearer ${token}`,
 });
 
-// Normalise the backend response — the endpoint might return an array
-// or an object with metadata + a list. We handle both gracefully.
 const parseQuotaListResponse = (data: unknown): QuotaListResponse => {
-  // Array response: backend returns QuotaRequest[]
   if (Array.isArray(data)) {
     return {
       summary: { currentAvailableQuota: null, remainingYearlyQuota: null },
       requests: data as QuotaRequest[],
     };
   }
-
-  // Object response
   if (data && typeof data === "object") {
     const obj = data as Record<string, unknown>;
-
     const requests: QuotaRequest[] = Array.isArray(obj.quotas)
       ? (obj.quotas as QuotaRequest[])
       : Array.isArray(obj.quotaRequests)
@@ -58,7 +53,6 @@ const parseQuotaListResponse = (data: unknown): QuotaListResponse => {
         : Array.isArray(obj.data)
           ? (obj.data as QuotaRequest[])
           : [];
-
     const summary: QuotaSummary = {
       currentAvailableQuota:
         typeof obj.currentAvailableQuota === "number"
@@ -73,42 +67,30 @@ const parseQuotaListResponse = (data: unknown): QuotaListResponse => {
             ? obj.yearlyQuota
             : null,
     };
-
     return { summary, requests };
   }
-
   return {
     summary: { currentAvailableQuota: null, remainingYearlyQuota: null },
     requests: [],
   };
 };
 
-// ─── API Functions ────────────────────────────────────────────
+// ─── Company-side API ─────────────────────────────────────────
 
-/**
- * Fetch all quota requests for the logged-in company.
- * Endpoint: GET /quotaHeader/geetQuotas
- */
 export const getQuotas = async (token: string): Promise<QuotaListResponse> => {
   const response = await fetch(`${API_BASE_URL}/quotaHeader/getQuotas`, {
     method: "GET",
     headers: authHeaders(token),
   });
-
   if (!response.ok) {
     const err = new Error(`Failed to fetch quotas: ${response.status}`);
     (err as Error & { status: number }).status = response.status;
     throw err;
   }
-
   const data = await response.json();
   return parseQuotaListResponse(data);
 };
 
-/**
- * Add a new quota request.
- * Endpoint: POST /quotaHeader/addQuota
- */
 export const addQuota = async (
   token: string,
   payload: AddQuotaPayload,
@@ -118,32 +100,25 @@ export const addQuota = async (
     headers: authHeaders(token),
     body: JSON.stringify(payload),
   });
-
   if (!response.ok) {
     let message = `Request failed: ${response.status}`;
     try {
       const err = await response.json();
       message = err.message || err.error || message;
     } catch {
-      // keep default message
+      /* keep default */
     }
     throw new Error(message);
   }
-
-  // return response.json();
   const text = await response.text();
   try {
     return JSON.parse(text);
   } catch {
-    return { message: text }; // backend returned plain text like "Quota saved"
+    return { message: text };
   }
 };
-// RMIS/files/services/quotaService.ts
 
-import { QuotaFilters, QuotaPaginatedResponse } from "@/types/quota";
-import { getToken } from "@/services/authService";
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+// ─── Admin-side API ───────────────────────────────────────────
 
 export const getQuotaRequests = async (
   filters: QuotaFilters,
@@ -153,7 +128,6 @@ export const getQuotaRequests = async (
   const params = new URLSearchParams();
   params.set("page", String(page));
   params.set("limit", String(pageSize));
-
   if (filters.companyName) params.set("company_name", filters.companyName);
   if (filters.status) params.set("status", filters.status);
   if (filters.submissionDate)
@@ -162,9 +136,8 @@ export const getQuotaRequests = async (
   const hasFilters =
     filters.companyName || filters.status || filters.submissionDate;
   const endpoint = hasFilters ? "filter" : "paginated";
-  const url = `${BASE_URL}/ministry/quota-requests/${endpoint}?${params}`;
+  const url = `${API_BASE_URL}/ministry/quota-requests/${endpoint}?${params}`;
 
-  // ← attach token to every request
   const token = getToken();
   const response = await fetch(url, {
     headers: {
@@ -173,6 +146,87 @@ export const getQuotaRequests = async (
     },
   });
 
-  if (!response.ok) throw new Error("Failed to fetch quota requests");
+  if (!response.ok) {
+    const text = await response.text();
+    console.log("Status:", response.status, "Body:", text);
+    throw new Error("Failed to fetch quota requests");
+  }
   return response.json();
+};
+
+/**
+ * Approve a quota request.
+ * Endpoint: PATCH /ministry/statusApprove/{requestId}
+ */
+// export const approveRequest = async (
+//   token: string,
+//   requestId: string,
+// ): Promise<string> => {
+//   const response = await fetch(
+//     `${API_BASE_URL}/ministry/statusApprove/${requestId}`,
+//     {
+//       method: "PATCH",
+//       headers: authHeaders(token),
+//     },
+//   );
+//   const text = await response.text();
+//   console.log("approve status:", response.status, "body:", text);
+//   if (!response.ok) {
+//     throw new Error(text || `Approval failed: ${response.status}`);
+//   }
+//   return text; // e.g. "Status set to APPROVED"
+// };
+// export const approveRequest = async (
+//   token: string,
+//   requestId: string,
+// ): Promise<string> => {
+//   const url = `${API_BASE_URL}/ministry/statusApprove/${requestId}`;
+//   console.log("PATCH URL:", url);
+//   const response = await fetch(url, {
+//     method: "PATCH",
+//     headers: { Authorization: `Bearer ${token}` },
+//   });
+//   console.log("response.ok:", response.ok, "status:", response.status);
+//   const text = await response.text();
+//   console.log("response text:", text);
+//   if (!response.ok) {
+//     throw new Error(text || `Approval failed: ${response.status}`);
+//   }
+//   return text;
+// };
+
+export const approveRequest = async (
+  token: string,
+  requestId: string,
+): Promise<string> => {
+  const response = await fetch(
+    `${API_BASE_URL}/ministry/statusApprove/${requestId}`,
+    {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+  const text = await response.text();
+  return text; // ← remove the !response.ok check entirely
+};
+/**
+ * Reject a quota request.
+ * Endpoint: PATCH /ministry/statusReject/{requestId}
+ */
+export const rejectRequest = async (
+  token: string,
+  requestId: string,
+): Promise<string> => {
+  const response = await fetch(
+    `${API_BASE_URL}/ministry/statusReject/${requestId}`,
+    {
+      method: "PATCH",
+      headers: authHeaders(token),
+    },
+  );
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(text || `Rejection failed: ${response.status}`);
+  }
+  return text; // e.g. "Status set to REJECTED"
 };

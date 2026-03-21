@@ -29,6 +29,7 @@ public class QuotaRequestsController {
         if (quotaRequestService.getAllRequests().isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+        System.out.println(quotaRequestService.getAllRequests());
         return ResponseEntity.ok(quotaRequestService.getAllRequests());
     }
 

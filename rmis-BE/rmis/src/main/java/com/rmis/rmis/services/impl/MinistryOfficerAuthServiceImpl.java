@@ -69,6 +69,7 @@ public class MinistryOfficerAuthServiceImpl implements MinistryOfficerAuthServic
         ministryOfficer.setRole(role);
         ministryOfficer.setOfficerId(officerRegisterDto.getOfficerId());
 
+
         officerRepo.save(ministryOfficer);
 
         Authentication authentication = officerAuthenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(

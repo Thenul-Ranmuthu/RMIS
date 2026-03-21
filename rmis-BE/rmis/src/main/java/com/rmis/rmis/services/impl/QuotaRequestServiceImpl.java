@@ -103,7 +103,8 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
 
     private QuotaRequestResponseDto toDto(QuotaRequest entity) {
         return QuotaRequestResponseDto.builder()
-                .requestId(formatRequestId(entity.getRequestNumber()))
+                // .requestId(formatRequestId(entity.getRequestNumber()))
+                .requestId(entity.getRequestId().toString())
                 .companyName(entity.getCompanyName())
                 .requestedQuota(entity.getRequestedQuota())
                 .submissionDate(entity.getSubmissionDate())
@@ -111,9 +112,9 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
                 .build();
     }
 
-    private String formatRequestId(Long requestNumber) {
-        return String.format("REQ-%04d", requestNumber);
-    }
+    // private String formatRequestId(Long requestNumber) {
+    //     return String.format("REQ-%04d", requestNumber);
+    // }
 
     @Override
     public String addQuotaRequest(QuotaRequestHeaderDto quotaRequestHeaderDto) {
