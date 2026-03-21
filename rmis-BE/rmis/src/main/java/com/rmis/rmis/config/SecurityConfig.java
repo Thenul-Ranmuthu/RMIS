@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -31,6 +32,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Value("${app.cors.allowed-origins}")//http://localhost:3000
@@ -42,15 +44,18 @@ public class SecurityConfig {
     private final UserDetailsService companyDetailsService;
     private final UserDetailsService publicUserDetailsService;
     private final UserDetailsService technicianDetailsService;
+    private final UserDetailsService ministryOfficerDetailsService;
 
     public SecurityConfig(
             @Qualifier("applicationCompanyDetailsService") UserDetailsService companyDetailsService,
             @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService,
-            @Qualifier("applicationTechnicianDetailsService") UserDetailsService technicianDetailsService
+            @Qualifier("applicationTechnicianDetailsService") UserDetailsService technicianDetailsService,
+            @Qualifier("applicationMinistryOfficerDetailsService")  UserDetailsService ministryOfficerDetailsService
     ) {
         this.companyDetailsService = companyDetailsService;
         this.publicUserDetailsService = publicUserDetailsService;
         this.technicianDetailsService = technicianDetailsService;
+        this.ministryOfficerDetailsService = ministryOfficerDetailsService;
     }
 
     // ---- Authentication Providers ----
@@ -76,6 +81,13 @@ public class SecurityConfig {
         return provider;
     }
 
+    @Bean
+    public AuthenticationProvider ministryOfficerAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(ministryOfficerDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -91,7 +103,9 @@ public class SecurityConfig {
                 .requestMatchers("/auth/technician/**").permitAll()
                 .requestMatchers("/sendMail/**").permitAll()
                 .requestMatchers("/admin/**").permitAll()
+                    .requestMatchers("/ministry/auth/**").permitAll()
                 .requestMatchers("/api/password-reset/**").permitAll()
+                    .requestMatchers("/ministry/quota-requests/**").hasRole("MINISTRY_OFFICER")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
@@ -113,7 +127,7 @@ public class SecurityConfig {
                   .map(String::trim)
                   .collect(Collectors.toList())
         );
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
 

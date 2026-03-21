@@ -197,7 +197,7 @@ export default function SignupCard() {
 
   const validatePassword = (password: string): boolean => {
     const passwordRegex =
-      /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%#?&])[A-Za-z\d@$!%#?&]{6,}$/;
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%#?&])[A-Za-z\d@$!%#?&]{6,}$/;
     return passwordRegex.test(password);
   };
 
@@ -259,12 +259,13 @@ export default function SignupCard() {
     //   alert("Password must be at least 6 characters");
     //   return;
     // }
-    if (!validatePassword(formData.password)) {
-      alert(
-        "Password must be at least 6 characters and include at least one lowercase letter, one uppercase letter, one number, and one special character",
-      );
-      return;
-    }
+
+    // if (!validatePassword(formData.password)) {
+    //   alert(
+    //     "Password must be at least 6 characters and include at least one lowercase letter, one uppercase letter, one number, and one special character",
+    //   );
+    //   return;
+    // }
 
     if (role === "Technician") {
       if (!formData.firstName || !formData.lastName || !formData.phoneNumber) {

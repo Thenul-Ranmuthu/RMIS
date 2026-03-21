@@ -25,6 +25,9 @@ public class DataInitializer {
             if(roleRepository.findByName("ROLE_TECHNITIAN") == null){
                 roleRepository.save(new Role(null, "ROLE_TECHNITIAN"));
             }
+            if(roleRepository.findByName("ROLE_MINISTRY_OFFICER") == null){
+                roleRepository.save(new Role(null, "ROLE_MINISTRY_OFFICER"));
+            }
         };
     }
 }
