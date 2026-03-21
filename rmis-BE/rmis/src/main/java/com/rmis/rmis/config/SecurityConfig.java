@@ -42,15 +42,18 @@ public class SecurityConfig {
     private final UserDetailsService companyDetailsService;
     private final UserDetailsService publicUserDetailsService;
     private final UserDetailsService technicianDetailsService;
+    private final UserDetailsService ministryOfficerDetailsService;
 
     public SecurityConfig(
             @Qualifier("applicationCompanyDetailsService") UserDetailsService companyDetailsService,
             @Qualifier("applicationPublicUserDetailsService") UserDetailsService publicUserDetailsService,
-            @Qualifier("applicationTechnicianDetailsService") UserDetailsService technicianDetailsService
+            @Qualifier("applicationTechnicianDetailsService") UserDetailsService technicianDetailsService,
+            @Qualifier("applicationMinistryOfficerDetailsService")  UserDetailsService ministryOfficerDetailsService
     ) {
         this.companyDetailsService = companyDetailsService;
         this.publicUserDetailsService = publicUserDetailsService;
         this.technicianDetailsService = technicianDetailsService;
+        this.ministryOfficerDetailsService = ministryOfficerDetailsService;
     }
 
     // ---- Authentication Providers ----
@@ -72,6 +75,13 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider technicianAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(technicianDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    @Bean
+    public AuthenticationProvider ministryOfficerAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(ministryOfficerDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }

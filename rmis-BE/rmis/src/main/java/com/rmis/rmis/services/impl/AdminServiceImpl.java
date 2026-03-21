@@ -1,15 +1,17 @@
 package com.rmis.rmis.services.impl;
 
 
+import java.math.BigDecimal;
+
 import org.springframework.stereotype.Service;
 
 import com.rmis.rmis.domain.entities.Company;
-import com.rmis.rmis.domain.entities.QuotaRequestHeader;
+// import com.rmis.rmis.domain.entities.QuotaRequestHeader;
 import com.rmis.rmis.domain.entities.Technician;
 import com.rmis.rmis.enums.CompanyStatus;
-import com.rmis.rmis.enums.QuotaRequestStatus;
+// import com.rmis.rmis.enums.QuotaRequestStatus;
 import com.rmis.rmis.repositories.CompanyRepository;
-import com.rmis.rmis.repositories.QuotaRequestHeaderRepository;
+// import com.rmis.rmis.repositories.QuotaRequestHeaderRepository;
 import com.rmis.rmis.repositories.TechnicianRepository;
 import com.rmis.rmis.services.interfaces.AdminService;
 
@@ -21,7 +23,7 @@ public class AdminServiceImpl implements AdminService{
 
     private TechnicianRepository technicianRepository;
     private CompanyRepository companyRepository;
-    private QuotaRequestHeaderRepository quotaRequestHeaderRepository;
+    // private QuotaRequestHeaderRepository quotaRequestHeaderRepository;
 
     @Override
     public String updateTechnicianStatus(String email) {
@@ -37,7 +39,7 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
-    public String addCompanyQouata(String email, Double quota) {
+    public String addCompanyQouata(String email, BigDecimal quota) {
         if(!companyRepository.existsByEmail(email)){
             return "company not found in the repository!!";
         }
@@ -59,43 +61,43 @@ public class AdminServiceImpl implements AdminService{
     //     return headers;
     // }
 
-    @Override
-    public String changeQuotaRequestStatusApprove(Long id) {
-        if(!quotaRequestHeaderRepository.existsById(id)){
-            return "No quota found with the ID: " + id;
-        }
+    // @Override
+    // public String changeQuotaRequestStatusApprove(Long id) {
+    //     if(!quotaRequestHeaderRepository.existsById(id)){
+    //         return "No quota found with the ID: " + id;
+    //     }
 
-        QuotaRequestHeader quotaRequestHeader = quotaRequestHeaderRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("No Quota request!!"));
+    //     QuotaRequestHeader quotaRequestHeader = quotaRequestHeaderRepository.findById(id)
+    //         .orElseThrow(() -> new RuntimeException("No Quota request!!"));
 
-        quotaRequestHeader.setStatus(QuotaRequestStatus.ACCEPTED);
+    //     quotaRequestHeader.setStatus(QuotaRequestStatus.ACCEPTED);
         
-        quotaRequestHeaderRepository.save(quotaRequestHeader);
+    //     quotaRequestHeaderRepository.save(quotaRequestHeader);
         
-        Company company = companyRepository.findByEmail(quotaRequestHeader.getCompany().getEmail())
-            .orElseThrow(() -> new RuntimeException("No Company found!!"));
+    //     Company company = companyRepository.findByEmail(quotaRequestHeader.getCompany().getEmail())
+    //         .orElseThrow(() -> new RuntimeException("No Company found!!"));
 
-        company.setQuota(company.getQuota()-quotaRequestHeader.getRequestQuata());
+    //     company.setQuota(company.getQuota()-quotaRequestHeader.getRequestQuata());
 
-        companyRepository.save(company);
+    //     companyRepository.save(company);
 
-        return "Status set to ACCEPTED";
-    }
+    //     return "Status set to ACCEPTED";
+    // }
 
-    @Override
-    public String changeQuotaRequestStatusDecline(Long id) {
-        if(!quotaRequestHeaderRepository.existsById(id)){
-            return "No quota found with the ID: " + id;
-        }
+    // @Override
+    // public String changeQuotaRequestStatusDecline(Long id) {
+    //     if(!quotaRequestHeaderRepository.existsById(id)){
+    //         return "No quota found with the ID: " + id;
+    //     }
 
-        QuotaRequestHeader quotaRequestHeader = quotaRequestHeaderRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("No Quota request!!"));
+    //     QuotaRequestHeader quotaRequestHeader = quotaRequestHeaderRepository.findById(id)
+    //         .orElseThrow(() -> new RuntimeException("No Quota request!!"));
 
-        quotaRequestHeader.setStatus(QuotaRequestStatus.DECLINED);
+    //     quotaRequestHeader.setStatus(QuotaRequestStatus.DECLINED);
         
-        quotaRequestHeaderRepository.save(quotaRequestHeader);
+    //     quotaRequestHeaderRepository.save(quotaRequestHeader);
 
-        return "Status set to DECLINED";
-    }
+    //     return "Status set to DECLINED";
+    // }
 
 }

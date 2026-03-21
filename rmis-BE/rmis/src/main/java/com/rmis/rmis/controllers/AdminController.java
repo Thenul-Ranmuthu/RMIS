@@ -8,6 +8,7 @@ import com.rmis.rmis.services.interfaces.AdminService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import java.math.BigDecimal;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class AdminController {
     }
 
     @PatchMapping("/companyQouta/{email}/{quota}")
-    public ResponseEntity<String> addCompanyQouata(@PathVariable("email") String email, @PathVariable("quota") Double quota){
+    public ResponseEntity<String> addCompanyQouata(@PathVariable("email") String email, @PathVariable("quota") BigDecimal quota){
         String response = adminService.addCompanyQouata(email, quota);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
@@ -43,25 +44,25 @@ public class AdminController {
     //     return new ResponseEntity<>(quotas,HttpStatus.FOUND);
     // }
 
-    @PatchMapping(path = "/statusApprove/{id}")
-    public ResponseEntity<String> changeQuotaRequestStatusApprove(@PathVariable("id") Long id){
-        String response = adminService.changeQuotaRequestStatusApprove(id);
+    // @PatchMapping(path = "/statusApprove/{id}")
+    // public ResponseEntity<String> changeQuotaRequestStatusApprove(@PathVariable("id") Long id){
+    //     String response = adminService.changeQuotaRequestStatusApprove(id);
         
-        if(response.equalsIgnoreCase("Status set to ACCEPTED")){
-            return new ResponseEntity<>(response,HttpStatus.OK);
-        }
+    //     if(response.equalsIgnoreCase("Status set to ACCEPTED")){
+    //         return new ResponseEntity<>(response,HttpStatus.OK);
+    //     }
 
-        return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
-    }
+    //     return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+    // }
 
-    @PatchMapping(path = "/statusDecline/{id}")
-    public ResponseEntity<String> changeQuotaRequestStatusDecline(@PathVariable("id") Long id){
-        String response = adminService.changeQuotaRequestStatusDecline(id);
+    // @PatchMapping(path = "/statusDecline/{id}")
+    // public ResponseEntity<String> changeQuotaRequestStatusDecline(@PathVariable("id") Long id){
+    //     String response = adminService.changeQuotaRequestStatusDecline(id);
         
-        if(response.equalsIgnoreCase("Status set to DECLINED")){
-            return new ResponseEntity<>(response,HttpStatus.OK);
-        }
+    //     if(response.equalsIgnoreCase("Status set to DECLINED")){
+    //         return new ResponseEntity<>(response,HttpStatus.OK);
+    //     }
 
-        return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
-    }
+    //     return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+    // }
 }
