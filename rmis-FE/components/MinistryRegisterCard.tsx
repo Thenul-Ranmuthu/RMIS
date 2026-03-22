@@ -68,7 +68,7 @@ export default function MinistryRegisterCard() {
             }
 
             // Redirect to login after successful registration
-            router.push("/ministry/login");
+            router.push("/ministry/auth/login");
 
         } catch (err) {
             setError(
@@ -248,7 +248,7 @@ export default function MinistryRegisterCard() {
 
                 <p className="text-center text-sm text-gray-500 mt-6">
                     Already have an account?{" "}
-                    <Link href="/ministry/login" className="text-emerald-600 font-semibold hover:text-emerald-700 transition">
+                    <Link href="/ministry/auth/login" className="text-emerald-600 font-semibold hover:text-emerald-700 transition">
                         Sign In →
                     </Link>
                 </p>

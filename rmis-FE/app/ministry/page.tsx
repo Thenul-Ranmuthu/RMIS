@@ -76,7 +76,7 @@ export default function MinistryPortalPage() {
 
                     <div className="flex flex-col gap-3 mt-auto">
                         <Link
-                            href="/admin/login"
+                            href="/admin/auth/login"
                             className="w-full bg-slate-800 hover:bg-slate-900 active:scale-[0.98] text-white py-3 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 transition-all duration-200 flex items-center justify-center gap-2"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
