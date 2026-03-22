@@ -1,15 +1,17 @@
 package com.rmis.rmis.services.impl;
 
 import com.rmis.rmis.domain.dtos.PagedResponseDto;
-import com.rmis.rmis.domain.dtos.QuotaRequestHeaderDto;
+import com.rmis.rmis.domain.dtos.QuotaRequestAddQuotaDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestResponseDto;
 import com.rmis.rmis.domain.entities.Company;
 import com.rmis.rmis.domain.entities.QuotaRequest;
 import com.rmis.rmis.enums.QuotaRequestStatus;
 import com.rmis.rmis.repositories.CompanyRepository;
+import com.rmis.rmis.repositories.MinistryOfficerRepository;
 import com.rmis.rmis.repositories.QuotaRequestRepository;
 import com.rmis.rmis.services.QuotaRequestsSpecification;
 import com.rmis.rmis.services.interfaces.QuotaRequestService;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,10 +31,15 @@ import java.util.stream.Collectors;
 public class QuotaRequestServiceImpl implements QuotaRequestService {
     private final QuotaRequestRepository quotaRequestRepository;
     private final CompanyRepository companyRepository;
+//     private final MinistryOfficerRepository ministryOfficerRepository;
+    
+//     @Value("${app.mail.resend.api}")
+//     private String resendApiKey;
 
-    public QuotaRequestServiceImpl(QuotaRequestRepository quotaRequestRepository, CompanyRepository companyRepository) {
+    public QuotaRequestServiceImpl(QuotaRequestRepository quotaRequestRepository, CompanyRepository companyRepository, MinistryOfficerRepository ministryOfficerRepository) {
         this.quotaRequestRepository = quotaRequestRepository;
         this.companyRepository = companyRepository;
+        // this.ministryOfficerRepository = ministryOfficerRepository;
     }
 
     @Override
@@ -117,7 +124,7 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
     // }
 
     @Override
-    public String addQuotaRequest(QuotaRequestHeaderDto quotaRequestHeaderDto) {
+    public String addQuotaRequest(QuotaRequestAddQuotaDto quotaRequestHeaderDto) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
 

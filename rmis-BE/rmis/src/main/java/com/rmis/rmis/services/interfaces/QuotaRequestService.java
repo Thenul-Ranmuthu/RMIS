@@ -1,7 +1,7 @@
 package com.rmis.rmis.services.interfaces;
 
 import com.rmis.rmis.domain.dtos.PagedResponseDto;
-import com.rmis.rmis.domain.dtos.QuotaRequestHeaderDto;
+import com.rmis.rmis.domain.dtos.QuotaRequestAddQuotaDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestResponseDto;
 import com.rmis.rmis.enums.QuotaRequestStatus;
 import org.jspecify.annotations.Nullable;
@@ -19,5 +19,5 @@ public interface QuotaRequestService {
                                                                   LocalDate submissionDate,
                                                                   int page, int limit);
 
-    String addQuotaRequest(QuotaRequestHeaderDto quotaRequestHeaderDto);
+    String addQuotaRequest(QuotaRequestAddQuotaDto quotaRequestHeaderDto);
 }
