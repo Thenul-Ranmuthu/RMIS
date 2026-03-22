@@ -5,13 +5,23 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 // ─── Interfaces (company-side) ────────────────────────────────
 
+// export interface QuotaRequest {
+//   id?: number | string;
+//   companyEmail?: string;
+//   requestedQuota: number;
+//   status?: string;
+//   createdAt?: string;
+//   updatedAt?: string;
+//   [key: string]: unknown;
+// }
+
 export interface QuotaRequest {
-  id?: number | string;
-  companyEmail?: string;
+  requestId: string;
+  requestNumber: number;
+  companyName: string;
   requestedQuota: number;
-  status?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  submissionDate: string;
+  status: string;
   [key: string]: unknown;
 }
 
@@ -78,7 +88,7 @@ const parseQuotaListResponse = (data: unknown): QuotaListResponse => {
 // ─── Company-side API ─────────────────────────────────────────
 
 export const getQuotas = async (token: string): Promise<QuotaListResponse> => {
-  const response = await fetch(`${API_BASE_URL}/quotaHeader/getQuotas`, {
+  const response = await fetch(`${API_BASE_URL}/company/getQuotas`, {
     method: "GET",
     headers: authHeaders(token),
   });

@@ -12,4 +12,6 @@ import java.util.UUID;
 @Repository
 public interface QuotaRequestRepository extends JpaRepository<QuotaRequest, UUID>, JpaSpecificationExecutor<QuotaRequest> {
     List<QuotaRequest> findByCompanyName(String companyName);
+
+    List<QuotaRequest> findAllByCompanyName(String name);
 }
