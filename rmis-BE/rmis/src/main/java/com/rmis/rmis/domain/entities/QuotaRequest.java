@@ -1,6 +1,6 @@
 package com.rmis.rmis.domain.entities;
 
-import com.rmis.rmis.domain.enums.QuotaRequestStatus;
+import com.rmis.rmis.enums.QuotaRequestStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -69,7 +69,7 @@ public class QuotaRequest {
     @JoinColumn(name = "reviewed_by", foreignKey = @ForeignKey(name = "fk_quota_requests_reviewer"))
     private MinistryOfficer reviewedBy;
 
-    @Column(name = "reviewed_at")
+    @Column(name = "reviewed_at", nullable = true)
     private LocalDateTime reviewedAt;
 
     // Audit Fields

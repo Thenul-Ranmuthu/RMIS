@@ -1,7 +1,6 @@
 package com.rmis.rmis.domain.dtos;
 
-import com.rmis.rmis.domain.enums.QuotaRequestStatus;
-//import com.rmis.rmis.entity.QuotaRequestStatus;
+import com.rmis.rmis.enums.QuotaRequestStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -11,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor

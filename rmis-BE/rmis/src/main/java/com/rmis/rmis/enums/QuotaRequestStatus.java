@@ -1,4 +1,4 @@
-package com.rmis.rmis.domain.enums;
+package com.rmis.rmis.enums;
 
 public enum QuotaRequestStatus {
     PENDING,

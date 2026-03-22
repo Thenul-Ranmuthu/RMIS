@@ -259,12 +259,13 @@ export default function SignupCard() {
     //   alert("Password must be at least 6 characters");
     //   return;
     // }
-    if (!validatePassword(formData.password)) {
-      alert(
-        "Password must be at least 6 characters and include at least one lowercase letter, one uppercase letter, one number, and one special character",
-      );
-      return;
-    }
+
+    // if (!validatePassword(formData.password)) {
+    //   alert(
+    //     "Password must be at least 6 characters and include at least one lowercase letter, one uppercase letter, one number, and one special character",
+    //   );
+    //   return;
+    // }
 
     if (role === "Technician") {
       if (!formData.firstName || !formData.lastName || !formData.phoneNumber) {

@@ -3,7 +3,10 @@ package com.rmis.rmis.services.impl;
 import com.rmis.rmis.domain.dtos.PagedResponseDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestDetailDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestResponseDto;
+import com.rmis.rmis.domain.entities.Company;
 import com.rmis.rmis.domain.entities.QuotaRequest;
+import com.rmis.rmis.enums.QuotaRequestStatus;
+import com.rmis.rmis.repositories.CompanyRepository;
 import com.rmis.rmis.domain.enums.QuotaRequestStatus;
 import com.rmis.rmis.exceptions.QuotaRequestNotFoundException;
 import com.rmis.rmis.repositories.QuotaRequestRepository;
@@ -13,11 +16,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,9 +31,11 @@ import java.util.stream.Collectors;
 @Service
 public class QuotaRequestServiceImpl implements QuotaRequestService {
     private final QuotaRequestRepository quotaRequestRepository;
+    private final CompanyRepository companyRepository;
 
-    public QuotaRequestServiceImpl(QuotaRequestRepository quotaRequestRepository) {
+    public QuotaRequestServiceImpl(QuotaRequestRepository quotaRequestRepository, CompanyRepository companyRepository) {
         this.quotaRequestRepository = quotaRequestRepository;
+        this.companyRepository = companyRepository;
     }
 
     @Override
@@ -98,6 +106,8 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
 
     private QuotaRequestResponseDto toDto(QuotaRequest entity) {
         return QuotaRequestResponseDto.builder()
+                // .requestId(formatRequestId(entity.getRequestNumber()))
+                // .requestId(entity.getRequestId().toString())
                 .id(entity.getRequestId())
                 .requestId(formatRequestId(entity.getRequestNumber()))
                 .companyName(entity.getCompanyName())
@@ -107,8 +117,36 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
                 .build();
     }
 
-    private String formatRequestId(Long requestNumber) {
-        return String.format("REQ-%04d", requestNumber);
+    // private String formatRequestId(Long requestNumber) {
+    //     return String.format("REQ-%04d", requestNumber);
+    // }
+
+    @Override
+    public String addQuotaRequest(QuotaRequestHeaderDto quotaRequestHeaderDto) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        Company company = companyRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Company not found with email: " + email));
+
+        if(quotaRequestHeaderDto.getRequestedQuota().compareTo(company.getQuota()) > 0){
+            return "Error: Insuffitient quota balance!!";
+        }
+        
+
+        QuotaRequest entity = new QuotaRequest();
+
+        entity.setCompany(company);
+        entity.setRequestedQuota(quotaRequestHeaderDto.getRequestedQuota());
+        entity.setCompanyName(company.getName());
+        entity.setUpdatedAt(LocalDateTime.now());
+
+        long nextNumber = quotaRequestRepository.count() + 1;
+        entity.setRequestNumber(nextNumber);
+        
+
+        quotaRequestRepository.save(entity);
+        return "Quota saved succefully!!";
     }
 
     public QuotaRequestDetailDto getRequestById(UUID requestId) {

@@ -3,7 +3,7 @@ package com.rmis.rmis.controllers;
 import com.rmis.rmis.domain.dtos.PagedResponseDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestDetailDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestResponseDto;
-import com.rmis.rmis.domain.enums.QuotaRequestStatus;
+import com.rmis.rmis.enums.QuotaRequestStatus;
 import com.rmis.rmis.services.interfaces.QuotaRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,6 +28,7 @@ public class QuotaRequestsController {
         if (quotaRequestService.getAllRequests().isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+        System.out.println(quotaRequestService.getAllRequests());
         return ResponseEntity.ok(quotaRequestService.getAllRequests());
     }
 
