@@ -3,6 +3,7 @@ package com.rmis.rmis.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rmis.rmis.domain.dtos.QuotaDetailsResponseDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestHeaderDto;
 import com.rmis.rmis.services.interfaces.CompanyService;
 
@@ -28,12 +29,6 @@ public class CompanyController {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
-        // System.out.println(email);
-        // List<QuotaRequestHeaderDto> quotaRequestHeaderDtos = companyService.getQuotas(email);
-        // if(quotaRequestHeaderDtos.isEmpty()){
-        //     return new ResponseEntity<>(quotaRequestHeaderDtos,HttpStatus.NO_CONTENT);
-        // }
-        // return new ResponseEntity<>(quotaRequestHeaderDtos,HttpStatus.OK);
         
         List<QuotaRequestHeaderDto> dtos = companyService.listQuotas(email);
 
@@ -42,5 +37,16 @@ public class CompanyController {
         }
         return new ResponseEntity<>(dtos,HttpStatus.OK);
     }
+
+    @GetMapping("/getQuotaDetails")
+    public ResponseEntity<QuotaDetailsResponseDto> getQuotaDetails() {
+        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        QuotaDetailsResponseDto dto = companyService.getQuotaDetails(email);
+        return new ResponseEntity<>(dto,HttpStatus.OK);
+    }
+    
     
 }

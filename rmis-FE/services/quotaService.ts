@@ -5,16 +5,6 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 // ─── Interfaces (company-side) ────────────────────────────────
 
-// export interface QuotaRequest {
-//   id?: number | string;
-//   companyEmail?: string;
-//   requestedQuota: number;
-//   status?: string;
-//   createdAt?: string;
-//   updatedAt?: string;
-//   [key: string]: unknown;
-// }
-
 export interface QuotaRequest {
   requestId: string;
   requestNumber: number;
@@ -38,6 +28,11 @@ export interface QuotaListResponse {
 export interface AddQuotaPayload {
   companyEmail: string;
   requestedQuota: number;
+}
+
+export interface QuotaDetails {
+  quota: number;
+  remainingQuota: number;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────
@@ -239,4 +234,17 @@ export const rejectRequest = async (
     throw new Error(text || `Rejection failed: ${response.status}`);
   }
   return text; // e.g. "Status set to REJECTED"
+};
+
+export const getQuotaDetails = async (token: string): Promise<QuotaDetails> => {
+  const response = await fetch(`${API_BASE_URL}/company/getQuotaDetails`, {
+    method: "GET",
+    headers: authHeaders(token),
+  });
+  if (!response.ok) {
+    const err = new Error(`Failed to fetch quota details: ${response.status}`);
+    (err as Error & { status: number }).status = response.status;
+    throw err;
+  }
+  return response.json();
 };

@@ -3,7 +3,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import AddQuotaModal from "@/components/AddQuotaModal";
-import { getQuotas } from "@/services/quotaService";
+// import { getQuotas } from "@/services/quotaService";
+// import type { QuotaRequest, QuotaSummary } from "@/services/quotaService";
+
+import { getQuotas, getQuotaDetails } from "@/services/quotaService";
 import type { QuotaRequest, QuotaSummary } from "@/services/quotaService";
 
 // ─── Status badge helper ───────────────────────────────────────
@@ -158,7 +161,16 @@ export default function CompanyDashboard() {
     setQuotaError("");
     try {
       const data = await getQuotas(token);
-      setSummary(data.summary);
+      // setSummary(data.summary);
+      try {
+        const details = await getQuotaDetails(token);
+        setSummary({
+          currentAvailableQuota: details.quota,
+          remainingYearlyQuota: details.remainingQuota,
+        });
+      } catch {
+        setSummary({ currentAvailableQuota: null, remainingYearlyQuota: null });
+      }
       setRequests(data.requests);
     } catch (err: unknown) {
       const status = (err as Error & { status?: number }).status;
@@ -312,7 +324,8 @@ export default function CompanyDashboard() {
           {/* ── Stat cards ────────────────────────────────────── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
             <StatCard
-              label="Current Available Quota"
+              // label="Current Available Quota"
+              label="Assigned Quota"
               value={summary.currentAvailableQuota}
               accent="emerald"
               loading={quotaLoading}
@@ -334,7 +347,8 @@ export default function CompanyDashboard() {
               }
             />
             <StatCard
-              label="Remaining Yearly Quota"
+              // label="Remaining Yearly Quota"
+              label="Remaining Quota"
               value={summary.remainingYearlyQuota}
               accent="purple"
               loading={quotaLoading}
