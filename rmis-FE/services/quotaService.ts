@@ -1,4 +1,8 @@
-import { QuotaFilters, QuotaPaginatedResponse } from "@/types/quota";
+import {
+  QuotaFilters,
+  QuotaPaginatedResponse,
+  QuotaRequestDetail,
+} from "@/types/quota";
 import { getToken } from "@/services/authService";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
@@ -125,6 +129,7 @@ export const addQuota = async (
 
 // ─── Admin-side API ───────────────────────────────────────────
 
+// ── Get paginated/filtered list ────────────────────────────────────────────
 export const getQuotaRequests = async (
   filters: QuotaFilters,
   page: number = 1,
@@ -199,6 +204,20 @@ export const getQuotaRequests = async (
 //   }
 //   return text;
 // };
+
+export const getQuotaRequestById = async (
+  token: string,
+  id: string,
+): Promise<QuotaRequestDetail> => {
+  const response = await fetch(
+    `${API_BASE_URL}/ministry/quota-requests/${id}`,
+    {
+      headers: authHeaders(token),
+    },
+  );
+  if (!response.ok) throw new Error("Failed to fetch quota request detail");
+  return response.json();
+};
 
 export const approveRequest = async (
   token: string,

@@ -1,12 +1,9 @@
 package com.rmis.rmis.domain.dtos;
 
-import com.rmis.rmis.enums.QuotaRequestStatus;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.rmis.rmis.domain.enums.QuotaRequestStatus;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,16 +13,24 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class QuotaRequestResponseDto {
+public class QuotaRequestDetailDto {
     @JsonProperty("id")
     private UUID id;
 
     @JsonProperty("request_id")
     private String requestId;
 
+    // Company Information
     @JsonProperty("company_name")
     private String companyName;
 
+    @JsonProperty("company_email")
+    private String companyEmail;
+
+    @JsonProperty("company_id")
+    private String companyIdentifier;
+
+    // Request Details
     @JsonProperty("requested_quota")
     private BigDecimal requestedQuota;
 
@@ -35,4 +40,12 @@ public class QuotaRequestResponseDto {
 
     @JsonProperty("status")
     private QuotaRequestStatus status;
+
+    // Review Details
+    @JsonProperty("reviewed_by")
+    private String reviewedBy;
+
+    @JsonProperty("reviewed_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime reviewedAt;
 }

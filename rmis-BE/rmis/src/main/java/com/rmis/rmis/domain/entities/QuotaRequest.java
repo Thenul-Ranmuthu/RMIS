@@ -67,7 +67,7 @@ public class QuotaRequest {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewed_by", foreignKey = @ForeignKey(name = "fk_quota_requests_reviewer"))
-    private Admin reviewedBy;
+    private MinistryOfficer reviewedBy;
 
     @Column(name = "reviewed_at", nullable = true)
     private LocalDateTime reviewedAt;
