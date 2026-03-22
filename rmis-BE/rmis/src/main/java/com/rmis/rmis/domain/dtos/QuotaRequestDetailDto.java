@@ -2,7 +2,7 @@ package com.rmis.rmis.domain.dtos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.rmis.rmis.domain.enums.QuotaRequestStatus;
+import com.rmis.rmis.enums.QuotaRequestStatus;
 import lombok.*;
 
 import java.math.BigDecimal;

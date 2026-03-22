@@ -1,7 +1,7 @@
 package com.rmis.rmis.controllers;
 
 import com.rmis.rmis.domain.dtos.PagedResponseDto;
-import com.rmis.rmis.domain.dtos.QuotaRequestDetailDto;
+// import com.rmis.rmis.domain.dtos.QuotaRequestDetailDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestResponseDto;
 import com.rmis.rmis.enums.QuotaRequestStatus;
 import com.rmis.rmis.services.interfaces.QuotaRequestService;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
+// import java.util.UUID;
 
 @RestController
 @RequestMapping("/ministry/quota-requests")
@@ -70,11 +70,11 @@ public class QuotaRequestsController {
         );
     }
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('MINISTRY_OFFICER')")
-    public ResponseEntity<QuotaRequestDetailDto> getRequestById(
-            @PathVariable UUID id
-    ) {
-        return ResponseEntity.ok(quotaRequestService.getRequestById(id));
-    }
+//     @GetMapping("/{id}")
+//     @PreAuthorize("hasRole('MINISTRY_OFFICER')")
+//     public ResponseEntity<QuotaRequestDetailDto> getRequestById(
+//             @PathVariable UUID id
+//     ) {
+//         return ResponseEntity.ok(quotaRequestService.getRequestById(id));
+//     }
 }
