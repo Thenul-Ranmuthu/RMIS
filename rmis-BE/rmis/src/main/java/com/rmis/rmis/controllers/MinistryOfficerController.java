@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rmis.rmis.services.interfaces.EmailService;
 import com.rmis.rmis.services.interfaces.MinistryOfficerService;
 
 import lombok.AllArgsConstructor;
@@ -19,16 +20,18 @@ import lombok.AllArgsConstructor;
 public class MinistryOfficerController {
 
     private MinistryOfficerService ministryOfficerService;
+    private EmailService emailService;
     
     @PatchMapping(path = "/statusApprove/{id}")
     public ResponseEntity<String> changeQuotaRequestStatusApprove(@PathVariable("id") UUID id){
         String response = ministryOfficerService.changeQuotaRequestStatusApprove(id);
         
-        if(response.equalsIgnoreCase("Status set to ACCEPTED")){
+        if(response.equalsIgnoreCase("Status set to APPROVED")){
+            emailService.sendNotificationRequestApproval(id);
             return new ResponseEntity<>(response,HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
         }
-
-        return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
     }
 
     @PatchMapping(path = "/statusReject/{id}")
@@ -36,6 +39,7 @@ public class MinistryOfficerController {
         String response = ministryOfficerService.changeQuotaRequestStatusReject(id);
         
         if(response.equalsIgnoreCase("Status set to REJECTED")){
+            emailService.sendNotificationRequestRejection(id);
             return new ResponseEntity<>(response,HttpStatus.OK);
         }
 
