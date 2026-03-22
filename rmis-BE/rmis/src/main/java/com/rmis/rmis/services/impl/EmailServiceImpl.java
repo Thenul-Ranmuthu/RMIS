@@ -140,8 +140,39 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendNotificationRequestRejection(UUID id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'sendNotificationRequestRejection'");
+        QuotaRequest quotaRequest = quotaRequestRepository.findByIdWithCompany(id)
+            .orElseThrow(() -> new RuntimeException("No Quota request!!"));
+
+        Resend resend = new Resend(resendApiKey);
+
+        CreateEmailOptions params = CreateEmailOptions.builder()
+            .from("RMIS Support <rmis.qouta@rmis.space>")
+            .to(quotaRequest.getCompany().getEmail())
+            .subject("Quota Request Rejected!! - RMIS")
+            .html("""
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+                    <h2 style="color: #c0392b;">Quota Request Rejected ✗</h2>
+                    <p>Hello,</p>
+                    <p>Your environmental quota request with ID <strong>%s</strong> has been <strong style="color: #c0392b;">rejected</strong> by the Ministry of Environment.</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="%s/company/dashboard" style="background-color: #c0392b; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">View Dashboard</a>
+                </div>
+                    <p>You can log in to the Company Portal to view your quota request history.</p>
+                    <p>If you believe this decision was made in error, please contact the Ministry of Environment for further assistance.</p>
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                    <p style="font-size: 12px; color: #777;">RMIS Team</p>
+                </div>
+                """
+            .formatted(quotaRequest.getRequestId(), "http://localhost:3000"))
+        .build();
+
+        try {
+            resend.emails().send(params);
+        } catch (Exception e) {
+            // Log the error and rethrow to allow the caller (Controller) to handle it
+            System.err.println("Failed to send password reset email to " + quotaRequest.getCompany().getEmail() + ": " + e.getMessage());
+            throw new RuntimeException("Failed to send email: " + e.getMessage(), e);
+        }
     }
 }
 
