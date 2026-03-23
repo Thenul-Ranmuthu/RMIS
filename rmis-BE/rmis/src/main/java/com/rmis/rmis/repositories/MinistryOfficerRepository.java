@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface MinistryOfficerRepository extends JpaRepository<MinistryOfficer, Long> {
     Optional<MinistryOfficer> findByEmail(String email);
+    boolean existsByEmail(String officerEmail);
 }

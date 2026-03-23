@@ -1,269 +1,199 @@
-import {
-  QuotaFilters,
-  QuotaPaginatedResponse,
-  QuotaRequestDetail,
-} from "@/types/quota";
+// RMIS-FE/services/quotaService.ts
+
+import { QuotaFilters, QuotaPaginatedResponse, QuotaRequestDetail } from "@/types/quota";
 import { getToken } from "@/services/authService";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
-// ─── Interfaces (company-side) ────────────────────────────────
+// ── Helper: build auth headers ─────────────────────────────────────────────
+const authHeaders = (token?: string | null) => ({
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token ?? getToken()}`,
+});
 
-export interface QuotaRequest {
-  requestId: string;
-  requestNumber: number;
-  companyName: string;
-  requestedQuota: number;
-  submissionDate: string;
-  status: string;
-  [key: string]: unknown;
+// ─── Interfaces (company-side) ────────────────────────────────────────────
+
+export interface CompanyQuotaRequest {
+    id?: number | string;
+    companyEmail?: string;
+    requestedQuota: number;
+    status?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    [key: string]: unknown;
 }
 
 export interface QuotaSummary {
-  currentAvailableQuota: number | null;
-  remainingYearlyQuota: number | null;
+    currentAvailableQuota: number | null;
+    remainingYearlyQuota: number | null;
 }
 
 export interface QuotaListResponse {
-  summary: QuotaSummary;
-  requests: QuotaRequest[];
+    summary: QuotaSummary;
+    requests: CompanyQuotaRequest[];
 }
 
 export interface AddQuotaPayload {
-  companyEmail: string;
-  requestedQuota: number;
+    companyEmail: string;
+    requestedQuota: number;
 }
 
-export interface QuotaDetails {
-  quota: number;
-  remainingQuota: number;
-}
-
-// ─── Helpers ──────────────────────────────────────────────────
-
-const authHeaders = (token: string) => ({
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${token}`,
-});
+// ─── Company-side response parser ─────────────────────────────────────────
 
 const parseQuotaListResponse = (data: unknown): QuotaListResponse => {
-  if (Array.isArray(data)) {
+    if (Array.isArray(data)) {
+        return {
+            summary: { currentAvailableQuota: null, remainingYearlyQuota: null },
+            requests: data as CompanyQuotaRequest[],
+        };
+    }
+    if (data && typeof data === "object") {
+        const obj = data as Record<string, unknown>;
+        const requests: CompanyQuotaRequest[] = Array.isArray(obj.quotas)
+            ? (obj.quotas as CompanyQuotaRequest[])
+            : Array.isArray(obj.quotaRequests)
+                ? (obj.quotaRequests as CompanyQuotaRequest[])
+                : Array.isArray(obj.data)
+                    ? (obj.data as CompanyQuotaRequest[])
+                    : [];
+        const summary: QuotaSummary = {
+            currentAvailableQuota:
+                typeof obj.currentAvailableQuota === "number"
+                    ? obj.currentAvailableQuota
+                    : typeof obj.availableQuota === "number"
+                        ? obj.availableQuota
+                        : null,
+            remainingYearlyQuota:
+                typeof obj.remainingYearlyQuota === "number"
+                    ? obj.remainingYearlyQuota
+                    : typeof obj.yearlyQuota === "number"
+                        ? obj.yearlyQuota
+                        : null,
+        };
+        return { summary, requests };
+    }
     return {
-      summary: { currentAvailableQuota: null, remainingYearlyQuota: null },
-      requests: data as QuotaRequest[],
+        summary: { currentAvailableQuota: null, remainingYearlyQuota: null },
+        requests: [],
     };
-  }
-  if (data && typeof data === "object") {
-    const obj = data as Record<string, unknown>;
-    const requests: QuotaRequest[] = Array.isArray(obj.quotas)
-      ? (obj.quotas as QuotaRequest[])
-      : Array.isArray(obj.quotaRequests)
-        ? (obj.quotaRequests as QuotaRequest[])
-        : Array.isArray(obj.data)
-          ? (obj.data as QuotaRequest[])
-          : [];
-    const summary: QuotaSummary = {
-      currentAvailableQuota:
-        typeof obj.currentAvailableQuota === "number"
-          ? obj.currentAvailableQuota
-          : typeof obj.availableQuota === "number"
-            ? obj.availableQuota
-            : null,
-      remainingYearlyQuota:
-        typeof obj.remainingYearlyQuota === "number"
-          ? obj.remainingYearlyQuota
-          : typeof obj.yearlyQuota === "number"
-            ? obj.yearlyQuota
-            : null,
-    };
-    return { summary, requests };
-  }
-  return {
-    summary: { currentAvailableQuota: null, remainingYearlyQuota: null },
-    requests: [],
-  };
 };
 
-// ─── Company-side API ─────────────────────────────────────────
+// ─── Company-side API ─────────────────────────────────────────────────────
 
 export const getQuotas = async (token: string): Promise<QuotaListResponse> => {
-  const response = await fetch(`${API_BASE_URL}/company/getQuotas`, {
-    method: "GET",
-    headers: authHeaders(token),
-  });
-  if (!response.ok) {
-    const err = new Error(`Failed to fetch quotas: ${response.status}`);
-    (err as Error & { status: number }).status = response.status;
-    throw err;
-  }
-  const data = await response.json();
-  return parseQuotaListResponse(data);
+    const response = await fetch(`${BASE_URL}/quotaHeader/getQuotas`, {
+        method: "GET",
+        headers: authHeaders(token),
+    });
+    if (!response.ok) {
+        const err = new Error(`Failed to fetch quotas: ${response.status}`);
+        (err as Error & { status: number }).status = response.status;
+        throw err;
+    }
+    const data = await response.json();
+    return parseQuotaListResponse(data);
 };
 
 export const addQuota = async (
-  token: string,
-  payload: AddQuotaPayload,
+    token: string,
+    payload: AddQuotaPayload
 ): Promise<unknown> => {
-  const response = await fetch(`${API_BASE_URL}/quotaHeader/addQuota`, {
-    method: "POST",
-    headers: authHeaders(token),
-    body: JSON.stringify(payload),
-  });
-  if (!response.ok) {
-    let message = `Request failed: ${response.status}`;
-    try {
-      const err = await response.json();
-      message = err.message || err.error || message;
-    } catch {
-      /* keep default */
+    const response = await fetch(`${BASE_URL}/quotaHeader/addQuota`, {
+        method: "POST",
+        headers: authHeaders(token),
+        body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+        let message = `Request failed: ${response.status}`;
+        try {
+            const err = await response.json();
+            message = err.message || err.error || message;
+        } catch {
+            /* keep default */
+        }
+        throw new Error(message);
     }
-    throw new Error(message);
-  }
-  const text = await response.text();
-  try {
-    return JSON.parse(text);
-  } catch {
-    return { message: text };
-  }
-};
-
-// ─── Admin-side API ───────────────────────────────────────────
-
-// ── Get paginated/filtered list ────────────────────────────────────────────
-export const getQuotaRequests = async (
-  filters: QuotaFilters,
-  page: number = 1,
-  pageSize: number = 5,
-): Promise<QuotaPaginatedResponse> => {
-  const params = new URLSearchParams();
-  params.set("page", String(page));
-  params.set("limit", String(pageSize));
-  if (filters.companyName) params.set("company_name", filters.companyName);
-  if (filters.status) params.set("status", filters.status);
-  if (filters.submissionDate)
-    params.set("submission_date", filters.submissionDate);
-
-  const hasFilters =
-    filters.companyName || filters.status || filters.submissionDate;
-  const endpoint = hasFilters ? "filter" : "paginated";
-  const url = `${API_BASE_URL}/ministry/quota-requests/${endpoint}?${params}`;
-
-  const token = getToken();
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
     const text = await response.text();
-    console.log("Status:", response.status, "Body:", text);
-    throw new Error("Failed to fetch quota requests");
-  }
-  return response.json();
+    try {
+        return JSON.parse(text);
+    } catch {
+        return { message: text };
+    }
 };
 
-/**
- * Approve a quota request.
- * Endpoint: PATCH /ministry/statusApprove/{requestId}
- */
-// export const approveRequest = async (
-//   token: string,
-//   requestId: string,
-// ): Promise<string> => {
-//   const response = await fetch(
-//     `${API_BASE_URL}/ministry/statusApprove/${requestId}`,
-//     {
-//       method: "PATCH",
-//       headers: authHeaders(token),
-//     },
-//   );
-//   const text = await response.text();
-//   console.log("approve status:", response.status, "body:", text);
-//   if (!response.ok) {
-//     throw new Error(text || `Approval failed: ${response.status}`);
-//   }
-//   return text; // e.g. "Status set to APPROVED"
-// };
-// export const approveRequest = async (
-//   token: string,
-//   requestId: string,
-// ): Promise<string> => {
-//   const url = `${API_BASE_URL}/ministry/statusApprove/${requestId}`;
-//   console.log("PATCH URL:", url);
-//   const response = await fetch(url, {
-//     method: "PATCH",
-//     headers: { Authorization: `Bearer ${token}` },
-//   });
-//   console.log("response.ok:", response.ok, "status:", response.status);
-//   const text = await response.text();
-//   console.log("response text:", text);
-//   if (!response.ok) {
-//     throw new Error(text || `Approval failed: ${response.status}`);
-//   }
-//   return text;
-// };
+// ─── Ministry-side API ────────────────────────────────────────────────────
 
-export const getQuotaRequestById = async (
-  token: string,
-  id: string,
-): Promise<QuotaRequestDetail> => {
-  const response = await fetch(
-    `${API_BASE_URL}/ministry/quota-requests/${id}`,
-    {
-      headers: authHeaders(token),
-    },
-  );
-  if (!response.ok) throw new Error("Failed to fetch quota request detail");
-  return response.json();
+// ── Get paginated / filtered list ──────────────────────────────────────────
+export const getQuotaRequests = async (
+    filters: QuotaFilters,
+    page: number = 1,
+    pageSize: number = 5
+): Promise<QuotaPaginatedResponse> => {
+    const params = new URLSearchParams();
+    params.set("page", String(page));
+    params.set("limit", String(pageSize));
+
+    if (filters.companyName)    params.set("company_name",    filters.companyName);
+    if (filters.status)         params.set("status",          filters.status);
+    if (filters.submissionDate) params.set("submission_date", filters.submissionDate);
+
+    const hasFilters = filters.companyName || filters.status || filters.submissionDate;
+    const endpoint = hasFilters ? "filter" : "paginated";
+    const url = `${BASE_URL}/ministry/quota-requests/${endpoint}?${params}`;
+
+    const response = await fetch(url, { headers: authHeaders() });
+
+    if (!response.ok) {
+        const text = await response.text();
+        console.error("Status:", response.status, "Body:", text);
+        throw new Error("Failed to fetch quota requests");
+    }
+
+    return response.json();
 };
 
+// ── Get single request detail by UUID ─────────────────────────────────────
+export const getQuotaRequestById = async (id: string): Promise<QuotaRequestDetail> => {
+    const url = `${BASE_URL}/ministry/quota-requests/${id}`;
+    const response = await fetch(url, { headers: authHeaders() });
+    if (!response.ok) throw new Error("Failed to fetch quota request detail");
+    return response.json();
+};
+
+// ── Approve a quota request ────────────────────────────────────────────────
 export const approveRequest = async (
-  token: string,
-  requestId: string,
+    token: string,
+    id: string
 ): Promise<string> => {
-  const response = await fetch(
-    `${API_BASE_URL}/ministry/statusApprove/${requestId}`,
-    {
-      method: "PATCH",
-      headers: { Authorization: `Bearer ${token}` },
-    },
-  );
-  const text = await response.text();
-  return text; // ← remove the !response.ok check entirely
-};
-/**
- * Reject a quota request.
- * Endpoint: PATCH /ministry/statusReject/{requestId}
- */
-export const rejectRequest = async (
-  token: string,
-  requestId: string,
-): Promise<string> => {
-  const response = await fetch(
-    `${API_BASE_URL}/ministry/statusReject/${requestId}`,
-    {
-      method: "PATCH",
-      headers: authHeaders(token),
-    },
-  );
-  const text = await response.text();
-  if (!response.ok) {
-    throw new Error(text || `Rejection failed: ${response.status}`);
-  }
-  return text; // e.g. "Status set to REJECTED"
+    const response = await fetch(
+        `${BASE_URL}/ministry/quota-requests/statusApprove/${id}`,
+        {
+            method: "PATCH",
+            headers: { Authorization: `Bearer ${token}` },
+        }
+    );
+    const text = await response.text();
+    if (!response.ok) {
+        throw new Error(text || `Approval failed: ${response.status}`);
+    }
+    return text;
 };
 
-export const getQuotaDetails = async (token: string): Promise<QuotaDetails> => {
-  const response = await fetch(`${API_BASE_URL}/company/getQuotaDetails`, {
-    method: "GET",
-    headers: authHeaders(token),
-  });
-  if (!response.ok) {
-    const err = new Error(`Failed to fetch quota details: ${response.status}`);
-    (err as Error & { status: number }).status = response.status;
-    throw err;
-  }
-  return response.json();
+// ── Reject a quota request ─────────────────────────────────────────────────
+export const rejectRequest = async (
+    token: string,
+    id: string
+): Promise<string> => {
+    const response = await fetch(
+        `${BASE_URL}/ministry/quota-requests/statusReject/${id}`,
+        {
+            method: "PATCH",
+            headers: authHeaders(token),
+        }
+    );
+    const text = await response.text();
+    if (!response.ok) {
+        throw new Error(text || `Rejection failed: ${response.status}`);
+    }
+    return text;
 };

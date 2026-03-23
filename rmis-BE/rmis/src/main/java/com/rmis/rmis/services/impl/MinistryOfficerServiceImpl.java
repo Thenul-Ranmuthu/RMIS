@@ -1,7 +1,10 @@
 package com.rmis.rmis.services.impl;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.rmis.rmis.domain.entities.MinistryOfficer;
+import com.rmis.rmis.services.interfaces.AuditLogService;
 import org.springframework.stereotype.Service;
 
 import com.rmis.rmis.domain.entities.Company;
@@ -19,9 +22,10 @@ public class MinistryOfficerServiceImpl implements MinistryOfficerService{
 
     private QuotaRequestRepository quotaRequestRepository;
     private CompanyRepository companyRepository;
+    private final AuditLogService auditLogService;
 
     @Override
-    public String changeQuotaRequestStatusApprove(UUID id) {
+    public String changeQuotaRequestStatusApprove(UUID id, MinistryOfficer officer) {
         if(!quotaRequestRepository.existsById(id)){
             return "No quota found with the ID: " + id;
         }
@@ -30,9 +34,12 @@ public class MinistryOfficerServiceImpl implements MinistryOfficerService{
             .orElseThrow(() -> new RuntimeException("No Quota request!!"));
 
         quotaRequest.setStatus(QuotaRequestStatus.APPROVED);
+        quotaRequest.setReviewedBy(officer);
+        quotaRequest.setReviewedAt(LocalDateTime.now());
         
         quotaRequestRepository.save(quotaRequest);
-        
+        auditLogService.logApproval(officer, quotaRequest);
+
         Company company = companyRepository.findByEmail(quotaRequest.getCompany().getEmail())
             .orElseThrow(() -> new RuntimeException("No Company found!!"));
 
@@ -44,7 +51,7 @@ public class MinistryOfficerServiceImpl implements MinistryOfficerService{
     }
 
     @Override
-    public String changeQuotaRequestStatusReject(UUID id) {
+    public String changeQuotaRequestStatusReject(UUID id, MinistryOfficer officer) {
         if(!quotaRequestRepository.existsById(id)){
             return "No quota found with the ID: " + id;
         }
@@ -53,8 +60,11 @@ public class MinistryOfficerServiceImpl implements MinistryOfficerService{
             .orElseThrow(() -> new RuntimeException("No Quota request!!"));
         
         quotaRequest.setStatus(QuotaRequestStatus.REJECTED);
+        quotaRequest.setReviewedBy(officer);
+        quotaRequest.setReviewedAt(LocalDateTime.now());
         
         quotaRequestRepository.save(quotaRequest);
+        auditLogService.logRejection(officer, quotaRequest);
 
         return "Status set to REJECTED";
     }

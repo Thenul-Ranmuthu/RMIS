@@ -4,6 +4,7 @@ import com.rmis.rmis.domain.dtos.LoginDto;
 import com.rmis.rmis.domain.dtos.MinistryOfficerRegisterDto;
 import com.rmis.rmis.domain.entities.MinistryOfficer;
 import com.rmis.rmis.domain.entities.Role;
+import com.rmis.rmis.exceptions.RegisterUserAlreadyExistsException;
 import com.rmis.rmis.repositories.MinistryOfficerRepository;
 import com.rmis.rmis.repositories.RoleRepository;
 import com.rmis.rmis.services.interfaces.MinistryOfficerAuthService;
@@ -39,11 +40,6 @@ public class MinistryOfficerAuthServiceImpl implements MinistryOfficerAuthServic
         this.passwordEncoder = passwordEncoder;
     }
 
-//    @Autowired
-//    public MinistryOfficerAuthServiceImpl(PasswordEncoder passwordEncoder) {
-//        this.passwordEncoder = passwordEncoder;
-//    }
-
     public String ministryOfficerLogin(LoginDto loginRequest) {
 
         // Authenticates email and password against DB
@@ -61,6 +57,9 @@ public class MinistryOfficerAuthServiceImpl implements MinistryOfficerAuthServic
     }
 
     public String ministryOfficerRegister(MinistryOfficerRegisterDto officerRegisterDto) {
+        if(officerRepo.existsByEmail(officerRegisterDto.getOfficerEmail())){
+            throw new RegisterUserAlreadyExistsException("A Ministry Officer with this email already exists");
+        }
         Role role = roleRepository.findByName("ROLE_MINISTRY_OFFICER");
         MinistryOfficer ministryOfficer = new MinistryOfficer();
         ministryOfficer.setName(officerRegisterDto.getOfficerName());

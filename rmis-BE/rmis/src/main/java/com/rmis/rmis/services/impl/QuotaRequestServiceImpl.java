@@ -1,8 +1,9 @@
 package com.rmis.rmis.services.impl;
 
 import com.rmis.rmis.domain.dtos.PagedResponseDto;
-import com.rmis.rmis.domain.dtos.QuotaRequestAddQuotaDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestDetailDto;
+import com.rmis.rmis.domain.dtos.QuotaRequestHeaderDto;
+import com.rmis.rmis.domain.dtos.QuotaRequestAddQuotaDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestResponseDto;
 import com.rmis.rmis.domain.entities.Company;
 import com.rmis.rmis.domain.entities.QuotaRequest;
@@ -113,8 +114,8 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
 
     private QuotaRequestResponseDto toDto(QuotaRequest entity) {
         return QuotaRequestResponseDto.builder()
-                // .requestId(formatRequestId(entity.getRequestNumber()))
-                .requestId(entity.getRequestId().toString())
+                .id(entity.getRequestId())
+                .requestId(formatRequestId(entity.getRequestNumber()))
                 .companyName(entity.getCompanyName())
                 .requestedQuota(entity.getRequestedQuota())
                 .submissionDate(entity.getSubmissionDate())
@@ -122,9 +123,9 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
                 .build();
     }
 
-    // private String formatRequestId(Long requestNumber) {
-    //     return String.format("REQ-%04d", requestNumber);
-    // }
+     private String formatRequestId(Long requestNumber) {
+         return String.format("REQ-%04d", requestNumber);
+     }
 
     @Override
     public String addQuotaRequest(QuotaRequestAddQuotaDto quotaRequestHeaderDto) {
@@ -164,7 +165,7 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
     private QuotaRequestDetailDto toDetailDto(QuotaRequest entity) {
         return QuotaRequestDetailDto.builder()
                 .id(entity.getRequestId())
-                .requestId(entity.getRequestId().toString())
+                .requestId(formatRequestId(entity.getRequestNumber()))
                 .companyName(entity.getCompanyName())
                 .companyEmail(entity.getCompany().getEmail())
                 .companyIdentifier(entity.getCompany().getCompanyid())

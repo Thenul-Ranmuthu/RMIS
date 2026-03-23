@@ -2,8 +2,11 @@ package com.rmis.rmis.controllers;
 
 import java.util.UUID;
 
+import com.rmis.rmis.domain.entities.MinistryOfficer;
+import com.rmis.rmis.repositories.MinistryOfficerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,15 +19,24 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "ministry")
+@RequestMapping(path = "/ministry/quota-requests")
 public class MinistryOfficerController {
 
     private MinistryOfficerService ministryOfficerService;
+    private MinistryOfficerRepository ministryOfficerRepository;
     private EmailService emailService;
     
     @PatchMapping(path = "/statusApprove/{id}")
     public ResponseEntity<String> changeQuotaRequestStatusApprove(@PathVariable("id") UUID id){
-        String response = ministryOfficerService.changeQuotaRequestStatusApprove(id);
+        // Get the logged-in officer's email from the security context
+        String officerEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        // Load the full officer object from DB using their email
+        MinistryOfficer officer = ministryOfficerRepository.findByEmail(officerEmail)
+                .orElseThrow(() -> new RuntimeException("Officer not found"));
+        String response = ministryOfficerService.changeQuotaRequestStatusApprove(id, officer);
         
         if(response.equalsIgnoreCase("Status set to APPROVED")){
             emailService.sendNotificationRequestApproval(id);
@@ -36,7 +48,16 @@ public class MinistryOfficerController {
 
     @PatchMapping(path = "/statusReject/{id}")
     public ResponseEntity<String> changeQuotaRequestStatusReject(@PathVariable("id") UUID id){
-        String response = ministryOfficerService.changeQuotaRequestStatusReject(id);
+        // Get the logged-in officer's email from the security context
+        String officerEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        // Load the full officer object from DB using their email
+        MinistryOfficer officer = ministryOfficerRepository.findByEmail(officerEmail)
+                .orElseThrow(() -> new RuntimeException("Officer not found"));
+
+        String response = ministryOfficerService.changeQuotaRequestStatusReject(id, officer);
         
         if(response.equalsIgnoreCase("Status set to REJECTED")){
             emailService.sendNotificationRequestRejection(id);
