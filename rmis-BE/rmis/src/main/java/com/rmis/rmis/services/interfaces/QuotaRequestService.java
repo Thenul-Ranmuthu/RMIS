@@ -22,6 +22,6 @@ public interface QuotaRequestService {
                                                                   LocalDate submissionDate,
                                                                   int page, int limit);
 
-    String addQuotaRequest(QuotaRequestHeaderDto quotaRequestHeaderDto);
+    String addQuotaRequest(QuotaRequestAddQuotaDto quotaRequestHeaderDto);
     QuotaRequestDetailDto getRequestById(UUID requestId);
 }
