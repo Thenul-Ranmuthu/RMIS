@@ -37,7 +37,7 @@ export default function AdminDashboardPage() {
         const role = getRole();
 
         if (!token) {
-            router.push('/admin/login');
+            router.push('/admin/auth/login');
             return;
         }
 
@@ -75,7 +75,8 @@ export default function AdminDashboardPage() {
     const handleLogout = () => {
         localStorage.removeItem('accessToken');
         sessionStorage.removeItem('accessToken');
-        router.push('/admin/login');
+        document.cookie = "accessToken=; path=/; max-age=0"; // ← clear cookie
+        router.push('/ministry');
     };
 
     // ── Stats derived from data ────────────────────────────────────────────

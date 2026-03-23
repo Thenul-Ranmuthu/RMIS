@@ -70,9 +70,12 @@ export default function MinistryLoginCard() {
                 saveToken(data.accessToken);
                 if (rememberMe) {
                     localStorage.setItem("accessToken", data.accessToken);
+                    
                 } else {
                     sessionStorage.setItem("accessToken", data.accessToken);
                 }
+                // After saving to localStorage/sessionStorage, also set a cookie
+                document.cookie = `accessToken=${data.accessToken}; path=/; max-age=${rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24}`;
             }
 
             router.push("/ministry/quota-requests");

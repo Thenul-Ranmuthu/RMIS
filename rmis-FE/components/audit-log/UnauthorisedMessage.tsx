@@ -27,7 +27,7 @@ export default function UnauthorisedMessage() {
                 This page is restricted to system administrators only.
             </p>
             <Link
-                href="/admin/login"
+                href="/admin/auth/login"
                 style={{
                     marginTop: 8,
                     backgroundColor: '#1e293b',
