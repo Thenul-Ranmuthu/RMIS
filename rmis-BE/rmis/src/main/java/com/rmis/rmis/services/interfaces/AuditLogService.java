@@ -11,7 +11,7 @@ public interface AuditLogService {
 
     void logApproval(MinistryOfficer officer, QuotaRequest request);
 
-    void logRejection(MinistryOfficer officer, QuotaRequest request, String reason);
+    void logRejection(MinistryOfficer officer, QuotaRequest request);
 
     List<AuditLogResponseDto> getAuditLogs(LocalDate from, LocalDate to);
 }

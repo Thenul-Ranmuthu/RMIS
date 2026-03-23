@@ -36,13 +36,12 @@ public class AuditLogServiceImpl implements AuditLogService {
     }
 
     @Override
-    public void logRejection(MinistryOfficer officer, QuotaRequest request, String reason) {
+    public void logRejection(MinistryOfficer officer, QuotaRequest request) {
         AuditLog log = AuditLog.builder()
                 .officerName(officer.getName())
                 .officerEmail(officer.getEmail())
                 .actionType(AuditActionType.REJECTED)
                 .requestId(formatRequestId(request.getRequestNumber()))
-                .rejectionReason(reason)
                 .build();
 
         auditLogRepository.save(log);
