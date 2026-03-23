@@ -34,35 +34,4 @@ public class AdminController {
         String response = adminService.addCompanyQouata(email, quota);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
-
-    // @GetMapping(path = "/getQuotas")
-    // public ResponseEntity<List<QuotaRequestHeader>> getPendingQuotas() {
-    //     List<QuotaRequestHeader> quotas = adminService.getPendingQuotas();
-    //     if(quotas.isEmpty()){
-    //         return new ResponseEntity<>(quotas,HttpStatus.NO_CONTENT);
-    //     }
-    //     return new ResponseEntity<>(quotas,HttpStatus.FOUND);
-    // }
-
-    // @PatchMapping(path = "/statusApprove/{id}")
-    // public ResponseEntity<String> changeQuotaRequestStatusApprove(@PathVariable("id") Long id){
-    //     String response = adminService.changeQuotaRequestStatusApprove(id);
-        
-    //     if(response.equalsIgnoreCase("Status set to ACCEPTED")){
-    //         return new ResponseEntity<>(response,HttpStatus.OK);
-    //     }
-
-    //     return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
-    // }
-
-    // @PatchMapping(path = "/statusDecline/{id}")
-    // public ResponseEntity<String> changeQuotaRequestStatusDecline(@PathVariable("id") Long id){
-    //     String response = adminService.changeQuotaRequestStatusDecline(id);
-        
-    //     if(response.equalsIgnoreCase("Status set to DECLINED")){
-    //         return new ResponseEntity<>(response,HttpStatus.OK);
-    //     }
-
-    //     return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
-    // }
 }

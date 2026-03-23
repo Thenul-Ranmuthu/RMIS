@@ -3,7 +3,8 @@ package com.rmis.rmis.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rmis.rmis.domain.dtos.QuotaRequestHeaderDto;
+import com.rmis.rmis.domain.dtos.QuotaRequestAddQuotaDto;
+import com.rmis.rmis.services.interfaces.EmailService;
 import com.rmis.rmis.services.interfaces.QuotaRequestService;
 
 import lombok.AllArgsConstructor;
@@ -22,10 +23,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class QuotaRequestController {
 
     private QuotaRequestService quotaRequestService;
+    private EmailService emailService;
 
     @PostMapping(path = "/addQuota")
-    public ResponseEntity<String> addQuotaRequest(@RequestBody QuotaRequestHeaderDto quotaRequestHeaderDto) {
-        String response = quotaRequestService.addQuotaRequest(quotaRequestHeaderDto);
+    public ResponseEntity<String> addQuotaRequest(@RequestBody QuotaRequestAddQuotaDto quotaRequestAddQuotaDto) {
+        emailService.sendNotificationNewRequestSubmission(quotaRequestAddQuotaDto);
+        String response = quotaRequestService.addQuotaRequest(quotaRequestAddQuotaDto);
         if(response.equalsIgnoreCase("Error: Insuffitient quota balance!!")){
             return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
         }

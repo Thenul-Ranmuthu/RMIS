@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuotaDetailsResponseDto {
-    private BigDecimal quota;
-    private BigDecimal remainingQuota;
+public class QuotaRequestAddQuotaDto {
+    private BigDecimal requestedQuota;
+    private String companyEmail;
 }

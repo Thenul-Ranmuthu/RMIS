@@ -43,6 +43,7 @@ const StatusBadge = ({ status }: { status: QuotaStatus }) => {
     );
 };
 
+// Loading skeleton rows
 const SkeletonRow = () => (
     <tr>
         {Array.from({ length: 6 }).map((_, i) => (
