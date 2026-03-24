@@ -1,6 +1,6 @@
 // RMIS-FE/services/quotaService.ts
 
-import { QuotaFilters, QuotaPaginatedResponse, QuotaRequestDetail } from "@/types/quota";
+import { QuotaFilters, QuotaPaginatedResponse ,QuotaRequestDetail} from "@/types/quota";
 import { getToken } from "@/services/authService";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
@@ -15,8 +15,11 @@ const authHeaders = (token?: string | null) => ({
 
 export interface CompanyQuotaRequest {
     id?: number | string;
+    requestNumber: number;
+    companyName: string;
     companyEmail?: string;
     requestedQuota: number;
+    submissionDate: string;
     status?: string;
     createdAt?: string;
     updatedAt?: string;
@@ -36,6 +39,11 @@ export interface QuotaListResponse {
 export interface AddQuotaPayload {
     companyEmail: string;
     requestedQuota: number;
+}
+
+export interface QuotaDetails {
+  quota: number;
+  remainingQuota: number;
 }
 
 // ─── Company-side response parser ─────────────────────────────────────────
@@ -81,7 +89,7 @@ const parseQuotaListResponse = (data: unknown): QuotaListResponse => {
 // ─── Company-side API ─────────────────────────────────────────────────────
 
 export const getQuotas = async (token: string): Promise<QuotaListResponse> => {
-    const response = await fetch(`${BASE_URL}/quotaHeader/getQuotas`, {
+    const response = await fetch(`${BASE_URL}/company/getQuotas`, {
         method: "GET",
         headers: authHeaders(token),
     });
@@ -173,9 +181,9 @@ export const approveRequest = async (
         }
     );
     const text = await response.text();
-    if (!response.ok) {
-        throw new Error(text || `Approval failed: ${response.status}`);
-    }
+    // if (!response.ok) {
+    //     throw new Error(text || `Approval failed: ${response.status}`);
+    // }
     return text;
 };
 
@@ -196,4 +204,17 @@ export const rejectRequest = async (
         throw new Error(text || `Rejection failed: ${response.status}`);
     }
     return text;
+};
+
+export const getQuotaDetails = async (token: string): Promise<QuotaDetails> => {
+  const response = await fetch(`${BASE_URL}/company/getQuotaDetails`, {
+    method: "GET",
+    headers: authHeaders(token),
+  });
+  if (!response.ok) {
+    const err = new Error(`Failed to fetch quota details: ${response.status}`);
+    (err as Error & { status: number }).status = response.status;
+    throw err;
+  }
+  return response.json();
 };

@@ -7,7 +7,7 @@ import AddQuotaModal from "@/components/AddQuotaModal";
 // import type { QuotaRequest, QuotaSummary } from "@/services/quotaService";
 
 import { getQuotas, getQuotaDetails } from "@/services/quotaService";
-import type { QuotaRequest, QuotaSummary } from "@/services/quotaService";
+import type { CompanyQuotaRequest, QuotaSummary } from "@/services/quotaService";
 
 // ─── Status badge helper ───────────────────────────────────────
 
@@ -117,7 +117,7 @@ export default function CompanyDashboard() {
     currentAvailableQuota: null,
     remainingYearlyQuota: null,
   });
-  const [requests, setRequests] = useState<QuotaRequest[]>([]);
+  const [requests, setRequests] = useState<CompanyQuotaRequest[]>([]);
   const [quotaLoading, setQuotaLoading] = useState(true);
   const [quotaError, setQuotaError] = useState<string>("");
 
@@ -508,7 +508,7 @@ export default function CompanyDashboard() {
                       {requests.map((req, idx) => (
                         <tr
                           // key={req.id ?? idx}
-                          key={req.requestId ?? idx}
+                          key={req.id ?? idx}
                           className="hover:bg-gray-50/60 transition"
                         >
                           <td className="py-3.5 pr-4 text-gray-400 font-medium text-xs">
