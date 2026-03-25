@@ -12,14 +12,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+//import org.springframework.boot.test.mock.mockito.MockBean;
+//import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
@@ -28,31 +30,31 @@ import java.util.List;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(QuotaRequestsController.class)
+@org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest(QuotaRequestsController.class)
 public class QuotaRequestsIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private QuotaRequestService quotaRequestService;
 
-    @MockBean
+    @MockitoBean
     private JwtTokenProvider jwtTokenProvider;
 
-    @MockBean
+    @MockitoBean
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    @MockBean(name = "applicationCompanyDetailsService")
+    @MockitoBean(name = "applicationCompanyDetailsService")
     private UserDetailsService companyDetailsService;
 
-    @MockBean(name = "applicationPublicUserDetailsService")
+    @MockitoBean(name = "applicationPublicUserDetailsService")
     private UserDetailsService publicUserDetailsService;
 
-    @MockBean(name = "applicationTechnicianDetailsService")
+    @MockitoBean(name = "applicationTechnicianDetailsService")
     private UserDetailsService technicianDetailsService;
 
-    @MockBean
+    @MockitoBean
     private ApplicationMinistryOfficerDetailsService applicationMinistryOfficerDetailsService;
 
     @BeforeEach
