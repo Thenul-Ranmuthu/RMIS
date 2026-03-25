@@ -1,4 +1,57 @@
-rmis-FE/node_modules
+# Node.js
+node_modules/
+.npm
+.eslintcache
+.next/
+out/
+build/
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Application specific
 rmis-BE/rmis/src/main/resources/application.properties
-rmis-BE/rmis/target
-rmis-BE/rmis/src/main/java/com/rmis/rmis/uploads
+rmis-BE/rmis/src/main/java/com/rmis/rmis/uploads/
+rmis-BE/rmis/target/
+
+# Frontend specific
+rmis-FE/.next/
+rmis-FE/node_modules/
+rmis-FE/out/
+rmis-FE/build/
+rmis-FE/dist/
