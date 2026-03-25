@@ -1,6 +1,41 @@
-rmis-FE/node_modules
-rmis-BE/rmis/src/main/resources/application.properties
-rmis-BE/rmis/target
-rmis-BE/rmis/src/main/java/com/rmis/rmis/uploads
+# General
+.DS_Store
+Thumbs.db
 
-rmis-FE/.next
+# Backend
+rmis-BE/rmis/target/
+rmis-BE/rmis/.mvn/
+rmis-BE/rmis/src/main/resources/application.properties
+rmis-BE/rmis/src/main/java/com/rmis/rmis/uploads/
+
+# IDE and Project Files
+*.iml
+.idea/
+.settings/
+.classpath
+.project
+.vscode/
+
+# Frontend
+rmis-FE/node_modules/
+rmis-FE/.next/
+rmis-FE/out/
+rmis-FE/build/
+rmis-FE/.env
+rmis-FE/.env.local
+rmis-FE/.env.development.local
+rmis-FE/.env.test.local
+rmis-FE/.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+rmis-FE/dev_log.txt
+rmis-BE/rmis/test_out.txt
+rmis-BE/rmis/test_out_utf8.txt
+
+# Testing/Coverage
+coverage/
+.nyc_output/

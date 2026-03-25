@@ -72,6 +72,9 @@ public class QuotaRequest {
     @Column(name = "reviewed_at", nullable = true)
     private LocalDateTime reviewedAt;
 
+    @Column(name = "rejection_reason", length = 500)
+    private String rejectionReason;
+
     // Audit Fields
 
     @CreationTimestamp

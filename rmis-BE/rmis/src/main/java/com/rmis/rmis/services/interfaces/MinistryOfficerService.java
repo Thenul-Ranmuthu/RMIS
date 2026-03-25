@@ -6,6 +6,6 @@ public interface MinistryOfficerService {
 
     String changeQuotaRequestStatusApprove(UUID id);
 
-    String changeQuotaRequestStatusReject(UUID id);
+    String changeQuotaRequestStatusReject(UUID id, String reason);
 
 }
