@@ -1,0 +1,228 @@
+﻿[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.rmis:rmis:jar:0.0.1-SNAPSHOT
+[WARNING] 'dependencies.dependency.version' for com.resend:resend-java:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 108, column 16
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] 
+[INFO] ---------------------------< com.rmis:rmis >----------------------------
+[INFO] Building rmis 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ rmis ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ rmis ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 89 source files with javac [debug parameters release 21] to target\classes
+mvn : WARNING: A terminally 
+deprecated method in 
+sun.misc.Unsafe has been 
+called
+At line:1 char:1
++ mvn test -Dtest=QuotaReque
+stIntegrationTest 2>&1 | 
+Out-File -FilePath ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          
+    : NotSpecified: (WARNI  
+  NG: A term...has been c   
+ alled:String) [], Remot    
+eException
+    + FullyQualifiedErrorId 
+    : NativeCommandError
+ 
+WARNING: sun.misc.Unsafe::ob
+jectFieldOffset has been 
+called by 
+lombok.permit.Permit
+WARNING: Please consider 
+reporting this to the 
+maintainers of class 
+lombok.permit.Permit
+WARNING: sun.misc.Unsafe::ob
+jectFieldOffset will be 
+removed in a future release
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ rmis ---
+[INFO] skip non existing resourceDirectory E:\CS\SE\RMIS\rmis-BE\rmis\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ rmis ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 3 source files with javac [debug parameters release 21] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ rmis ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.rmis.rmis.integration.QuotaRequestIntegrationTest
+15:28:39.563 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.rmis.rmis.integration.QuotaRequestIntegrationTest]: QuotaRequestIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+15:28:39.705 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.rmis.rmis.RmisApplication for test class com.rmis.rmis.integration.QuotaRequestIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.2)
+
+2026-03-25T15:28:40.218+05:30  WARN 31104 --- [rmis] [           main] ory$DuplicateJsonObjectContextCustomizer : 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/C:/Users/HP/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+	jar:file:/C:/Users/HP/.m2/repository/org/json/json/20250517/json-20250517.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2026-03-25T15:28:40.233+05:30  INFO 31104 --- [rmis] [           main] c.r.r.i.QuotaRequestIntegrationTest      : Starting QuotaRequestIntegrationTest using Java 25.0.2 with PID 31104 (started by HP in E:\CS\SE\RMIS\rmis-BE\rmis)
+2026-03-25T15:28:40.235+05:30  INFO 31104 --- [rmis] [           main] c.r.r.i.QuotaRequestIntegrationTest      : No active profile set, falling back to 1 default profile: "default"
+2026-03-25T15:28:41.367+05:30  INFO 31104 --- [rmis] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-03-25T15:28:41.368+05:30  INFO 31104 --- [rmis] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2026-03-25T15:28:41.405+05:30  INFO 31104 --- [rmis] [           main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.rmis.rmis.repositories.AdminRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2026-03-25T15:28:41.407+05:30  INFO 31104 --- [rmis] [           main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.rmis.rmis.repositories.CertificationRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2026-03-25T15:28:41.409+05:30  INFO 31104 --- [rmis] [           main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.rmis.rmis.repositories.CompanyRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2026-03-25T15:28:41.411+05:30  INFO 31104 --- [rmis] [           main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.rmis.rmis.repositories.MinistryOfficerRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2026-03-25T15:28:41.412+05:30  INFO 31104 --- [rmis] [           main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.rmis.rmis.repositories.PasswordResetTokenRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2026-03-25T15:28:41.413+05:30  INFO 31104 --- [rmis] [           main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.rmis.rmis.repositories.PublicUserRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2026-03-25T15:28:41.415+05:30  INFO 31104 --- [rmis] [           main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.rmis.rmis.repositories.QuotaRequestRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2026-03-25T15:28:41.417+05:30  INFO 31104 --- [rmis] [           main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.rmis.rmis.repositories.RoleRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2026-03-25T15:28:41.418+05:30  INFO 31104 --- [rmis] [           main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.rmis.rmis.repositories.TechnicianRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2026-03-25T15:28:41.420+05:30  INFO 31104 --- [rmis] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 45 ms. Found 0 JDBC repository interfaces.
+2026-03-25T15:28:41.431+05:30  INFO 31104 --- [rmis] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-03-25T15:28:41.432+05:30  INFO 31104 --- [rmis] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-25T15:28:41.484+05:30  INFO 31104 --- [rmis] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 48 ms. Found 9 JPA repository interfaces.
+2026-03-25T15:28:42.226+05:30  INFO 31104 --- [rmis] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-03-25T15:28:42.243+05:30  INFO 31104 --- [rmis] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-03-25T15:28:42.244+05:30  INFO 31104 --- [rmis] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-03-25T15:28:42.313+05:30  INFO 31104 --- [rmis] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2052 ms
+2026-03-25T15:28:42.476+05:30  INFO 31104 --- [rmis] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-03-25T15:28:42.559+05:30  INFO 31104 --- [rmis] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-03-25T15:28:43.124+05:30  INFO 31104 --- [rmis] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-25T15:28:43.157+05:30  INFO 31104 --- [rmis] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-03-25T15:28:43.352+05:30  INFO 31104 --- [rmis] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1b868ef0
+2026-03-25T15:28:43.353+05:30  INFO 31104 --- [rmis] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-03-25T15:28:43.424+05:30  INFO 31104 --- [rmis] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/rmis]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.3
+	Default catalog/schema: rmis/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-03-25T15:28:44.513+05:30  INFO 31104 --- [rmis] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-03-25T15:28:44.594+05:30  INFO 31104 --- [rmis] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-25T15:28:44.663+05:30  INFO 31104 --- [rmis] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-03-25T15:28:45.188+05:30  WARN 31104 --- [rmis] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-03-25T15:28:45.301+05:30  INFO 31104 --- [rmis] [           main] eAuthenticationProviderManagerConfigurer : Found 4 AuthenticationProvider beans, with names [companyAuthenticationProvider, publicUserAuthenticationProvider, technicianAuthenticationProvider, ministryOfficerAuthenticationProvider]. Global Authentication Manager will not be configured with AuthenticationProviders. Consider publishing a single AuthenticationProvider bean, or wiring your Providers directly using the DSL.
+2026-03-25T15:28:45.302+05:30  WARN 31104 --- [rmis] [           main] r$InitializeUserDetailsManagerConfigurer : Found 4 UserDetailsService beans, with names [applicationCompanyDetailsService, applicationMinistryOfficerDetailsService, applicationPublicUserDetailsService, applicationTechnicianDetailsService]. Global Authentication Manager will not use a UserDetailsService for username/password login. Consider publishing a single UserDetailsService bean.
+2026-03-25T15:28:45.868+05:30  INFO 31104 --- [rmis] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 61129 (http) with context path '/'
+2026-03-25T15:28:45.875+05:30  INFO 31104 --- [rmis] [           main] c.r.r.i.QuotaRequestIntegrationTest      : Started QuotaRequestIntegrationTest in 5.888 seconds (process running for 7.245)
+Hibernate: select r1_0.id,r1_0.name from roles r1_0 where r1_0.name=?
+Hibernate: select r1_0.id,r1_0.name from roles r1_0 where r1_0.name=?
+Hibernate: select r1_0.id,r1_0.name from roles r1_0 where r1_0.name=?
+Hibernate: select r1_0.id,r1_0.name from roles r1_0 where r1_0.name=?
+Mockito is currently 
+self-attaching to enable 
+the inline-mock-maker. This 
+will no longer work in 
+future releases of the JDK. 
+Please add Mockito as an 
+agent to your build as 
+described in Mockito's 
+documentation: https://javad
+oc.io/doc/org.mockito/mockit
+o-core/latest/org.mockito/or
+g/mockito/Mockito.html#0.3
+Java HotSpot(TM) 64-Bit 
+Server VM warning: Sharing 
+is only supported for boot 
+loader classes because 
+bootstrap classpath has 
+been appended
+WARNING: A Java agent has 
+been loaded dynamically (C:\
+Users\HP\.m2\repository\net\
+bytebuddy\byte-buddy-agent\1
+.17.8\byte-buddy-agent-1.17.
+8.jar)
+WARNING: If a 
+serviceability tool is in 
+use, please run with -XX:+En
+ableDynamicAgentLoading to 
+hide this warning
+WARNING: If a 
+serviceability tool is not 
+in use, please run with 
+-Djdk.instrument.traceUsage 
+for more information
+WARNING: Dynamic loading of 
+agents will be disallowed 
+by default in a future 
+release
+2026-03-25T15:28:46.697+05:30  INFO 31104 --- [rmis] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+2026-03-25T15:28:46.697+05:30  INFO 31104 --- [rmis] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-03-25T15:28:46.698+05:30  INFO 31104 --- [rmis] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+Hibernate: select r1_0.id,r1_0.name from roles r1_0 where r1_0.name=?
+Hibernate: insert into roles (name) values (?)
+Hibernate: insert into companies (companyid,email,failed_login_attempts,locked_until,name,password,quota,role_id,status) values (?,?,?,?,?,?,?,?,?)
+Hibernate: update companies set companyid=?,email=?,failed_login_attempts=?,locked_until=?,name=?,password=?,quota=?,role_id=?,status=? where id=?
+Hibernate: select c1_0.id,c1_0.companyid,c1_0.email,c1_0.failed_login_attempts,c1_0.locked_until,c1_0.name,c1_0.password,c1_0.quota,c1_0.role_id,c1_0.status from companies c1_0 where c1_0.email=?
+2026-03-25T15:28:46.939+05:30  INFO 31104 --- [rmis] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+2026-03-25T15:28:46.939+05:30  INFO 31104 --- [rmis] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-03-25T15:28:46.941+05:30  INFO 31104 --- [rmis] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+Hibernate: select r1_0.id,r1_0.name from roles r1_0 where r1_0.name=?
+Hibernate: insert into roles (name) values (?)
+Hibernate: insert into companies (companyid,email,failed_login_attempts,locked_until,name,password,quota,role_id,status) values (?,?,?,?,?,?,?,?,?)
+Hibernate: update companies set companyid=?,email=?,failed_login_attempts=?,locked_until=?,name=?,password=?,quota=?,role_id=?,status=? where id=?
+Hibernate: select c1_0.id,c1_0.companyid,c1_0.email,c1_0.failed_login_attempts,c1_0.locked_until,c1_0.name,c1_0.password,c1_0.quota,c1_0.role_id,c1_0.status from companies c1_0 where c1_0.email=?
+Hibernate: select count(*) from quota_requests qr1_0
+2026-03-25T15:28:47.010+05:30  INFO 31104 --- [rmis] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+2026-03-25T15:28:47.010+05:30  INFO 31104 --- [rmis] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-03-25T15:28:47.012+05:30  INFO 31104 --- [rmis] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 2 ms
+Hibernate: select r1_0.id,r1_0.name from roles r1_0 where r1_0.name=?
+Hibernate: insert into roles (name) values (?)
+Hibernate: insert into companies (companyid,email,failed_login_attempts,locked_until,name,password,quota,role_id,status) values (?,?,?,?,?,?,?,?,?)
+Hibernate: update companies set companyid=?,email=?,failed_login_attempts=?,locked_until=?,name=?,password=?,quota=?,role_id=?,status=? where id=?
+Hibernate: select c1_0.id,c1_0.companyid,c1_0.email,c1_0.failed_login_attempts,c1_0.locked_until,c1_0.name,c1_0.password,c1_0.quota,c1_0.role_id,c1_0.status from companies c1_0 where c1_0.email=?
+Hibernate: select count(*) from quota_requests qr1_0
+2026-03-25T15:28:47.039+05:30  INFO 31104 --- [rmis] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+2026-03-25T15:28:47.039+05:30  INFO 31104 --- [rmis] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-03-25T15:28:47.041+05:30  INFO 31104 --- [rmis] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 2 ms
+Hibernate: select r1_0.id,r1_0.name from roles r1_0 where r1_0.name=?
+Hibernate: insert into roles (name) values (?)
+Hibernate: insert into companies (companyid,email,failed_login_attempts,locked_until,name,password,quota,role_id,status) values (?,?,?,?,?,?,?,?,?)
+2026-03-25T15:28:47.062+05:30  INFO 31104 --- [rmis] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+2026-03-25T15:28:47.062+05:30  INFO 31104 --- [rmis] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-03-25T15:28:47.063+05:30  INFO 31104 --- [rmis] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+Hibernate: select r1_0.id,r1_0.name from roles r1_0 where r1_0.name=?
+Hibernate: insert into roles (name) values (?)
+Hibernate: insert into companies (companyid,email,failed_login_attempts,locked_until,name,password,quota,role_id,status) values (?,?,?,?,?,?,?,?,?)
+Hibernate: update companies set companyid=?,email=?,failed_login_attempts=?,locked_until=?,name=?,password=?,quota=?,role_id=?,status=? where id=?
+Hibernate: select c1_0.id,c1_0.companyid,c1_0.email,c1_0.failed_login_attempts,c1_0.locked_until,c1_0.name,c1_0.password,c1_0.quota,c1_0.role_id,c1_0.status from companies c1_0 where c1_0.email=?
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.730 s -- in com.rmis.rmis.integration.QuotaRequestIntegrationTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  16.405 s
+[INFO] Finished at: 2026-03-25T15:28:47+05:30
+[INFO] ------------------------------------------------------------------------
