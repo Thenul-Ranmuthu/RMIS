@@ -4,3 +4,7 @@ rmis-BE/rmis/target
 rmis-BE/rmis/src/main/java/com/rmis/rmis/uploads
 
 rmis-FE/.next
+rmis-FE/.env
+.idea/
+.vscode/
+*.log
