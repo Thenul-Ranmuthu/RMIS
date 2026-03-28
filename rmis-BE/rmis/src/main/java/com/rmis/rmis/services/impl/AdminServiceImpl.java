@@ -33,7 +33,7 @@ public class AdminServiceImpl implements AdminService{
         Technician technician = technicianRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Technician not found with email: " + email));
         
-        technician.setStatus("VERIFIED");
+        technician.setStatus("ACTIVE");
         technicianRepository.save(technician);
         return "Technician verified successfully!!";
     }

@@ -26,7 +26,7 @@ public class EmailController {
         Resend resend = new Resend(resendApiKey);
 
         CreateEmailOptions params = CreateEmailOptions.builder()
-            .from("RMIS <rmis.verify@rmis.space>")
+            .from("RMIS <onboarding@resend.dev>")
             .to(email)
             .subject("RMIS verification code")
             .html("""

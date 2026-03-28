@@ -116,6 +116,8 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").permitAll()
                     .requestMatchers("/ministry/auth/**").permitAll()
                 .requestMatchers("/api/password-reset/**").permitAll()
+                    .requestMatchers("/public/**").permitAll()
+                    .requestMatchers("/uploads/**").permitAll()
                     .requestMatchers("/ministry/quota-requests/**").hasRole("MINISTRY_OFFICER")
                 .anyRequest().authenticated()
             )
