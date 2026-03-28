@@ -5,6 +5,22 @@ rmis-BE/rmis/src/main/java/com/rmis/rmis/uploads
 
 rmis-FE/.next
 
-rmis-FE/
 node_modules/
 .next/
+
+# Node
+node_modules/
+.next/
+
+# Java / Spring
+target/
+*.log
+
+# IDE
+.idea/
+
+# Runtime / uploads
+uploads/
+
+# Env
+application.properties
