@@ -1,6 +1,6 @@
 // // RMIS/files/services/authService.ts
 
-// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 // // ─── Interfaces ───────────────────────────────────────────────
 
@@ -118,7 +118,7 @@
 // export const loginCompany = (email: string, password: string) =>
 //   post(`${API_BASE_URL}/auth/company/login`, { email, password });
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 // ─── Interfaces ───────────────────────────────────────────────
 
@@ -220,3 +220,33 @@ export const loginTechnician = (email: string, password: string) =>
 
 export const loginCompany = (email: string, password: string) =>
   post(`${API_BASE_URL}/auth/company/login`, { email, password });
+
+// ─── Technician Admin API ─────────────────────────────────────
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
+const authFetch = (url: string, options: RequestInit = {}) => {
+  const token = getToken();
+  return fetch(url, {
+    ...options,
+    headers: {
+      ...(options.headers || {}),
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const getTechniciansByStatus = (status: "PENDING" | "ACTIVE" | "REJECTED") =>
+  authFetch(`${API_BASE}/admin/technicians/${status.toLowerCase()}`).then(r => r.json());
+
+export const getTechnicianById = (id: number) =>
+  authFetch(`${API_BASE}/admin/technicians/${id}`).then(r => r.json());
+
+export const approveTechnician = (id: number) =>
+  authFetch(`${API_BASE}/admin/technicians/${id}/approve`, { method: "POST" }).then(r => r.json());
+
+export const rejectTechnician = (id: number, reason: string) =>
+  authFetch(`${API_BASE}/admin/technicians/${id}/reject?reason=${encodeURIComponent(reason)}`, { method: "POST" }).then(r => r.json());
+
+export const deleteTechnician = (id: number) =>
+  authFetch(`${API_BASE}/admin/technicians/${id}`, { method: "DELETE" }).then(r => r.json());
