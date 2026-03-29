@@ -221,7 +221,7 @@ export default function SignupCard() {
     try {
       setIsSendingCode(true);
       const response = await fetch(
-        `http://localhost:8080/sendMail/${formData.email}`,
+        `http://localhost:5050/sendMail/${formData.email}`,
         {
           method: "GET",
         },
@@ -345,7 +345,7 @@ export default function SignupCard() {
 
       if (role === "Technician") {
         // endpoint =
-        //   "http://localhost:8080/auth/technician/register";
+        //   "http://localhost:5050/auth/technician/register";
         // const formDataObj = new FormData();
         // formDataObj.append("firstName", formData.firstName);
         // formDataObj.append("lastName", formData.lastName);
@@ -395,7 +395,7 @@ export default function SignupCard() {
         (window as any).__pendingCertifications = formData.certifications;
 
         // Send verification email
-        await fetch(`http://localhost:8080/sendMail/${formData.email}`, {
+        await fetch(`http://localhost:5050/sendMail/${formData.email}`, {
           method: "GET",
         });
 
@@ -404,7 +404,7 @@ export default function SignupCard() {
         router.push("/verify-email");
         return;
       } else if (role === "Company") {
-        // endpoint = `http://localhost:8080/auth/company/register/${verificationCode}`;
+        // endpoint = `http://localhost:5050/auth/company/register/${verificationCode}`;
         // const companyData = {
         //     name: formData.companyName,
         //     email: formData.email,
@@ -426,7 +426,7 @@ export default function SignupCard() {
             role: role,
           }),
         );
-        await fetch(`http://localhost:8080/sendMail/${formData.email}`, {
+        await fetch(`http://localhost:5050/sendMail/${formData.email}`, {
           method: "GET",
         });
         setIsLoading(false);
@@ -447,7 +447,7 @@ export default function SignupCard() {
         );
 
         // Send verification email
-        await fetch(`http://localhost:8080/sendMail/${formData.email}`, {
+        await fetch(`http://localhost:5050/sendMail/${formData.email}`, {
           method: "GET",
         });
 

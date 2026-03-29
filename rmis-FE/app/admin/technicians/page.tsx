@@ -6,7 +6,7 @@ import { getToken, getRole } from '@/services/authService';
 import UnauthorisedMessage from '@/components/audit-log/UnauthorisedMessage';
 import Link from 'next/link';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
 
 interface Certification {
   id: number;
@@ -451,7 +451,7 @@ export default function AdminTechnicianPage() {
                     {selectedTechnician.certifications.map(cert => (
                       <a
                         key={cert.id}
-                        href={`http://localhost:8080${cert.fileUrl}`}
+                        href={`http://localhost:5050${cert.fileUrl}`}
                         target="_blank"
                         rel="noreferrer"
                         style={{

@@ -110,7 +110,7 @@ export default function PublicDirectory() {
     (async () => {
       setIsLoading(true);
       try {
-        const res  = await fetch("http://localhost:8080/public/technicians/active");
+        const res  = await fetch("http://localhost:5050/public/technicians/active");
         if (!res.ok) throw new Error();
         const data = await res.json();
         setTechnicians(Array.isArray(data) ? data : []);
