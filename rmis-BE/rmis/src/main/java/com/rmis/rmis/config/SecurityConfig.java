@@ -119,6 +119,7 @@ public class SecurityConfig {
                     .requestMatchers("/public/**").permitAll()
                     .requestMatchers("/uploads/**").permitAll()
                     .requestMatchers("/ministry/quota-requests/**").hasRole("MINISTRY_OFFICER")
+                    .requestMatchers("/technician/availability/**").hasRole("TECHNICIAN")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
