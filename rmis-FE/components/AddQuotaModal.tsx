@@ -29,7 +29,7 @@ export default function AddQuotaModal({
     }
 
     const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+      localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
     if (!token) {
       setError("Session expired. Please log in again.");
       return;

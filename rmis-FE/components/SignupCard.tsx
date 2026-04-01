@@ -473,7 +473,7 @@ export default function SignupCard() {
       console.log("Registration successful:", data);
 
       if (data.accessToken) {
-        localStorage.setItem("token", data.accessToken);
+        localStorage.setItem("accessToken", data.accessToken);  
         localStorage.setItem("user", JSON.stringify(data));
       }
 

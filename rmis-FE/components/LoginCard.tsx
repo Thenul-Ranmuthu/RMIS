@@ -104,7 +104,7 @@
 //       // Store the token
 //       if (data.accessToken) {
 //         if (rememberMe) {
-//           localStorage.setItem("token", data.accessToken);
+//           localStorage.setItem("accessToken", data.accessToken);  
 //           localStorage.setItem(
 //             "user",
 //             JSON.stringify({
@@ -114,7 +114,7 @@
 //           );
 //         } else {
 //           // Use sessionStorage if not remember me
-//           sessionStorage.setItem("token", data.accessToken);
+//           sessionStorage.setItem("accessToken", data.accessToken);
 //           sessionStorage.setItem(
 //             "user",
 //             JSON.stringify({
@@ -550,7 +550,7 @@ export default function LoginCard() {
       // Store the token
       if (data.accessToken) {
         if (rememberMe) {
-          localStorage.setItem("token", data.accessToken);
+          localStorage.setItem("accessToken", data.accessToken);  
           localStorage.setItem(
             "user",
             JSON.stringify({
@@ -561,7 +561,7 @@ export default function LoginCard() {
           );
         } else {
           // Use sessionStorage if not remember me
-          sessionStorage.setItem("token", data.accessToken);
+          sessionStorage.setItem("accessToken", data.accessToken);
           sessionStorage.setItem(
             "user",
             JSON.stringify({

@@ -128,7 +128,7 @@ export default function CompanyDashboard() {
   useEffect(() => {
     const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
     const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+      localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
 
     if (!raw || !token) {
       router.push("/");
@@ -191,7 +191,7 @@ export default function CompanyDashboard() {
   // ── Sign out ─────────────────────────────────────────────────
 
   const handleSignOut = () => {
-    ["token", "user"].forEach((key) => {
+    ["accessToken", "user"].forEach((key) => {
       localStorage.removeItem(key);
       sessionStorage.removeItem(key);
     });
@@ -203,7 +203,7 @@ export default function CompanyDashboard() {
   const handleQuotaAdded = () => {
     setShowModal(false);
     const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+      localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
     if (token) fetchQuotas(token);
   };
 
@@ -432,8 +432,8 @@ export default function CompanyDashboard() {
                   <button
                     onClick={() => {
                       const token =
-                        localStorage.getItem("token") ||
-                        sessionStorage.getItem("token");
+                        localStorage.getItem("accessToken") ||
+                        sessionStorage.getItem("accessToken");
                       if (token) fetchQuotas(token);
                     }}
                     className="mt-2 text-xs font-semibold text-amber-700 underline underline-offset-2 hover:text-amber-900 transition"

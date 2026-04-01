@@ -104,7 +104,7 @@ export default function VerifyEmailPage() {
       (window as any).__pendingCertifications = null;
 
       if (data.accessToken) {
-        localStorage.setItem("token", data.accessToken);
+        localStorage.setItem("accessToken", data.accessToken);  
         localStorage.setItem(
           "user",
           JSON.stringify({
