@@ -1,9 +1,11 @@
 package com.rmis.rmis.domain.dtos;
 
+import com.rmis.rmis.domain.enums.SkillLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,10 +20,13 @@ public class TechnicianResponseDto {
     private String email;
     private String phoneNumber;
     private String address;
+    private String district;
     private String specialization;
     private Integer yearsOfExperience;
+    private SkillLevel skillLevel;
     private String status;
     private LocalDateTime registrationDate;
     private LocalDateTime approvalDate;
     private List<CertificationResponseDto> certifications;
+    private List<AvailabilityResponseDto> availabilities;
 }

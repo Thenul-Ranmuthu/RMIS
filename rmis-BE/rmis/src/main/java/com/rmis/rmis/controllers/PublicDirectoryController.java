@@ -1,13 +1,16 @@
 package com.rmis.rmis.controllers;
 
 import com.rmis.rmis.domain.dtos.TechnicianResponseDto;
+import com.rmis.rmis.domain.enums.SkillLevel;
 import com.rmis.rmis.services.interfaces.TechnicianAuthService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +33,24 @@ public class PublicDirectoryController {
             log.error("Error fetching active technicians", e);
             return new ResponseEntity<>(
                     Map.of("error", "Failed to fetch technicians: " + e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/technicians/search")
+    public ResponseEntity<?> searchAvailableTechnicians(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) SkillLevel skillLevel) {
+
+        log.info("Searching available technicians for date: {}, skillLevel: {}", date, skillLevel);
+        try {
+            List<TechnicianResponseDto> technicians =
+                    technicianAuthService.searchAvailableTechnicians(date, skillLevel);
+            return new ResponseEntity<>(technicians, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error searching available technicians", e);
+            return new ResponseEntity<>(
+                    Map.of("error", "Failed to search technicians: " + e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

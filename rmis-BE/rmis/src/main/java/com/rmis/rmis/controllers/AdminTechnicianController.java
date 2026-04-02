@@ -1,6 +1,7 @@
 package com.rmis.rmis.controllers;
 
 import com.rmis.rmis.domain.dtos.TechnicianResponseDto;
+import com.rmis.rmis.domain.enums.SkillLevel;
 import com.rmis.rmis.services.interfaces.TechnicianAuthService;
 
 import lombok.AllArgsConstructor;
@@ -51,10 +52,12 @@ public class AdminTechnicianController {
     }
 
     @PostMapping("/{id}/approve")
-    public ResponseEntity<?> approveTechnician(@PathVariable Long id) {
-        log.info("Admin approving technician: {}", id);
+    public ResponseEntity<?> approveTechnician(
+            @PathVariable Long id,
+            @RequestParam SkillLevel skillLevel) {
+        log.info("Admin approving technician: {} with skillLevel: {}", id, skillLevel);
         try {
-            TechnicianResponseDto response = technicianAuthService.approveTechnician(id);
+            TechnicianResponseDto response = technicianAuthService.approveTechnician(id, skillLevel);
             Map<String, Object> result = new HashMap<>();
             result.put("message", "Technician approved successfully");
             result.put("technician", response);

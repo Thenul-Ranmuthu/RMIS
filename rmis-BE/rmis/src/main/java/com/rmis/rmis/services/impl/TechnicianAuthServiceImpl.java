@@ -4,15 +4,17 @@ import com.rmis.rmis.domain.dtos.*;
 import com.rmis.rmis.domain.entities.Certification;
 import com.rmis.rmis.domain.entities.Role;
 import com.rmis.rmis.domain.entities.Technician;
+import com.rmis.rmis.domain.enums.SkillLevel;
 import com.rmis.rmis.exceptions.RegisterUserAlreadyExistsException;
 import com.rmis.rmis.exceptions.ResourceNotFoundException;
 import com.rmis.rmis.exceptions.UnregisteredUserException;
+import com.rmis.rmis.repositories.AvailabilityRepository;
 import com.rmis.rmis.repositories.CertificationRepository;
 import com.rmis.rmis.repositories.RoleRepository;
 import com.rmis.rmis.repositories.TechnicianRepository;
 import com.rmis.rmis.services.interfaces.TechnicianAuthService;
 import com.rmis.rmis.utils.JwtTokenProvider;
-
+import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +40,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
 
     private final TechnicianRepository technicianRepository;
     private final CertificationRepository certificationRepository;
+    private final AvailabilityRepository availabilityRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationProvider authenticationProvider;
@@ -46,6 +50,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
     public TechnicianAuthServiceImpl(
             TechnicianRepository technicianRepository,
             CertificationRepository certificationRepository,
+            AvailabilityRepository availabilityRepository,
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
             FileStorageServiceImpl fileStorageServiceImpl,
@@ -55,6 +60,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
     ) {
         this.technicianRepository = technicianRepository;
         this.certificationRepository = certificationRepository;
+        this.availabilityRepository = availabilityRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.fileStorageServiceImpl = fileStorageServiceImpl;
@@ -85,6 +91,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
         technician.setPhoneNumber(registerDto.getPhoneNumber());
         technician.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         technician.setAddress(registerDto.getAddress());
+        technician.setDistrict(registerDto.getDistrict());
         technician.setSpecialization(registerDto.getSpecialization());
         technician.setYearsOfExperience(registerDto.getYearsOfExperience());
         technician.setStatus("PENDING");
@@ -163,11 +170,12 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
 
     @Override
     @Transactional
-    public TechnicianResponseDto approveTechnician(Long technicianId) {
+    public TechnicianResponseDto approveTechnician(Long technicianId, SkillLevel skillLevel) {
         log.info("Approving technician with ID: {}", technicianId);
         Technician technician = technicianRepository.findById(technicianId)
                 .orElseThrow(() -> new ResourceNotFoundException("Technician not found with id: " + technicianId));
         technician.setStatus("ACTIVE");
+        technician.setSkillLevel(skillLevel);
         technician.setApprovalDate(LocalDateTime.now());
         technician.setRejectionReason(null);
         return mapToResponseDto(technicianRepository.save(technician));
@@ -213,6 +221,26 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
         log.info("Technician deleted successfully: {}", id);
     }
 
+    @Override
+    public List<TechnicianResponseDto> searchAvailableTechnicians(LocalDate date, SkillLevel skillLevel) {
+        log.info("Searching available technicians for date: {}, skillLevel: {}", date, skillLevel);
+        if (date != null) {
+            // filter by date + optional skillLevel
+            return technicianRepository.findAvailableByDateAndSkillLevel(date, skillLevel)
+                    .stream()
+                    .map(t -> mapToResponseDtoWithAvailability(t, date))
+                    .collect(Collectors.toList());
+        } else {
+            // no date — return all active, optional skillLevel filter
+            return technicianRepository.findActiveBySkillLevel(skillLevel)
+                    .stream()
+                    .map(this::mapToResponseDto)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    // ---- mappers ----
+
     private TechnicianResponseDto mapToResponseDto(Technician technician) {
         TechnicianResponseDto dto = new TechnicianResponseDto();
         dto.setId(technician.getId());
@@ -221,8 +249,10 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
         dto.setEmail(technician.getEmail());
         dto.setPhoneNumber(technician.getPhoneNumber());
         dto.setAddress(technician.getAddress());
+        dto.setDistrict(technician.getDistrict());
         dto.setSpecialization(technician.getSpecialization());
         dto.setYearsOfExperience(technician.getYearsOfExperience());
+        dto.setSkillLevel(technician.getSkillLevel());
         dto.setStatus(technician.getStatus());
         dto.setRegistrationDate(technician.getRegistrationDate());
         dto.setApprovalDate(technician.getApprovalDate());
@@ -233,6 +263,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
                         CertificationResponseDto c = new CertificationResponseDto();
                         c.setId(cert.getId());
                         c.setCertificationName(cert.getCertificationName());
+                        c.setIssuingAuthority(cert.getIssuingAuthority());
                         c.setFileType(cert.getFileType());
                         c.setOriginalFileName(cert.getOriginalFileName());
                         c.setFileUrl("/uploads/" + cert.getFilePath());
@@ -240,6 +271,31 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
                     })
                     .collect(Collectors.toList());
             dto.setCertifications(certDtos);
+        }
+        return dto;
+    }
+
+    // Used for search results — maps only the AVAILABLE slots for the queried date
+    private TechnicianResponseDto mapToResponseDtoWithAvailability(Technician technician, LocalDate date) {
+        TechnicianResponseDto dto = mapToResponseDto(technician);
+
+        if (technician.getAvailabilities() != null) {
+            List<AvailabilityResponseDto> availDtos = technician.getAvailabilities().stream()
+                    .filter(a -> "AVAILABLE".equals(a.getStatus()))
+                    .filter(a -> a.getDate().equals(date))
+                    .map(a -> {
+                        AvailabilityResponseDto av = new AvailabilityResponseDto();
+                        av.setId(a.getId());
+                        av.setTechnicianId(technician.getId());
+                        av.setTechnicianName(technician.getFirstName() + " " + technician.getLastName());
+                        av.setDate(a.getDate());
+                        av.setStartTime(a.getStartTime());
+                        av.setEndTime(a.getEndTime());
+                        av.setStatus(a.getStatus());
+                        return av;
+                    })
+                    .collect(Collectors.toList());
+            dto.setAvailabilities(availDtos);
         }
         return dto;
     }

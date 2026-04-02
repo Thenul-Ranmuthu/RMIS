@@ -36,6 +36,8 @@ public class TechnicianRegisterDto {
 
     private String address;
 
+    private String district;
+
     private String specialization;
 
     @Min(value = 0, message = "Years of experience cannot be negative")

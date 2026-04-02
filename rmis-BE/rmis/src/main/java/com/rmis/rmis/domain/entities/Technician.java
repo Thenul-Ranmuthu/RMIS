@@ -1,5 +1,6 @@
 package com.rmis.rmis.domain.entities;
 
+import com.rmis.rmis.domain.enums.SkillLevel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,9 +40,14 @@ public class Technician {
 
     private String address;
 
+    private String district;
+
     private String specialization;
 
     private Integer yearsOfExperience;
+
+    @Enumerated(EnumType.STRING)
+    private SkillLevel skillLevel;
 
     @Column(nullable = false)
     private String status; // PENDING, ACTIVE, REJECTED
@@ -60,6 +66,10 @@ public class Technician {
     @OneToMany(mappedBy = "technician", cascade = CascadeType.ALL,
             orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Certification> certifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "technician", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Availability> availabilities = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
