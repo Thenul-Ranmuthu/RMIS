@@ -3,28 +3,41 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+
 interface Certification {
-  id: number;
+  id?: number;
   certificationName: string;
-  issuingAuthority: string;
-  fileType: string;
-  fileUrl: string;
-  originalFileName: string;
+  issuingAuthority?: string;
+  fileType?: string;
+  fileUrl?: string;
+  originalFileName?: string;
+}
+
+interface Availability {
+  id?: number;
+  date?: string;
+  startTime: string;
+  endTime: string;
+  status: string;
 }
 
 interface Technician {
   id: number;
   firstName: string;
   lastName: string;
-  email: string;
-  phoneNumber: string;
-  address: string;
-  specialization: string;
-  yearsOfExperience: number;
-  status: string;
-  registrationDate: string;
-  approvalDate: string;
-  certifications: Certification[];
+  email?: string;
+  phoneNumber?: string;
+  address?: string;
+  district?: string;
+  specialization?: string;
+  yearsOfExperience?: number;
+  skillLevel?: string;
+  status?: string;
+  registrationDate?: string;
+  approvalDate?: string;
+  certifications?: Certification[];
+  availabilities?: Availability[];
 }
 
 const sriLankanDistricts = [
@@ -35,402 +48,704 @@ const sriLankanDistricts = [
   "Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya",
 ];
 
-// ── Inline SVG nature/environment background ──────────────────────────────
-function NatureBg() {
-  return (
-    <svg style={{ position:"absolute", inset:0, width:"100%", height:"100%", opacity:0.2 }}
-      xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
-      {/* Mountains */}
-      <polygon points="0,900 280,380 560,900"          fill="#34d399" />
-      <polygon points="180,900 520,270 860,900"         fill="#10b981" />
-      <polygon points="460,900 780,400 1100,900"        fill="#34d399" />
-      <polygon points="720,900 1020,330 1320,900"       fill="#6ee7b7" />
-      <polygon points="1050,900 1260,440 1440,580 1440,900" fill="#10b981" />
-      {/* Snow caps */}
-      <polygon points="280,380 252,448 308,448"  fill="#ffffff" opacity="0.55" />
-      <polygon points="520,270 490,345 550,345"  fill="#ffffff" opacity="0.55" />
-      <polygon points="780,400 752,468 808,468"  fill="#ffffff" opacity="0.55" />
-      <polygon points="1020,330 990,405 1050,405" fill="#ffffff" opacity="0.55" />
-      {/* Left trees */}
-      <rect x="28"  y="748" width="10" height="62" rx="3" fill="#065f46" />
-      <polygon points="33,678 8,756  58,756"   fill="#059669" />
-      <polygon points="33,716 12,782 54,782"   fill="#047857" />
-      <rect x="88"  y="758" width="8"  height="52" rx="3" fill="#065f46" />
-      <polygon points="92,698 70,762 114,762"  fill="#059669" />
-      <rect x="140" y="752" width="9"  height="58" rx="3" fill="#065f46" />
-      <polygon points="144,688 119,756 169,756" fill="#10b981" />
-      {/* Right trees */}
-      <rect x="1358" y="748" width="10" height="62" rx="3" fill="#065f46" />
-      <polygon points="1363,678 1338,756 1388,756" fill="#059669" />
-      <rect x="1308" y="758" width="8"  height="52" rx="3" fill="#065f46" />
-      <polygon points="1312,698 1290,762 1334,762" fill="#047857" />
-      <rect x="1258" y="752" width="9"  height="58" rx="3" fill="#065f46" />
-      <polygon points="1262,688 1237,756 1287,756" fill="#10b981" />
-      {/* Sun */}
-      <circle cx="720" cy="110" r="52"  fill="#fde68a" opacity="0.38" />
-      <circle cx="720" cy="110" r="85"  fill="#fde68a" opacity="0.12" />
-      <circle cx="720" cy="110" r="115" fill="#fde68a" opacity="0.06" />
-      {/* Birds */}
-      <path d="M195 175 Q206 164 217 175" stroke="#fff" strokeWidth="1.8" fill="none" opacity="0.5"/>
-      <path d="M228 160 Q239 149 250 160" stroke="#fff" strokeWidth="1.8" fill="none" opacity="0.5"/>
-      <path d="M1195 195 Q1206 184 1217 195" stroke="#fff" strokeWidth="1.8" fill="none" opacity="0.5"/>
-      <path d="M1235 178 Q1246 167 1257 178" stroke="#fff" strokeWidth="1.8" fill="none" opacity="0.5"/>
-      {/* River / water */}
-      <path d="M0,820 Q200,800 400,828 Q600,856 800,838 Q1000,820 1200,844 Q1320,856 1440,832 L1440,900 L0,900Z"
-        fill="#0d9488" opacity="0.32"/>
-      <path d="M0,852 Q180,836 360,854 Q540,872 720,858 Q900,844 1100,863 Q1280,878 1440,858 L1440,900 L0,900Z"
-        fill="#0f766e" opacity="0.22"/>
-    </svg>
-  );
+function formatSlotDate(dateStr?: string) {
+  if (!dateStr) return null;
+  const d = new Date(`${dateStr}T00:00:00`);
+  return d.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+/** Group availabilities by date, preserving order */
+function groupSlotsByDate(slots: Availability[]): Record<string, Availability[]> {
+  return slots.reduce<Record<string, Availability[]>>((acc, slot) => {
+    const key = slot.date || "unknown";
+    (acc[key] ||= []).push(slot);
+    return acc;
+  }, {});
+}
+
 export default function PublicDirectory() {
   const router = useRouter();
 
-  const [technicians, setTechnicians]   = useState<Technician[]>([]);
-  const [isLoading, setIsLoading]       = useState(true);
-  const [error, setError]               = useState("");
-  const [searchTerm, setSearchTerm]     = useState("");
+  const [technicians, setTechnicians] = useState<Technician[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedSpec, setSelectedSpec] = useState("");
-  const [selectedExp,  setSelectedExp]  = useState("");
   const [selectedDist, setSelectedDist] = useState("");
-  const [currentPage,  setCurrentPage]  = useState(1);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedSkill, setSelectedSkill] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [slotsPopover, setSlotsPopover] = useState<number | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+
   const PER_PAGE = 6;
 
-  const extractDistrict = (address: string) => {
-    if (!address) return "Unknown";
-    const parts   = address.split(",").map((p) => p.trim());
-    const last    = parts[parts.length - 1] || "";
-    const matched = sriLankanDistricts.find((d) => last.toLowerCase().includes(d.toLowerCase()));
-    return matched || last || "Unknown";
-  };
-
   useEffect(() => {
-    (async () => {
+    const fetchTechnicians = async () => {
       setIsLoading(true);
+      setError("");
       try {
-        const res  = await fetch("http://localhost:5050/public/technicians/active");
-        if (!res.ok) throw new Error();
+        const params = new URLSearchParams();
+        if (selectedDate) params.append("date", selectedDate);
+        if (selectedSkill) params.append("skillLevel", selectedSkill);
+        const url = `${API_BASE}/public/technicians/search${params.toString() ? `?${params.toString()}` : ""}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Failed to fetch technicians");
         const data = await res.json();
         setTechnicians(Array.isArray(data) ? data : []);
-      } catch { setError("Failed to load technicians. Please try again later."); }
-      finally  { setIsLoading(false); }
-    })();
-  }, []);
+      } catch {
+        setError("Failed to load technicians. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTechnicians();
+  }, [selectedDate, selectedSkill, reloadKey]);
 
-  const specs    = useMemo(() => Array.from(new Set(technicians.map((t) => (t.specialization || "").trim()).filter(Boolean))).sort(), [technicians]);
-  const dists    = useMemo(() => Array.from(new Set(technicians.map((t) => extractDistrict(t.address)).filter((d) => d !== "Unknown"))).sort(), [technicians]);
+  const specs = useMemo(
+    () => Array.from(new Set(technicians.map((t) => (t.specialization || "").trim()).filter(Boolean))).sort(),
+    [technicians]
+  );
 
   const filtered = useMemo(() => {
-    let f = [...technicians];
+    let list = [...technicians];
     if (searchTerm.trim()) {
-      const t = searchTerm.toLowerCase();
-      f = f.filter((x) => (x.firstName+x.lastName+x.specialization).toLowerCase().includes(t));
+      const q = searchTerm.toLowerCase();
+      list = list.filter((t) =>
+        `${t.firstName || ""} ${t.lastName || ""} ${t.specialization || ""}`.toLowerCase().includes(q)
+      );
     }
-    if (selectedSpec) f = f.filter((x) => x.specialization === selectedSpec);
-    if (selectedDist) f = f.filter((x) => extractDistrict(x.address) === selectedDist);
-    if (selectedExp)  {
-      const [mn, mx] = selectedExp.split("-").map(Number);
-      f = f.filter((x) => { const e = Number(x.yearsOfExperience)||0; return mx ? e>=mn&&e<=mx : e>=mn; });
-    }
-    return f;
-  }, [technicians, searchTerm, selectedSpec, selectedExp, selectedDist]);
+    if (selectedSpec) list = list.filter((t) => t.specialization === selectedSpec);
+    if (selectedDist) list = list.filter((t) => t.district === selectedDist);
+    return list;
+  }, [technicians, searchTerm, selectedSpec, selectedDist]);
 
-  useEffect(() => setCurrentPage(1), [searchTerm, selectedSpec, selectedExp, selectedDist]);
+  useEffect(() => {
+    setCurrentPage(1);
+    setSlotsPopover(null);
+  }, [searchTerm, selectedSpec, selectedDist, selectedDate, selectedSkill]);
 
-  const totalPages    = Math.ceil(filtered.length / PER_PAGE);
-  const currentItems  = filtered.slice((currentPage-1)*PER_PAGE, currentPage*PER_PAGE);
-  const clearFilters  = () => { setSearchTerm(""); setSelectedSpec(""); setSelectedExp(""); setSelectedDist(""); };
-  const initials      = (f:string, l:string) => `${f?.[0]||""}${l?.[0]||""}`.toUpperCase() || "T";
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const currentItems = filtered.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
 
-  const BG: React.CSSProperties = {
-    position: "fixed", inset: 0,
-    background: "linear-gradient(145deg, #064e3b 0%, #065f46 30%, #047857 60%, #059669 100%)",
-    zIndex: 0,
+  const clearFilters = () => {
+    setSearchTerm(""); setSelectedSpec("");
+    setSelectedDist(""); setSelectedSkill(""); setSelectedDate("");
   };
 
-  // ── Loading ──
-  if (isLoading) return (
-    <div style={{ minHeight:"100vh", position:"relative" }}>
-      <div style={BG}><NatureBg /><div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.46)" }}/></div>
-      <div style={{ position:"relative", zIndex:1, minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center" }}>
-        <div style={{ textAlign:"center" }}>
-          <div style={{ width:52, height:52, borderRadius:"50%", border:"4px solid rgba(52,211,153,0.3)", borderTopColor:"#34d399", animation:"spin 0.85s linear infinite", margin:"0 auto 14px" }}/>
-          <p style={{ color:"rgba(255,255,255,0.7)", fontSize:13, fontWeight:500 }}>Loading technicians…</p>
-        </div>
-      </div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-    </div>
-  );
+  const initials = (f: string, l: string) => `${f?.[0] || ""}${l?.[0] || ""}`.toUpperCase() || "T";
 
-  // ── Error ──
-  if (error) return (
-    <div style={{ minHeight:"100vh", position:"relative" }}>
-      <div style={BG}><NatureBg /><div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.46)" }}/></div>
-      <div style={{ position:"relative", zIndex:1, minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
-        <div className="bg-white rounded-3xl shadow-2xl p-10 text-center" style={{ maxWidth:380, width:"100%" }}>
-          <div style={{ background:"#fef2f2", borderRadius:"50%", width:64, height:64, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 14px" }}>
-            <svg style={{ width:30, height:30 }} fill="none" viewBox="0 0 24 24" stroke="#dc2626"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+  const skillPillClass = (level?: string) => {
+    if (level === "SENIOR") return "pill pill-amber";
+    if (level === "INTERMEDIATE") return "pill pill-blue";
+    return "pill pill-gray";
+  };
+
+  const skillLabel = (level?: string) => {
+    if (!level) return "Unknown";
+    return level.charAt(0) + level.slice(1).toLowerCase();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="page">
+        <div className="loading-wrap">
+          <div className="spinner" />
+          <p>Loading technicians…</p>
+        </div>
+        <style jsx global>{globalStyles}</style>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page">
+        <section className="hero">
+          <div className="hero-bg" />
+          <div className="hero-image" />
+          <div className="hero-overlay" />
+          <div className="hero-content">
+            <div className="badge"><span className="badge-dot" /><span>Public Directory</span></div>
+            <h1>Find Certified<br /><em>Technicians</em></h1>
+            <p>Browse verified environmental compliance technicians across Sri Lanka.</p>
           </div>
-          <h2 className="text-2xl font-black text-gray-900 mb-2">Something went wrong</h2>
-          <p className="text-sm text-gray-500 mb-6">{error}</p>
-          <button onClick={() => window.location.reload()} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl text-sm font-bold shadow-lg transition-all duration-200 active:scale-[0.98]">Try Again</button>
+        </section>
+        <div className="error-wrap">
+          <div className="error-card">
+            <div className="error-icon">
+              <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#f87171">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2>Something went wrong</h2>
+            <p>{error}</p>
+            <button className="btn-primary full" onClick={() => setReloadKey((v) => v + 1)}>Try Again</button>
+          </div>
         </div>
+        <style jsx global>{globalStyles}</style>
       </div>
-    </div>
-  );
+    );
+  }
 
-  // ── Main ──
   return (
-    <div style={{ minHeight:"100vh", position:"relative" }}>
-      {/* Fixed background */}
-      <div style={BG}><NatureBg /><div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.46)" }}/></div>
-
-      <style>{`
-        @keyframes spin      { to  { transform:rotate(360deg); } }
-        @keyframes fadeInUp  { from{ opacity:0; transform:translateY(18px); } to{ opacity:1; transform:translateY(0); } }
-        @keyframes scaleIn   { from{ opacity:0; transform:scale(0.95); }      to{ opacity:1; transform:scale(1);    } }
-        @keyframes pulseDot  { 0%,100%{ opacity:1; } 50%{ opacity:0.35; } }
-        .d-fadeup  { animation: fadeInUp 0.45s ease both; }
-        .d-scalein { animation: scaleIn  0.38s ease both; }
-        .d-card    { transition: transform 0.22s ease, box-shadow 0.22s ease; }
-        .d-card:hover { transform: translateY(-5px); box-shadow: 0 26px 60px rgba(0,0,0,0.22); }
-        .d-btn     { transition: background 0.18s ease, transform 0.14s ease, box-shadow 0.18s ease; cursor:pointer; }
-        .d-btn:hover  { background:#047857 !important; box-shadow:0 8px 22px rgba(5,150,105,0.45) !important; }
-        .d-btn:active { transform:scale(0.97); }
-        .d-inp     { transition: border-color 0.18s ease, box-shadow 0.18s ease; }
-        .d-inp:focus { border-color:#10b981 !important; box-shadow:0 0 0 3px rgba(16,185,129,0.18); outline:none; }
-        .d-stat    { transition: transform 0.18s ease, background 0.18s ease; }
-        .d-stat:hover { transform:translateY(-2px); background:rgba(255,255,255,0.17) !important; }
-      `}</style>
-
-      {/* Scrollable content */}
-      <div style={{ position:"relative", zIndex:1 }}>
-        <div style={{ maxWidth:1280, margin:"0 auto", padding:"40px 20px 64px" }}>
-
-          {/* ── Hero ── */}
-          <section className="d-fadeup" style={{ marginBottom:32, animationDelay:"0.04s" }}>
-            <div style={{ display:"flex", flexWrap:"wrap", gap:20, alignItems:"flex-end", justifyContent:"space-between" }}>
-              <div style={{ color:"#fff", flex:"1 1 280px" }}>
-                <div style={{ display:"inline-flex", alignItems:"center", gap:7, background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.18)", borderRadius:999, padding:"5px 14px", marginBottom:14, backdropFilter:"blur(8px)" }}>
-                  <span style={{ width:6, height:6, borderRadius:"50%", background:"#34d399", animation:"pulseDot 2s infinite" }}/>
-                  <span style={{ fontSize:10, fontWeight:700, letterSpacing:"0.18em", textTransform:"uppercase", color:"#6ee7b7" }}>Public Directory</span>
-                </div>
-                <h1 style={{ fontSize:"clamp(30px,4.5vw,52px)", fontWeight:900, lineHeight:1.1, margin:0 }}>
-                  Find Certified<br/><span style={{ color:"#34d399" }}>Technicians</span>
-                </h1>
-                <p style={{ marginTop:10, fontSize:14, color:"rgba(255,255,255,0.7)", maxWidth:460, lineHeight:1.65 }}>
-                  Browse verified environmental compliance technicians across Sri Lanka. Filter by expertise, experience, and district.
-                </p>
-              </div>
-
-              {/* Stats */}
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, flex:"0 0 auto" }}>
-                {[
-                  { v:technicians.length,  l:"Total",           e:"👥" },
-                  { v:specs.length,        l:"Specializations", e:"🎓" },
-                  { v:dists.length,        l:"Districts",       e:"📍" },
-                  { v:filtered.length,     l:"Matched",         e:"✅" },
-                ].map((s,i) => (
-                  <div key={s.l} className="d-stat d-fadeup"
-                    style={{ background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.14)", borderRadius:16, padding:"12px 16px", color:"#fff", backdropFilter:"blur(12px)", animationDelay:`${0.09+i*0.06}s`, minWidth:100 }}>
-                    <div style={{ fontSize:17, marginBottom:3 }}>{s.e}</div>
-                    <div style={{ fontSize:24, fontWeight:900, lineHeight:1 }}>{s.v}</div>
-                    <div style={{ fontSize:10, color:"rgba(255,255,255,0.55)", marginTop:3, fontWeight:600 }}>{s.l}</div>
-                  </div>
-                ))}
-              </div>
+    <div className="page">
+      <section className="hero">
+        <div className="hero-bg" />
+        <div className="hero-image" />
+        <div className="hero-overlay" />
+        <div className="hero-content">
+          <div className="badge"><span className="badge-dot" /><span>Public Directory</span></div>
+          <h1>Find Certified<br /><em>Technicians</em></h1>
+          <p>Browse verified environmental compliance technicians across Sri Lanka. Filter by date, skill level, specialization, and district.</p>
+          <div className="hero-stats">
+            <div className="stat">
+              <div className="stat-val">{technicians.length}</div>
+              <div className="stat-lbl">Total</div>
             </div>
-          </section>
-
-          {/* ── Filters ── */}
-          <section className="d-fadeup"
-            style={{ background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:22, padding:"18px 22px", marginBottom:26, backdropFilter:"blur(16px)", animationDelay:"0.17s" }}>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(170px,1fr))", gap:12 }}>
-              {/* Search spans 2 cols when possible */}
-              <div style={{ gridColumn:"span 2" }}>
-                <label style={LBL}>Search</label>
-                <div style={{ position:"relative" }}>
-                  <input type="text" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)}
-                    placeholder="Name or specialization…" className="d-inp"
-                    style={{ ...INP, paddingLeft:38 }}/>
-                  <svg style={{ position:"absolute", left:11, top:"50%", transform:"translateY(-50%)", width:15, height:15 }} fill="none" stroke="#9ca3af" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                  </svg>
-                </div>
-              </div>
-              <div>
-                <label style={LBL}>Specialization</label>
-                <select value={selectedSpec} onChange={e=>setSelectedSpec(e.target.value)} className="d-inp" style={INP}>
-                  <option value="">All</option>
-                  {specs.map(s=><option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-              <div>
-                <label style={LBL}>District</label>
-                <select value={selectedDist} onChange={e=>setSelectedDist(e.target.value)} className="d-inp" style={INP}>
-                  <option value="">All</option>
-                  {dists.map(d=><option key={d} value={d}>{d}</option>)}
-                </select>
-              </div>
-              <div>
-                <label style={LBL}>Experience</label>
-                <select value={selectedExp} onChange={e=>setSelectedExp(e.target.value)} className="d-inp" style={INP}>
-                  <option value="">Any</option>
-                  <option value="0-2">0–2 yrs</option>
-                  <option value="3-5">3–5 yrs</option>
-                  <option value="6-10">6–10 yrs</option>
-                  <option value="10-100">10+ yrs</option>
-                </select>
-              </div>
+            <div className="stat-divider" />
+            <div className="stat">
+              <div className="stat-val">{specs.length}</div>
+              <div className="stat-lbl">Specializations</div>
             </div>
-            <div style={{ marginTop:12, display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:8 }}>
-              <p style={{ fontSize:12, color:"rgba(255,255,255,0.7)", fontWeight:500, margin:0 }}>
-                Showing <strong style={{ color:"#fff" }}>{filtered.length}</strong> technician{filtered.length!==1?"s":""}
-              </p>
-              {(searchTerm||selectedSpec||selectedDist||selectedExp) && (
-                <button onClick={clearFilters}
-                  style={{ fontSize:11, fontWeight:700, color:"#fff", background:"rgba(255,255,255,0.12)", border:"1px solid rgba(255,255,255,0.2)", borderRadius:8, padding:"5px 12px", cursor:"pointer", transition:"background 0.18s" }}>
-                  ✕ Clear Filters
-                </button>
-              )}
+            <div className="stat-divider" />
+            <div className="stat">
+              <div className="stat-val">{filtered.length}</div>
+              <div className="stat-lbl">Matched</div>
             </div>
-          </section>
+          </div>
+        </div>
+      </section>
 
-          {/* ── Grid ── */}
-          {currentItems.length > 0 ? (
-            <>
-              <section style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(290px,1fr))", gap:18 }}>
-                {currentItems.map((tech, i) => (
-                  <article key={tech.id} className="d-card d-scalein bg-white rounded-3xl shadow-2xl overflow-hidden"
-                    style={{ animationDelay:`${i*0.06}s` }}>
+      <section className="filters-bar">
+        <div className="filter-group filter-date">
+          <label>Date</label>
+          <input type="date" value={selectedDate} min={new Date().toISOString().split("T")[0]} onChange={(e) => setSelectedDate(e.target.value)} />
+        </div>
+        <div className="filter-group small">
+          <label>Skill Level</label>
+          <select value={selectedSkill} onChange={(e) => setSelectedSkill(e.target.value)}>
+            <option value="">All levels</option>
+            <option value="JUNIOR">Junior</option>
+            <option value="INTERMEDIATE">Intermediate</option>
+            <option value="SENIOR">Senior</option>
+          </select>
+        </div>
+        <div className="filter-group small">
+          <label>Specialization</label>
+          <select value={selectedSpec} onChange={(e) => setSelectedSpec(e.target.value)}>
+            <option value="">All</option>
+            {specs.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+        <div className="filter-group small">
+          <label>District</label>
+          <select value={selectedDist} onChange={(e) => setSelectedDist(e.target.value)}>
+            <option value="">All districts</option>
+            {sriLankanDistricts.map((d) => <option key={d} value={d}>{d}</option>)}
+          </select>
+        </div>
+        <div className="filter-group search">
+          <label>Search</label>
+          <div className="search-wrap">
+            <svg width="14" height="14" fill="none" stroke="#64748b" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Name or specialization…" />
+          </div>
+        </div>
+        {(searchTerm || selectedSpec || selectedDist || selectedSkill || selectedDate) && (
+          <button className="clear-btn" onClick={clearFilters}>Clear</button>
+        )}
+      </section>
 
-                    {/* Header */}
-                    <div style={{ background:"linear-gradient(135deg,#059669,#10b981)", padding:"18px 18px 16px", color:"#fff" }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-                        <div style={{ width:56, height:56, borderRadius:"50%", background:"#fff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, boxShadow:"0 4px 14px rgba(0,0,0,0.15)" }}>
-                          <span style={{ fontSize:18, fontWeight:900, color:"#059669" }}>{initials(tech.firstName, tech.lastName)}</span>
+      <div className="filter-meta">
+        <span>
+          Showing <strong>{filtered.length}</strong> technicians
+          {selectedDate ? <> on <strong>{selectedDate}</strong></> : null}
+        </span>
+      </div>
+
+      <main className="grid-wrap">
+        {currentItems.length > 0 ? (
+          <div className="grid">
+            {currentItems.map((tech) => {
+              const hasSlots = (tech.availabilities?.length || 0) > 0;
+              const isOpen = slotsPopover === tech.id;
+              // Group slots by date so we can render date headers
+              const slotsByDate = hasSlots ? groupSlotsByDate(tech.availabilities!) : {};
+              const dateKeys = Object.keys(slotsByDate).filter((k) => k !== "unknown").sort();
+              const unknownSlots = slotsByDate["unknown"] || [];
+
+              return (
+                <article key={tech.id} className="card">
+                  {isOpen && hasSlots && (
+                    <>
+                      <div className="backdrop" onClick={() => setSlotsPopover(null)} />
+                      <div className="slots-panel">
+                        <div className="slots-title">
+                          <span>Available slots</span>
+                          <button type="button" className="slots-close" onClick={() => setSlotsPopover(null)}>✕</button>
                         </div>
-                        <div style={{ minWidth:0 }}>
-                          <h3 style={{ fontSize:15, fontWeight:900, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-                            {tech.firstName} {tech.lastName}
-                          </h3>
-                          <p style={{ fontSize:11, color:"rgba(255,255,255,0.8)", margin:"2px 0 0", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-                            {tech.specialization || "General Technician"}
-                          </p>
-                          <div style={{ marginTop:7, display:"inline-flex", alignItems:"center", gap:5, background:"rgba(255,255,255,0.18)", borderRadius:999, padding:"3px 9px" }}>
-                            <span style={{ width:5, height:5, borderRadius:"50%", background:"#86efac" }}/>
-                            <span style={{ fontSize:9, fontWeight:700, letterSpacing:"0.06em" }}>ACTIVE</span>
-                          </div>
+
+                        <div className="slots-scroll">
+                          {/* Slots that have a date — grouped */}
+                          {dateKeys.map((date) => (
+                            <div key={date} className="slots-date-group">
+                              <div className="slots-date-header">
+                                <span className="slots-date-dot" />
+                                {formatSlotDate(date)}
+                              </div>
+                              {slotsByDate[date].map((a, idx) => (
+                                <div key={idx} className="slot-row">
+                                  <span className="slot-time">{a.startTime.slice(0, 5)} – {a.endTime.slice(0, 5)}</span>
+                                  <span className={`slot-status-pill slot-status-${a.status.toLowerCase()}`}>{a.status}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ))}
+
+                          {/* Slots with no date (fallback, no date header) */}
+                          {unknownSlots.length > 0 && (
+                            <div className="slots-date-group">
+                              {unknownSlots.map((a, idx) => (
+                                <div key={idx} className="slot-row">
+                                  <span className="slot-time">{a.startTime.slice(0, 5)} – {a.endTime.slice(0, 5)}</span>
+                                  <span className={`slot-status-pill slot-status-${a.status.toLowerCase()}`}>{a.status}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
+                      </div>
+                    </>
+                  )}
+
+                  <div className="card-header">
+                    <div className="avatar">{initials(tech.firstName, tech.lastName)}</div>
+                    <div className="card-header-main">
+                      <div className="card-name">{tech.firstName} {tech.lastName}</div>
+                      <div className="card-spec">{tech.specialization || "General Technician"}</div>
+                      <div className="card-badges">
+                        <span className="pill pill-green">Active</span>
+                        {tech.skillLevel && <span className={skillPillClass(tech.skillLevel)}>{skillLabel(tech.skillLevel)}</span>}
                       </div>
                     </div>
+                  </div>
 
-                    {/* Body */}
-                    <div style={{ padding:"16px 18px 18px" }}>
-                      <div style={{ display:"flex", flexDirection:"column", gap:9 }}>
-                        {/* Experience */}
-                        <Row icon={<ClockIcon/>} label="Experience" value={`${tech.yearsOfExperience||0} years`}/>
-                        {/* District */}
-                        {tech.address && <Row icon={<PinIcon/>} label="District" value={extractDistrict(tech.address)}/>}
-                        {/* Phone */}
-                        <Row icon={<PhoneIcon/>} label="Contact" value={tech.phoneNumber||"Not available"}/>
-                        {/* Certs */}
-                        {tech.certifications?.length > 0 && (
-                          <div style={{ paddingTop:2 }}>
-                            <p style={{ ...SUBLBL, marginBottom:5 }}>Certifications</p>
-                            <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
-                              {tech.certifications.slice(0,2).map((c,k)=>(
-                                <span key={k} style={{ fontSize:10, fontWeight:600, background:"#f3f4f6", color:"#374151", borderRadius:6, padding:"3px 8px" }}>{c.certificationName}</span>
-                              ))}
-                              {tech.certifications.length>2 && (
-                                <span style={{ fontSize:10, fontWeight:700, background:"#ecfdf5", color:"#059669", borderRadius:6, padding:"3px 8px" }}>+{tech.certifications.length-2} more</span>
-                              )}
-                            </div>
-                          </div>
-                        )}
+                  <div className="card-body">
+                    <InfoRow icon={<ClockIcon />} label="Experience" value={`${tech.yearsOfExperience || 0} years`} />
+                    {tech.district ? <InfoRow icon={<PinIcon />} label="District" value={tech.district} /> : null}
+                    <InfoRow icon={<PhoneIcon />} label="Contact" value={tech.phoneNumber || "Not available"} />
+
+                    {tech.certifications && tech.certifications.length > 0 && (
+                      <div className="certs">
+                        <div className="cert-label">Certifications</div>
+                        <div className="cert-tags">
+                          {tech.certifications.slice(0, 2).map((c, idx) => (
+                            <span key={idx} className="cert-tag">{c.certificationName}</span>
+                          ))}
+                          {tech.certifications.length > 2 && (
+                            <span className="cert-tag cert-more">+{tech.certifications.length - 2}</span>
+                          )}
+                        </div>
                       </div>
-                      <button onClick={()=>router.push(`/public/technician/${tech.id}`)} className="d-btn"
-                        style={{ marginTop:14, width:"100%", background:"#059669", color:"#fff", border:"none", borderRadius:11, padding:"11px 0", fontSize:12, fontWeight:700, boxShadow:"0 4px 14px rgba(5,150,105,0.3)" }}>
-                        View Full Profile →
+                    )}
+
+                    <div className="card-actions">
+                      <button
+                        className="btn-outline"
+                        onClick={() => hasSlots ? setSlotsPopover(isOpen ? null : tech.id) : undefined}
+                        disabled={!hasSlots}
+                        style={!hasSlots ? { opacity: 0.4, cursor: 'not-allowed' } : undefined}
+                      >
+                        🕐 {hasSlots ? `${tech.availabilities!.length} Slot${tech.availabilities!.length !== 1 ? "s" : ""}` : "No slots"}
+                      </button>
+                      <button
+                        className="btn-primary"
+                        style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+                        onClick={() => router.push(`/public/technician/${tech.id}`)}
+                      >
+                        Book Me →
                       </button>
                     </div>
-                  </article>
-                ))}
-              </section>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div style={{ marginTop:32, display:"flex", alignItems:"center", justifyContent:"center", gap:7, flexWrap:"wrap" }}>
-                  <PageBtn onClick={()=>setCurrentPage(p=>Math.max(p-1,1))} disabled={currentPage===1}>← Prev</PageBtn>
-                  {Array.from({length:totalPages},(_,i)=>i+1).map(page=>(
-                    <PageBtn key={page} onClick={()=>setCurrentPage(page)} active={currentPage===page}>{page}</PageBtn>
-                  ))}
-                  <PageBtn onClick={()=>setCurrentPage(p=>Math.min(p+1,totalPages))} disabled={currentPage===totalPages}>Next →</PageBtn>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="d-scalein" style={{ maxWidth:400, margin:"0 auto" }}>
-              <div className="bg-white rounded-3xl shadow-2xl p-10 text-center">
-                <div style={{ background:"#f0fdf4", borderRadius:"50%", width:68, height:68, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 14px" }}>
-                  <svg style={{ width:32, height:32 }} fill="none" stroke="#059669" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-black text-gray-900 mb-2">No technicians found</h3>
-                <p className="text-sm text-gray-500 mb-6">Try adjusting your search filters.</p>
-                <button onClick={clearFilters} className="d-btn w-full bg-emerald-600 text-white py-3.5 rounded-xl text-sm font-bold"
-                  style={{ border:"none", boxShadow:"0 4px 18px rgba(5,150,105,0.3)" }}>Clear Filters</button>
-              </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="empty">
+            <div className="empty-icon">
+              <svg width="24" height="24" fill="none" stroke="#34d399" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
-          )}
+            <h3>No technicians found</h3>
+            <p>Try adjusting your filters or search term.</p>
+            <button className="btn-primary full" onClick={clearFilters}>Clear Filters</button>
+          </div>
+        )}
+      </main>
 
-          <footer style={{ marginTop:44, textAlign:"center", fontSize:11, color:"rgba(255,255,255,0.38)", fontWeight:500 }}>
-            © {new Date().getFullYear()} RMIS · Ministry of Environment
-          </footer>
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button className="page-btn" onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))} disabled={currentPage === 1}>← Prev</button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button key={page} className={`page-btn ${page === currentPage ? "active" : ""}`} onClick={() => setCurrentPage(page)}>{page}</button>
+          ))}
+          <button className="page-btn" onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}>Next →</button>
         </div>
-      </div>
+      )}
+
+      <footer className="footer">© {new Date().getFullYear()} RMIS · Ministry of Environment</footer>
+
+      <style jsx global>{globalStyles}</style>
     </div>
   );
 }
 
-// ── Small reusable pieces ────────────────────────────────────────────────────
-
-const LBL: React.CSSProperties = { display:"block", fontSize:11, fontWeight:700, color:"rgba(255,255,255,0.82)", marginBottom:5, textTransform:"uppercase", letterSpacing:"0.07em" };
-const INP: React.CSSProperties = { width:"100%", borderRadius:11, border:"1px solid #d1fae5", background:"#f9fafb", padding:"10px 12px", fontSize:12, color:"#111", boxSizing:"border-box", appearance:"none" };
-const SUBLBL: React.CSSProperties = { fontSize:9, fontWeight:700, color:"#9ca3af", textTransform:"uppercase", letterSpacing:"0.07em", margin:0 };
-
-function Row({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div style={{ display:"flex", alignItems:"center", gap:9 }}>
-      <div style={{ width:32, height:32, borderRadius:9, background:"#f0fdf4", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-        {icon}
-      </div>
-      <div style={{ minWidth:0 }}>
-        <p style={{ ...SUBLBL, marginBottom:1 }}>{label}</p>
-        <p style={{ fontSize:12, fontWeight:700, color:"#111827", margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{value}</p>
+    <div className="info-row">
+      <div className="info-icon">{icon}</div>
+      <div className="info-text">
+        <div className="info-label">{label}</div>
+        <div className="info-val">{value}</div>
       </div>
     </div>
-  );
-}
-
-function PageBtn({ children, onClick, disabled, active }: { children: React.ReactNode; onClick: ()=>void; disabled?: boolean; active?: boolean }) {
-  return (
-    <button onClick={onClick} disabled={disabled}
-      style={{ padding:"8px 15px", borderRadius:9, border: active ? "none" : "1px solid rgba(255,255,255,0.2)", background: active ? "#059669" : "rgba(255,255,255,0.9)", color: active ? "#fff" : "#374151", fontSize:12, fontWeight:700, cursor:"pointer", opacity: disabled ? 0.4 : 1, boxShadow: active ? "0 4px 14px rgba(5,150,105,0.4)" : "none", transition:"all 0.18s" }}>
-      {children}
-    </button>
   );
 }
 
 function ClockIcon() {
-  return <svg style={{ width:14, height:14 }} fill="none" stroke="#059669" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>;
+  return <svg width="13" height="13" fill="none" stroke="#34d399" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 }
 function PinIcon() {
-  return <svg style={{ width:14, height:14 }} fill="none" stroke="#059669" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>;
+  return <svg width="13" height="13" fill="none" stroke="#34d399" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
 }
 function PhoneIcon() {
-  return <svg style={{ width:14, height:14 }} fill="none" stroke="#059669" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>;
+  return <svg width="13" height="13" fill="none" stroke="#34d399" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>;
 }
+
+const globalStyles = `
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; padding: 0; background: #0f172a; }
+
+  .page {
+    min-height: 100vh;
+    background: #0f172a;
+    color: #f8fafc;
+    font-family: var(--font-sans, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  }
+
+  .hero {
+    position: relative;
+    padding: 48px 40px 40px;
+    overflow: hidden;
+    background: #0f172a;
+    border-bottom: 1px solid rgba(4, 120, 87, 0.22);
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(4, 120, 87, 0.13) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-image {
+    position: absolute; right: 0; top: 0; bottom: 0; width: 70%;
+    background-image: url('/public technician.png');
+    background-size: cover; background-position: center;
+    opacity: 0.66; filter: saturate(0.5);
+  }
+
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to right, #0f172a 0%, rgba(15, 23, 42, 0.92) 36%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .hero-content { position: relative; z-index: 2; max-width: 560px; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(4, 120, 87, 0.14); border: 1px solid rgba(4, 120, 87, 0.3);
+    border-radius: 999px; padding: 4px 12px; margin-bottom: 16px;
+  }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #34d399; }
+  .badge span:last-child { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #34d399; }
+
+  .hero h1 { font-size: clamp(34px, 4vw, 54px); font-weight: 500; line-height: 1.14; color: #f1f5f9; margin: 0 0 12px; }
+  .hero h1 em { font-style: normal; color: #34d399; }
+  .hero p { font-size: 14px; color: #94a3b8; line-height: 1.7; margin: 0 0 28px; max-width: 460px; }
+
+  .hero-stats { display: flex; align-items: stretch; gap: 18px; flex-wrap: wrap; }
+  .stat { min-width: 92px; }
+  .stat-val { font-size: 26px; font-weight: 500; color: #f1f5f9; line-height: 1; }
+  .stat-lbl { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+  .stat-divider { width: 1px; align-self: stretch; background: rgba(255, 255, 255, 0.08); }
+
+  .filters-bar {
+    background: #111827; border-bottom: 1px solid rgba(4, 120, 87, 0.16);
+    padding: 20px 40px; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
+  }
+
+  .filter-group { display: flex; flex-direction: column; gap: 5px; min-width: 140px; }
+  .filter-date { width: 160px; }
+  .small { width: 160px; }
+  .search { width: 230px; }
+
+  .filter-group label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; }
+
+  .filter-group input,
+  .filter-group select {
+    background: #1e293b; border: 1px solid rgba(4, 120, 87, 0.18);
+    color: #e2e8f0; border-radius: 8px; padding: 9px 12px;
+    font-size: 13px; width: 100%; outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease; appearance: none;
+  }
+  .filter-group input::placeholder { color: #475569; }
+  .filter-group input:focus,
+  .filter-group select:focus { border-color: #047857; box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.12); }
+
+  .search-wrap { position: relative; width: 100%; }
+  .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+  .search-wrap input { padding-left: 34px !important; }
+
+  .clear-btn {
+    background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.18);
+    color: #f87171; border-radius: 8px; padding: 9px 16px; font-size: 12px;
+    cursor: pointer; white-space: nowrap; align-self: flex-end;
+    transition: background 0.15s ease, transform 0.12s ease;
+  }
+  .clear-btn:hover { background: rgba(239, 68, 68, 0.18); }
+  .clear-btn:active { transform: scale(0.98); }
+
+  .filter-meta {
+    background: #0f172a; padding: 14px 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .filter-meta span { font-size: 12px; color: #64748b; }
+  .filter-meta strong { color: #e2e8f0; }
+
+  .grid-wrap { padding: 28px 40px 48px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+
+  .card {
+    position: relative; background: #111827;
+    border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 14px; overflow: hidden;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card:hover { transform: translateY(-3px); border-color: rgba(4, 120, 87, 0.34); box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28); }
+
+  .card-header {
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+    padding: 18px 18px 16px; display: flex; gap: 13px; align-items: center;
+  }
+
+  .avatar {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 500; color: #fff; flex-shrink: 0;
+  }
+
+  .card-header-main { min-width: 0; flex: 1; }
+  .card-name { font-size: 15px; font-weight: 500; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-spec { font-size: 12px; color: rgba(255, 255, 255, 0.62); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-badges { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+
+  .pill { font-size: 10px; font-weight: 500; border-radius: 999px; padding: 2px 9px; letter-spacing: 0.04em; border: 1px solid transparent; }
+  .pill-green  { background: rgba(52, 211, 153, 0.15); color: #34d399;  border-color: rgba(52, 211, 153, 0.2); }
+  .pill-amber  { background: rgba(251, 191, 36, 0.12); color: #fbbf24;  border-color: rgba(251, 191, 36, 0.2); }
+  .pill-blue   { background: rgba(96, 165, 250, 0.12); color: #93c5fd;  border-color: rgba(96, 165, 250, 0.2); }
+  .pill-gray   { background: rgba(148, 163, 184, 0.12); color: #94a3b8; border-color: rgba(148, 163, 184, 0.2); }
+
+  .card-body { padding: 16px 18px 18px; }
+
+  .info-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .info-icon {
+    width: 30px; height: 30px; border-radius: 7px;
+    background: rgba(4, 120, 87, 0.12); border: 1px solid rgba(4, 120, 87, 0.18);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .info-text { min-width: 0; }
+  .info-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1px; }
+  .info-val { font-size: 13px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .certs { margin-top: 4px; margin-bottom: 14px; }
+  .cert-label { font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+  .cert-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .cert-tag { font-size: 10px; color: #94a3b8; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 5px; padding: 3px 8px; }
+  .cert-more { color: #34d399; border-color: rgba(52, 211, 153, 0.2); background: rgba(52, 211, 153, 0.08); }
+
+  .card-actions { display: flex; gap: 8px; align-items: center; }
+
+  .btn-outline, .btn-primary, .page-btn { transition: all 0.15s ease; }
+
+  .btn-outline {
+    flex: 0 0 auto; background: transparent;
+    border: 1px solid rgba(4, 120, 87, 0.35); color: #34d399;
+    border-radius: 9px; padding: 10px 14px; font-size: 12px; cursor: pointer; white-space: nowrap;
+  }
+  .btn-outline:hover { background: rgba(4, 120, 87, 0.12); }
+
+  .btn-primary {
+    flex: 1; background: #047857; border: none; color: #fff;
+    border-radius: 9px; padding: 10px 0; font-size: 12px; font-weight: 500; cursor: pointer;
+  }
+  .btn-primary:hover { background: #065f46; }
+  .btn-primary.full {
+  width: 100%;
+  margin-top: 10px;
+  padding: 11px 0;
+  border-radius: 10px;
+  font-weight: 600;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;  
+  line-height: 1;       
+}
+
+  /* ── Slots popover ── */
+  .backdrop { position: fixed; inset: 0; z-index: 10; }
+
+  .slots-panel {
+    position: absolute; top: 10px; left: 10px; right: 10px; z-index: 20;
+    background: #1a2744;
+    border: 1px solid rgba(4, 120, 87, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+  }
+
+  .slots-title {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 11px 14px 10px;
+    border-bottom: 1px solid rgba(4, 120, 87, 0.18);
+    background: rgba(4, 120, 87, 0.1);
+    font-size: 10px; font-weight: 700; color: #34d399;
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+
+  .slots-close {
+    background: none; border: none; color: #475569; cursor: pointer;
+    font-size: 15px; line-height: 1; padding: 0;
+    transition: color 0.12s;
+  }
+  .slots-close:hover { color: #94a3b8; }
+
+  .slots-scroll {
+    max-height: 240px;
+    overflow-y: auto;
+    padding: 8px 10px 10px;
+    display: flex; flex-direction: column; gap: 2px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(4, 120, 87, 0.3) transparent;
+  }
+  .slots-scroll::-webkit-scrollbar { width: 4px; }
+  .slots-scroll::-webkit-scrollbar-thumb { background: rgba(4, 120, 87, 0.3); border-radius: 4px; }
+
+  /* Date group inside slots panel */
+  .slots-date-group { margin-bottom: 6px; }
+  .slots-date-group:last-child { margin-bottom: 0; }
+
+  .slots-date-header {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 700; color: #6ee7b7;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 4px 4px 5px;
+  }
+
+  .slots-date-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #34d399; flex-shrink: 0;
+  }
+
+  .slot-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(4, 120, 87, 0.07);
+    border: 1px solid rgba(4, 120, 87, 0.14);
+    border-radius: 7px; padding: 6px 10px; margin-bottom: 4px;
+  }
+  .slot-row:last-child { margin-bottom: 0; }
+
+  .slot-time { font-size: 12px; color: #a7f3d0; font-weight: 600; }
+
+  /* Status pills inside slot rows */
+  .slot-status-pill {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; border-radius: 99px; padding: 2px 8px;
+    border: 1px solid transparent;
+  }
+  .slot-status-available {
+    background: rgba(52, 211, 153, 0.12); color: #34d399;
+    border-color: rgba(52, 211, 153, 0.22);
+  }
+  .slot-status-booked {
+    background: rgba(251, 191, 36, 0.12); color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.22);
+  }
+  /* generic fallback */
+  .slot-status-pill:not(.slot-status-available):not(.slot-status-booked) {
+    background: rgba(148, 163, 184, 0.1); color: #94a3b8;
+    border-color: rgba(148, 163, 184, 0.2);
+  }
+
+  /* ── Empty / Error ── */
+  .empty { text-align: center; padding: 72px 20px 40px; max-width: 420px; margin: 0 auto; }
+  .empty-icon {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: rgba(4, 120, 87, 0.12); border: 1px solid rgba(4, 120, 87, 0.2);
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+  }
+  .empty h3 { font-size: 18px; font-weight: 500; color: #e2e8f0; margin: 0 0 8px; }
+  .empty p { font-size: 13px; color: #64748b; margin: 0 0 14px; }
+
+  .pagination { display: flex; gap: 6px; justify-content: center; padding: 0 40px 40px; flex-wrap: wrap; }
+  .page-btn {
+    padding: 8px 14px; border-radius: 8px; font-size: 12px; cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1); background: #111827; color: #94a3b8;
+  }
+  .page-btn:hover:not(:disabled) { background: #1e293b; color: #e2e8f0; }
+  .page-btn.active { background: #047857; color: #fff; border-color: #047857; }
+  .page-btn:disabled { opacity: 0.3; cursor: default; }
+
+  .footer { text-align: center; padding: 24px 40px; border-top: 1px solid rgba(255, 255, 255, 0.05); font-size: 11px; color: #334155; }
+
+  .loading-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
+  .loading-wrap p { margin: 0; color: #94a3b8; font-size: 13px; font-weight: 500; }
+  .spinner { width: 52px; height: 52px; border-radius: 50%; border: 4px solid rgba(52, 211, 153, 0.18); border-top-color: #34d399; animation: spin 0.9s linear infinite; }
+
+  .error-wrap { display: flex; justify-content: center; padding: 32px 20px 60px; }
+  .error-card { width: 100%; max-width: 380px; background: #111827; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; padding: 28px; text-align: center; box-shadow: 0 18px 44px rgba(0, 0, 0, 0.3); }
+  .error-icon { width: 64px; height: 64px; border-radius: 999px; background: rgba(248, 113, 113, 0.08); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; border: 1px solid rgba(248, 113, 113, 0.12); }
+  .error-card h2 { margin: 0 0 8px; font-size: 22px; font-weight: 600; color: #f8fafc; }
+  .error-card p { margin: 0 0 16px; font-size: 13px; color: #94a3b8; line-height: 1.6; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 900px) {
+    .hero-image { width: 100%; opacity: 0.08; }
+    .hero-overlay { background: linear-gradient(to right, #0f172a 0%, rgba(15, 23, 42, 0.92) 62%, rgba(4, 120, 87, 0.08) 100%); }
+  }
+
+  @media (max-width: 768px) {
+    .hero, .filters-bar, .filter-meta, .grid-wrap, .pagination, .footer { padding-left: 16px; padding-right: 16px; }
+    .hero { padding-top: 40px; }
+    .grid { grid-template-columns: 1fr; }
+    .filter-date, .small, .search { width: 100%; }
+    .clear-btn { width: 100%; }
+    .card-actions { flex-direction: column; align-items: stretch; }
+    .btn-outline { width: 100%; }
+  }
+`;

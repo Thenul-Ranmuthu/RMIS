@@ -23,8 +23,10 @@ interface Technician {
   email: string;
   phoneNumber: string;
   address: string;
+  district: string;
   specialization: string;
   yearsOfExperience: number;
+  skillLevel: string;
   status: string;
   registrationDate: string;
   approvalDate: string | null;
@@ -35,15 +37,16 @@ type TabType = 'PENDING' | 'ACTIVE' | 'REJECTED';
 
 export default function AdminTechnicianPage() {
   const router = useRouter();
-  const [isUnauthorised, setIsUnauthorised] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>('PENDING');
-  const [technicians, setTechnicians] = useState<Technician[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isUnauthorised, setIsUnauthorised]       = useState(false);
+  const [activeTab, setActiveTab]                 = useState<TabType>('PENDING');
+  const [technicians, setTechnicians]             = useState<Technician[]>([]);
+  const [isLoading, setIsLoading]                 = useState(true);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
-  const [rejectReason, setRejectReason] = useState('');
-  const [showRejectModal, setShowRejectModal] = useState(false);
-  const [rejectingId, setRejectingId] = useState<number | null>(null);
-  const [actionLoading, setActionLoading] = useState(false);
+  const [rejectReason, setRejectReason]           = useState('');
+  const [showRejectModal, setShowRejectModal]     = useState(false);
+  const [rejectingId, setRejectingId]             = useState<number | null>(null);
+  const [actionLoading, setActionLoading]         = useState(false);
+  const [selectedSkillLevel, setSelectedSkillLevel] = useState('');
 
   // ── Auth guard ─────────────────────────────────────────────────
   useEffect(() => {
@@ -76,15 +79,20 @@ export default function AdminTechnicianPage() {
   };
 
   const handleApprove = async (id: number) => {
+    if (!selectedSkillLevel) {
+      alert('Please select a skill level before approving');
+      return;
+    }
     setActionLoading(true);
     try {
       const token = getToken();
-      const res = await fetch(`${API_BASE}/admin/technicians/${id}/approve`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `${API_BASE}/admin/technicians/${id}/approve?skillLevel=${selectedSkillLevel}`,
+        { method: 'POST', headers: { Authorization: `Bearer ${token}` } }
+      );
       if (!res.ok) throw new Error('Approval failed');
       setSelectedTechnician(null);
+      setSelectedSkillLevel('');
       fetchTechnicians();
     } catch (err) {
       alert('Failed to approve technician');
@@ -149,6 +157,24 @@ export default function AdminTechnicianPage() {
     });
   };
 
+  const skillLevelBadge = (level: string) => {
+    const styles: Record<string, { bg: string; color: string }> = {
+      JUNIOR:       { bg: '#f3f4f6', color: '#374151' },
+      INTERMEDIATE: { bg: '#dbeafe', color: '#1d4ed8' },
+      SENIOR:       { bg: '#fef3c7', color: '#d97706' },
+    };
+    const s = styles[level] ?? { bg: '#f1f5f9', color: '#475569' };
+    return (
+      <span style={{
+        backgroundColor: s.bg, color: s.color,
+        padding: '3px 10px', borderRadius: 20,
+        fontSize: 12, fontWeight: 700,
+      }}>
+        {level || '—'}
+      </span>
+    );
+  };
+
   const statusBadge = (status: string) => {
     const styles: Record<string, { bg: string; color: string; label: string }> = {
       PENDING:  { bg: '#fef9c3', color: '#854d0e', label: 'Pending' },
@@ -169,15 +195,10 @@ export default function AdminTechnicianPage() {
 
   if (isUnauthorised) return <UnauthorisedMessage />;
 
-  const tabCounts = { PENDING: 0, ACTIVE: 0, REJECTED: 0 };
-  if (activeTab === 'PENDING')  tabCounts.PENDING  = technicians.length;
-  if (activeTab === 'ACTIVE')   tabCounts.ACTIVE   = technicians.length;
-  if (activeTab === 'REJECTED') tabCounts.REJECTED = technicians.length;
-
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
 
-      {/* ── Sidebar (identical to admin dashboard) ─────────────── */}
+      {/* ── Sidebar ─────────────────────────────────────────────── */}
       <aside style={{
         width: 260, backgroundColor: '#0f172a',
         display: 'flex', flexDirection: 'column',
@@ -210,7 +231,6 @@ export default function AdminTechnicianPage() {
             padding: '8px 8px 4px', margin: 0,
           }}>Administration</p>
 
-          {/* Audit Logs link */}
           <Link href="/admin/dashboard" style={{ textDecoration: 'none' }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
@@ -225,7 +245,6 @@ export default function AdminTechnicianPage() {
             </div>
           </Link>
 
-          {/* Technicians — active */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
             padding: '10px 12px', borderRadius: 8,
@@ -308,7 +327,7 @@ export default function AdminTechnicianPage() {
           {(['PENDING', 'ACTIVE', 'REJECTED'] as TabType[]).map(tab => (
             <button
               key={tab}
-              onClick={() => { setActiveTab(tab); setSelectedTechnician(null); }}
+              onClick={() => { setActiveTab(tab); setSelectedTechnician(null); setSelectedSkillLevel(''); }}
               style={{
                 padding: '8px 20px', borderRadius: 7, border: 'none', cursor: 'pointer',
                 fontWeight: 700, fontSize: 13, transition: 'all 0.15s',
@@ -344,7 +363,7 @@ export default function AdminTechnicianPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    {['Name', 'Email', 'Specialization', 'Registered', 'Status', ''].map(h => (
+                    {['Name', 'Email', 'Specialization', 'Skill Level', 'Registered', 'Status', ''].map(h => (
                       <th key={h} style={{
                         padding: '12px 16px', fontSize: 11, fontWeight: 700,
                         color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em',
@@ -356,7 +375,7 @@ export default function AdminTechnicianPage() {
                   {technicians.map(t => (
                     <tr
                       key={t.id}
-                      onClick={() => setSelectedTechnician(t)}
+                      onClick={() => { setSelectedTechnician(t); setSelectedSkillLevel(''); }}
                       style={{
                         borderBottom: '1px solid #f8fafc', cursor: 'pointer',
                         backgroundColor: selectedTechnician?.id === t.id ? '#f0fdf4' : 'transparent',
@@ -371,6 +390,9 @@ export default function AdminTechnicianPage() {
                       <td style={{ padding: '13px 16px', fontSize: 13, color: '#64748b' }}>{t.email}</td>
                       <td style={{ padding: '13px 16px', fontSize: 13, color: '#64748b' }}>
                         {t.specialization || '—'}
+                      </td>
+                      <td style={{ padding: '13px 16px' }}>
+                        {t.skillLevel ? skillLevelBadge(t.skillLevel) : <span style={{ color: '#94a3b8', fontSize: 13 }}>—</span>}
                       </td>
                       <td style={{ padding: '13px 16px', fontSize: 13, color: '#64748b' }}>
                         {formatDate(t.registrationDate)}
@@ -408,20 +430,21 @@ export default function AdminTechnicianPage() {
                   </p>
                 </div>
                 <button
-                  onClick={() => setSelectedTechnician(null)}
+                  onClick={() => { setSelectedTechnician(null); setSelectedSkillLevel(''); }}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: 18, lineHeight: 1 }}
                 >✕</button>
               </div>
 
               {/* Info rows */}
               {[
-                { label: 'Email',       value: selectedTechnician.email },
-                { label: 'Phone',       value: selectedTechnician.phoneNumber },
-                { label: 'Address',     value: selectedTechnician.address || '—' },
+                { label: 'Email',          value: selectedTechnician.email },
+                { label: 'Phone',          value: selectedTechnician.phoneNumber },
+                { label: 'District',       value: selectedTechnician.district || '—' },
+                { label: 'Address',        value: selectedTechnician.address || '—' },
                 { label: 'Specialization', value: selectedTechnician.specialization || '—' },
-                { label: 'Experience',  value: selectedTechnician.yearsOfExperience != null ? `${selectedTechnician.yearsOfExperience} yrs` : '—' },
-                { label: 'Registered',  value: formatDate(selectedTechnician.registrationDate) },
-                { label: 'Approved',    value: formatDate(selectedTechnician.approvalDate) },
+                { label: 'Experience',     value: selectedTechnician.yearsOfExperience != null ? `${selectedTechnician.yearsOfExperience} yrs` : '—' },
+                { label: 'Registered',     value: formatDate(selectedTechnician.registrationDate) },
+                { label: 'Approved',       value: formatDate(selectedTechnician.approvalDate) },
               ].map(row => (
                 <div key={row.label} style={{ marginBottom: 12 }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0 }}>
@@ -432,6 +455,17 @@ export default function AdminTechnicianPage() {
                   </p>
                 </div>
               ))}
+
+              {/* Skill Level */}
+              <div style={{ marginBottom: 12 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em', margin: '0 0 4px' }}>
+                  Skill Level
+                </p>
+                {selectedTechnician.skillLevel
+                  ? skillLevelBadge(selectedTechnician.skillLevel)
+                  : <span style={{ fontSize: 13, color: '#94a3b8' }}>Not assigned yet</span>
+                }
+              </div>
 
               {/* Status */}
               <div style={{ marginBottom: 16 }}>
@@ -451,7 +485,7 @@ export default function AdminTechnicianPage() {
                     {selectedTechnician.certifications.map(cert => (
                       <a
                         key={cert.id}
-                        href={`http://localhost:5050${cert.fileUrl}`}
+                        href={`${API_BASE}${cert.fileUrl}`}
                         target="_blank"
                         rel="noreferrer"
                         style={{
@@ -482,17 +516,39 @@ export default function AdminTechnicianPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {selectedTechnician.status === 'PENDING' && (
                   <>
+                    {/* Skill level selector */}
+                    <div style={{ marginBottom: 4 }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em', margin: '0 0 6px' }}>
+                        Assign Skill Level <span style={{ color: '#dc2626' }}>*</span>
+                      </p>
+                      <select
+                        value={selectedSkillLevel}
+                        onChange={e => setSelectedSkillLevel(e.target.value)}
+                        style={{
+                          width: '100%', padding: '9px 10px', borderRadius: 8,
+                          border: '1px solid #e2e8f0', fontSize: 13, fontWeight: 600,
+                          color: '#0f172a', background: '#f8fafc', cursor: 'pointer',
+                        }}
+                      >
+                        <option value="">Select level…</option>
+                        <option value="JUNIOR">Junior</option>
+                        <option value="INTERMEDIATE">Intermediate</option>
+                        <option value="SENIOR">Senior</option>
+                      </select>
+                    </div>
+
                     <button
                       onClick={() => handleApprove(selectedTechnician.id)}
-                      disabled={actionLoading}
+                      disabled={actionLoading || !selectedSkillLevel}
                       style={{
                         width: '100%', padding: '11px 0', borderRadius: 8, border: 'none',
                         backgroundColor: '#16a34a', color: '#fff',
-                        fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                        opacity: actionLoading ? 0.6 : 1,
+                        fontWeight: 700, fontSize: 14, cursor: selectedSkillLevel ? 'pointer' : 'not-allowed',
+                        opacity: (actionLoading || !selectedSkillLevel) ? 0.5 : 1,
+                        transition: 'opacity 0.15s',
                       }}
                     >
-                      ✅ Approve Technician
+                      {actionLoading ? 'Approving...' : '✅ Approve Technician'}
                     </button>
                     <button
                       onClick={() => { setRejectingId(selectedTechnician.id); setShowRejectModal(true); }}

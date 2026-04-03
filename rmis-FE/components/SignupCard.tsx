@@ -380,6 +380,7 @@ export default function SignupCard() {
             phoneNumber: formData.phoneNumber,
             password: formData.password,
             address: combineAddress(),
+            district: formData.district, 
             specialization: formData.specialization || "",
             yearsOfExperience:
               formData.yearsOfExperience !== ""

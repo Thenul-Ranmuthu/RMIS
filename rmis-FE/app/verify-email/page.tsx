@@ -68,6 +68,7 @@ export default function VerifyEmailPage() {
         formDataObj.append("phoneNumber", userData.phoneNumber);
         formDataObj.append("password", userData.password);
         formDataObj.append("address", userData.address || "");
+        formDataObj.append("district", userData.district || ""); 
         formDataObj.append("specialization", userData.specialization || "");
         if (userData.yearsOfExperience != null) {
           formDataObj.append("yearsOfExperience", userData.yearsOfExperience.toString());
