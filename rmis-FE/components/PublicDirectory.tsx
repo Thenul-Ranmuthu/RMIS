@@ -37,7 +37,6 @@ interface Technician {
   registrationDate?: string;
   approvalDate?: string;
   certifications?: Certification[];
-  availabilities?: Availability[];
 }
 
 const sriLankanDistricts = [
@@ -58,7 +57,6 @@ function formatSlotDate(dateStr?: string) {
   });
 }
 
-/** Group availabilities by date, preserving order */
 function groupSlotsByDate(slots: Availability[]): Record<string, Availability[]> {
   return slots.reduce<Record<string, Availability[]>>((acc, slot) => {
     const key = slot.date || "unknown";
@@ -82,6 +80,11 @@ export default function PublicDirectory() {
   const [slotsPopover, setSlotsPopover] = useState<number | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
+  // Lazy slots state
+  const [slotsCache, setSlotsCache] = useState<Record<number, Availability[]>>({});
+  const [loadingSlots, setLoadingSlots] = useState<number | null>(null);
+  const [slotsError, setSlotsError] = useState<number | null>(null);
+
   const PER_PAGE = 6;
 
   useEffect(() => {
@@ -97,6 +100,10 @@ export default function PublicDirectory() {
         if (!res.ok) throw new Error("Failed to fetch technicians");
         const data = await res.json();
         setTechnicians(Array.isArray(data) ? data : []);
+        // Clear slot cache when list refreshes — data may have changed
+        setSlotsCache({});
+        setSlotsPopover(null);
+        setSlotsError(null);
       } catch {
         setError("Failed to load technicians. Please try again later.");
       } finally {
@@ -105,6 +112,38 @@ export default function PublicDirectory() {
     };
     fetchTechnicians();
   }, [selectedDate, selectedSkill, reloadKey]);
+
+  const handleSlotsClick = async (techId: number) => {
+    // Toggle close
+    if (slotsPopover === techId) {
+      setSlotsPopover(null);
+      return;
+    }
+
+    // Clear any previous slot error for this tech
+    setSlotsError(null);
+
+    // Already cached — just open
+    if (slotsCache[techId] !== undefined) {
+      setSlotsPopover(techId);
+      return;
+    }
+
+    // Fetch from lazy endpoint
+    setLoadingSlots(techId);
+    try {
+      const params = selectedDate ? `?date=${selectedDate}` : "";
+      const res = await fetch(`${API_BASE}/public/technicians/${techId}/availability${params}`);
+      if (!res.ok) throw new Error("Failed to fetch slots");
+      const data = await res.json();
+      setSlotsCache((prev) => ({ ...prev, [techId]: Array.isArray(data) ? data : [] }));
+      setSlotsPopover(techId);
+    } catch {
+      setSlotsError(techId);
+    } finally {
+      setLoadingSlots(null);
+    }
+  };
 
   const specs = useMemo(
     () => Array.from(new Set(technicians.map((t) => (t.specialization || "").trim()).filter(Boolean))).sort(),
@@ -115,9 +154,12 @@ export default function PublicDirectory() {
     let list = [...technicians];
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase();
-      list = list.filter((t) =>
-        `${t.firstName || ""} ${t.lastName || ""} ${t.specialization || ""}`.toLowerCase().includes(q)
-      );
+      list = list.filter((t) => {
+        const first = (t.firstName || "").toLowerCase();
+        const last = (t.lastName || "").toLowerCase();
+
+        return first.startsWith(q) || last.startsWith(q);
+      });
     }
     if (selectedSpec) list = list.filter((t) => t.specialization === selectedSpec);
     if (selectedDist) list = list.filter((t) => t.district === selectedDist);
@@ -255,7 +297,7 @@ export default function PublicDirectory() {
             <svg width="14" height="14" fill="none" stroke="#64748b" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Name or specialization…" />
+            <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by name…" />
           </div>
         </div>
         {(searchTerm || selectedSpec || selectedDist || selectedSkill || selectedDate) && (
@@ -274,16 +316,20 @@ export default function PublicDirectory() {
         {currentItems.length > 0 ? (
           <div className="grid">
             {currentItems.map((tech) => {
-              const hasSlots = (tech.availabilities?.length || 0) > 0;
+              const techSlots = slotsCache[tech.id];
+              const isFetching = loadingSlots === tech.id;
+              const hasFetchError = slotsError === tech.id;
+              const isCached = techSlots !== undefined;
+              const slotCount = isCached ? techSlots.length : 0;
+              const hasSlots = isCached && slotCount > 0;
               const isOpen = slotsPopover === tech.id;
-              // Group slots by date so we can render date headers
-              const slotsByDate = hasSlots ? groupSlotsByDate(tech.availabilities!) : {};
+              const slotsByDate = hasSlots ? groupSlotsByDate(techSlots) : {};
               const dateKeys = Object.keys(slotsByDate).filter((k) => k !== "unknown").sort();
               const unknownSlots = slotsByDate["unknown"] || [];
 
               return (
                 <article key={tech.id} className="card">
-                  {isOpen && hasSlots && (
+                  {isOpen && (
                     <>
                       <div className="backdrop" onClick={() => setSlotsPopover(null)} />
                       <div className="slots-panel">
@@ -291,34 +337,36 @@ export default function PublicDirectory() {
                           <span>Available slots</span>
                           <button type="button" className="slots-close" onClick={() => setSlotsPopover(null)}>✕</button>
                         </div>
-
                         <div className="slots-scroll">
-                          {/* Slots that have a date — grouped */}
-                          {dateKeys.map((date) => (
-                            <div key={date} className="slots-date-group">
-                              <div className="slots-date-header">
-                                <span className="slots-date-dot" />
-                                {formatSlotDate(date)}
-                              </div>
-                              {slotsByDate[date].map((a, idx) => (
-                                <div key={idx} className="slot-row">
-                                  <span className="slot-time">{a.startTime.slice(0, 5)} – {a.endTime.slice(0, 5)}</span>
-                                  <span className={`slot-status-pill slot-status-${a.status.toLowerCase()}`}>{a.status}</span>
+                          {hasSlots ? (
+                            <>
+                              {dateKeys.map((date) => (
+                                <div key={date} className="slots-date-group">
+                                  <div className="slots-date-header">
+                                    <span className="slots-date-dot" />
+                                    {formatSlotDate(date)}
+                                  </div>
+                                  {slotsByDate[date].map((a, idx) => (
+                                    <div key={idx} className="slot-row">
+                                      <span className="slot-time">{a.startTime.slice(0, 5)} – {a.endTime.slice(0, 5)}</span>
+                                      <span className={`slot-status-pill slot-status-${a.status.toLowerCase()}`}>{a.status}</span>
+                                    </div>
+                                  ))}
                                 </div>
                               ))}
-                            </div>
-                          ))}
-
-                          {/* Slots with no date (fallback, no date header) */}
-                          {unknownSlots.length > 0 && (
-                            <div className="slots-date-group">
-                              {unknownSlots.map((a, idx) => (
-                                <div key={idx} className="slot-row">
-                                  <span className="slot-time">{a.startTime.slice(0, 5)} – {a.endTime.slice(0, 5)}</span>
-                                  <span className={`slot-status-pill slot-status-${a.status.toLowerCase()}`}>{a.status}</span>
+                              {unknownSlots.length > 0 && (
+                                <div className="slots-date-group">
+                                  {unknownSlots.map((a, idx) => (
+                                    <div key={idx} className="slot-row">
+                                      <span className="slot-time">{a.startTime.slice(0, 5)} – {a.endTime.slice(0, 5)}</span>
+                                      <span className={`slot-status-pill slot-status-${a.status.toLowerCase()}`}>{a.status}</span>
+                                    </div>
+                                  ))}
                                 </div>
-                              ))}
-                            </div>
+                              )}
+                            </>
+                          ) : (
+                            <div className="slots-empty">No available slots{selectedDate ? ` on ${selectedDate}` : ""}.</div>
                           )}
                         </div>
                       </div>
@@ -358,12 +406,17 @@ export default function PublicDirectory() {
 
                     <div className="card-actions">
                       <button
-                        className="btn-outline"
-                        onClick={() => hasSlots ? setSlotsPopover(isOpen ? null : tech.id) : undefined}
-                        disabled={!hasSlots}
-                        style={!hasSlots ? { opacity: 0.4, cursor: 'not-allowed' } : undefined}
+                        className={`btn-outline${hasFetchError ? " btn-outline-error" : ""}`}
+                        onClick={() => handleSlotsClick(tech.id)}
+                        disabled={isFetching}
                       >
-                        🕐 {hasSlots ? `${tech.availabilities!.length} Slot${tech.availabilities!.length !== 1 ? "s" : ""}` : "No slots"}
+                        {isFetching
+                          ? "Loading…"
+                          : hasFetchError
+                          ? "⚠ Retry"
+                          : isCached
+                          ? `🕐 ${slotCount} Slot${slotCount !== 1 ? "s" : ""}`
+                          : "🕐 View Slots"}
                       </button>
                       <button
                         className="btn-primary"
@@ -594,7 +647,10 @@ const globalStyles = `
     border: 1px solid rgba(4, 120, 87, 0.35); color: #34d399;
     border-radius: 9px; padding: 10px 14px; font-size: 12px; cursor: pointer; white-space: nowrap;
   }
-  .btn-outline:hover { background: rgba(4, 120, 87, 0.12); }
+  .btn-outline:hover:not(:disabled) { background: rgba(4, 120, 87, 0.12); }
+  .btn-outline:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-outline-error { border-color: rgba(239, 68, 68, 0.4); color: #f87171; }
+  .btn-outline-error:hover:not(:disabled) { background: rgba(239, 68, 68, 0.08); }
 
   .btn-primary {
     flex: 1; background: #047857; border: none; color: #fff;
@@ -602,21 +658,11 @@ const globalStyles = `
   }
   .btn-primary:hover { background: #065f46; }
   .btn-primary.full {
-  width: 100%;
-  margin-top: 10px;
-  padding: 11px 0;
-  border-radius: 10px;
-  font-weight: 600;
+    width: 100%; margin-top: 10px; padding: 11px 0; border-radius: 10px; font-weight: 600;
+    display: flex; justify-content: center; align-items: center; text-align: center; line-height: 1;
+  }
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  text-align: center;  
-  line-height: 1;       
-}
-
-  /* ── Slots popover ── */
+  /* Slots popover */
   .backdrop { position: fixed; inset: 0; z-index: 10; }
 
   .slots-panel {
@@ -639,69 +685,51 @@ const globalStyles = `
 
   .slots-close {
     background: none; border: none; color: #475569; cursor: pointer;
-    font-size: 15px; line-height: 1; padding: 0;
-    transition: color 0.12s;
+    font-size: 15px; line-height: 1; padding: 0; transition: color 0.12s;
   }
   .slots-close:hover { color: #94a3b8; }
 
   .slots-scroll {
-    max-height: 240px;
-    overflow-y: auto;
+    max-height: 240px; overflow-y: auto;
     padding: 8px 10px 10px;
     display: flex; flex-direction: column; gap: 2px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(4, 120, 87, 0.3) transparent;
+    scrollbar-width: thin; scrollbar-color: rgba(4, 120, 87, 0.3) transparent;
   }
   .slots-scroll::-webkit-scrollbar { width: 4px; }
   .slots-scroll::-webkit-scrollbar-thumb { background: rgba(4, 120, 87, 0.3); border-radius: 4px; }
 
-  /* Date group inside slots panel */
+  .slots-empty { font-size: 12px; color: #475569; text-align: center; padding: 16px 0; }
+
   .slots-date-group { margin-bottom: 6px; }
   .slots-date-group:last-child { margin-bottom: 0; }
 
   .slots-date-header {
     display: flex; align-items: center; gap: 6px;
     font-size: 10px; font-weight: 700; color: #6ee7b7;
-    text-transform: uppercase; letter-spacing: 0.1em;
-    padding: 4px 4px 5px;
+    text-transform: uppercase; letter-spacing: 0.1em; padding: 4px 4px 5px;
   }
 
-  .slots-date-dot {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: #34d399; flex-shrink: 0;
-  }
+  .slots-date-dot { width: 5px; height: 5px; border-radius: 50%; background: #34d399; flex-shrink: 0; }
 
   .slot-row {
     display: flex; align-items: center; justify-content: space-between;
-    background: rgba(4, 120, 87, 0.07);
-    border: 1px solid rgba(4, 120, 87, 0.14);
+    background: rgba(4, 120, 87, 0.07); border: 1px solid rgba(4, 120, 87, 0.14);
     border-radius: 7px; padding: 6px 10px; margin-bottom: 4px;
   }
   .slot-row:last-child { margin-bottom: 0; }
-
   .slot-time { font-size: 12px; color: #a7f3d0; font-weight: 600; }
 
-  /* Status pills inside slot rows */
   .slot-status-pill {
     font-size: 9px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.08em; border-radius: 99px; padding: 2px 8px;
-    border: 1px solid transparent;
+    letter-spacing: 0.08em; border-radius: 99px; padding: 2px 8px; border: 1px solid transparent;
   }
-  .slot-status-available {
-    background: rgba(52, 211, 153, 0.12); color: #34d399;
-    border-color: rgba(52, 211, 153, 0.22);
-  }
-  .slot-status-booked {
-    background: rgba(251, 191, 36, 0.12); color: #fbbf24;
-    border-color: rgba(251, 191, 36, 0.22);
-  }
-  /* generic fallback */
+  .slot-status-available { background: rgba(52, 211, 153, 0.12); color: #34d399; border-color: rgba(52, 211, 153, 0.22); }
+  .slot-status-booked { background: rgba(251, 191, 36, 0.12); color: #fbbf24; border-color: rgba(251, 191, 36, 0.22); }
   .slot-status-pill:not(.slot-status-available):not(.slot-status-booked) {
-    background: rgba(148, 163, 184, 0.1); color: #94a3b8;
-    border-color: rgba(148, 163, 184, 0.2);
+    background: rgba(148, 163, 184, 0.1); color: #94a3b8; border-color: rgba(148, 163, 184, 0.2);
   }
 
-  /* ── Empty / Error ── */
+  /* Empty / Error */
   .empty { text-align: center; padding: 72px 20px 40px; max-width: 420px; margin: 0 auto; }
   .empty-icon {
     width: 60px; height: 60px; border-radius: 50%;
