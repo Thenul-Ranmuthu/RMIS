@@ -272,6 +272,29 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
                     .collect(Collectors.toList());
             dto.setCertifications(certDtos);
         }
+
+        // Include all future AVAILABLE slots so the public directory
+        // can show the slots button even when no date filter is applied.
+        if (technician.getAvailabilities() != null) {
+            LocalDate today = LocalDate.now();
+            List<AvailabilityResponseDto> availDtos = technician.getAvailabilities().stream()
+                    .filter(a -> "AVAILABLE".equals(a.getStatus()))
+                    .filter(a -> a.getDate() != null && !a.getDate().isBefore(today))
+                    .map(a -> {
+                        AvailabilityResponseDto av = new AvailabilityResponseDto();
+                        av.setId(a.getId());
+                        av.setTechnicianId(technician.getId());
+                        av.setTechnicianName(technician.getFirstName() + " " + technician.getLastName());
+                        av.setDate(a.getDate());
+                        av.setStartTime(a.getStartTime());
+                        av.setEndTime(a.getEndTime());
+                        av.setStatus(a.getStatus());
+                        return av;
+                    })
+                    .collect(Collectors.toList());
+            dto.setAvailabilities(availDtos);
+        }
+
         return dto;
     }
 
