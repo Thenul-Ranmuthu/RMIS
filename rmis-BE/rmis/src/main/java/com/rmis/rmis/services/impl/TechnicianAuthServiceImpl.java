@@ -8,13 +8,11 @@ import com.rmis.rmis.domain.enums.SkillLevel;
 import com.rmis.rmis.exceptions.RegisterUserAlreadyExistsException;
 import com.rmis.rmis.exceptions.ResourceNotFoundException;
 import com.rmis.rmis.exceptions.UnregisteredUserException;
-import com.rmis.rmis.repositories.AvailabilityRepository;
 import com.rmis.rmis.repositories.CertificationRepository;
 import com.rmis.rmis.repositories.RoleRepository;
 import com.rmis.rmis.repositories.TechnicianRepository;
 import com.rmis.rmis.services.interfaces.TechnicianAuthService;
 import com.rmis.rmis.utils.JwtTokenProvider;
-import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,7 +38,6 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
 
     private final TechnicianRepository technicianRepository;
     private final CertificationRepository certificationRepository;
-    private final AvailabilityRepository availabilityRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationProvider authenticationProvider;
@@ -50,7 +47,6 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
     public TechnicianAuthServiceImpl(
             TechnicianRepository technicianRepository,
             CertificationRepository certificationRepository,
-            AvailabilityRepository availabilityRepository,
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
             FileStorageServiceImpl fileStorageServiceImpl,
@@ -60,7 +56,6 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
     ) {
         this.technicianRepository = technicianRepository;
         this.certificationRepository = certificationRepository;
-        this.availabilityRepository = availabilityRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.fileStorageServiceImpl = fileStorageServiceImpl;
@@ -193,6 +188,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public TechnicianResponseDto getTechnicianById(Long id) {
         Technician technician = technicianRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Technician not found with id: " + id));
@@ -200,6 +196,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<TechnicianResponseDto> getTechniciansByStatus(String status) {
         return technicianRepository.findByStatus(status).stream()
                 .map(this::mapToResponseDto)
@@ -225,21 +222,17 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
     public List<TechnicianResponseDto> searchAvailableTechnicians(LocalDate date, SkillLevel skillLevel) {
         log.info("Searching available technicians for date: {}, skillLevel: {}", date, skillLevel);
         if (date != null) {
-            // filter by date + optional skillLevel
             return technicianRepository.findAvailableByDateAndSkillLevel(date, skillLevel)
                     .stream()
-                    .map(t -> mapToResponseDtoWithAvailability(t, date))
+                    .map(this::mapToResponseDto)
                     .collect(Collectors.toList());
         } else {
-            // no date — return all active, optional skillLevel filter
-            return technicianRepository.findActiveBySkillLevel(skillLevel)
+            return technicianRepository.findActiveBySkillLevel(skillLevel, LocalDate.now())
                     .stream()
                     .map(this::mapToResponseDto)
                     .collect(Collectors.toList());
         }
     }
-
-    // ---- mappers ----
 
     private TechnicianResponseDto mapToResponseDto(Technician technician) {
         TechnicianResponseDto dto = new TechnicianResponseDto();
@@ -273,53 +266,6 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
             dto.setCertifications(certDtos);
         }
 
-        // Include all future AVAILABLE slots so the public directory
-        // can show the slots button even when no date filter is applied.
-        if (technician.getAvailabilities() != null) {
-            LocalDate today = LocalDate.now();
-            List<AvailabilityResponseDto> availDtos = technician.getAvailabilities().stream()
-                    .filter(a -> "AVAILABLE".equals(a.getStatus()))
-                    .filter(a -> a.getDate() != null && !a.getDate().isBefore(today))
-                    .map(a -> {
-                        AvailabilityResponseDto av = new AvailabilityResponseDto();
-                        av.setId(a.getId());
-                        av.setTechnicianId(technician.getId());
-                        av.setTechnicianName(technician.getFirstName() + " " + technician.getLastName());
-                        av.setDate(a.getDate());
-                        av.setStartTime(a.getStartTime());
-                        av.setEndTime(a.getEndTime());
-                        av.setStatus(a.getStatus());
-                        return av;
-                    })
-                    .collect(Collectors.toList());
-            dto.setAvailabilities(availDtos);
-        }
-
-        return dto;
-    }
-
-    // Used for search results — maps only the AVAILABLE slots for the queried date
-    private TechnicianResponseDto mapToResponseDtoWithAvailability(Technician technician, LocalDate date) {
-        TechnicianResponseDto dto = mapToResponseDto(technician);
-
-        if (technician.getAvailabilities() != null) {
-            List<AvailabilityResponseDto> availDtos = technician.getAvailabilities().stream()
-                    .filter(a -> "AVAILABLE".equals(a.getStatus()))
-                    .filter(a -> a.getDate().equals(date))
-                    .map(a -> {
-                        AvailabilityResponseDto av = new AvailabilityResponseDto();
-                        av.setId(a.getId());
-                        av.setTechnicianId(technician.getId());
-                        av.setTechnicianName(technician.getFirstName() + " " + technician.getLastName());
-                        av.setDate(a.getDate());
-                        av.setStartTime(a.getStartTime());
-                        av.setEndTime(a.getEndTime());
-                        av.setStatus(a.getStatus());
-                        return av;
-                    })
-                    .collect(Collectors.toList());
-            dto.setAvailabilities(availDtos);
-        }
         return dto;
     }
 }

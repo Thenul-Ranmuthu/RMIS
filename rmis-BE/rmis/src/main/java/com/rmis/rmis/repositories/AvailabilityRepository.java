@@ -13,6 +13,12 @@ public interface AvailabilityRepository extends JpaRepository<Availability, Long
     List<Availability> findByTechnicianIdAndDateGreaterThanEqualOrderByDateAscStartTimeAsc(
             Long technicianId, LocalDate fromDate);
 
+    List<Availability> findByTechnicianIdAndDateGreaterThanEqualAndStatusOrderByDateAscStartTimeAsc(
+            Long technicianId, LocalDate fromDate, String status);
+
+    List<Availability> findByTechnicianIdAndDateAndStatusOrderByStartTimeAsc(
+            Long technicianId, LocalDate date, String status);
+
     boolean existsByTechnicianIdAndDateAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
             Long technicianId,
             LocalDate date,

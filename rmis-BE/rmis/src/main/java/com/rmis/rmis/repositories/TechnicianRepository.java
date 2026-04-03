@@ -35,10 +35,19 @@ public interface TechnicianRepository extends JpaRepository<Technician, Long> {
     );
 
     @Query("""
-    SELECT DISTINCT t FROM Technician t
-    WHERE t.status = 'ACTIVE'
-    AND (:skillLevel IS NULL OR t.skillLevel = :skillLevel)
-    ORDER BY t.firstName ASC
-    """)
-    List<Technician> findActiveBySkillLevel(@Param("skillLevel") SkillLevel skillLevel);
+        SELECT DISTINCT t FROM Technician t
+        WHERE t.status = 'ACTIVE'
+        AND (:skillLevel IS NULL OR t.skillLevel = :skillLevel)
+        AND EXISTS (
+            SELECT 1 FROM Availability a
+            WHERE a.technician = t
+            AND a.date >= :today
+            AND a.status = 'AVAILABLE'
+        )
+        ORDER BY t.firstName ASC
+        """)
+    List<Technician> findActiveBySkillLevel(
+            @Param("skillLevel") SkillLevel skillLevel,
+            @Param("today") LocalDate today
+    );
 }

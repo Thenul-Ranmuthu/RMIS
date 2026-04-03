@@ -28,5 +28,4 @@ public class TechnicianResponseDto {
     private LocalDateTime registrationDate;
     private LocalDateTime approvalDate;
     private List<CertificationResponseDto> certifications;
-    private List<AvailabilityResponseDto> availabilities;
 }
