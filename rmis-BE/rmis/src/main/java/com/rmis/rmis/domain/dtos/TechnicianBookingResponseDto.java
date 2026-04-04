@@ -10,7 +10,9 @@ public class TechnicianBookingResponseDto {
     private Long id;
     private String ticketNumber;
     private String status;
+    private String cancellationReason;
     private LocalDateTime createdAt;
+    private LocalDate submissionDate;
     private Long availabilityId;
     private LocalDate scheduledDate;
     private LocalTime scheduledStartTime;

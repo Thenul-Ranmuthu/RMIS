@@ -48,10 +48,12 @@ public class ServiceTicket {
     @Column(length = 500)
     private String description;
 
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ServiceTicketStatus status;
+
+    @Column(length = 500)
+    private String cancellationReason;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

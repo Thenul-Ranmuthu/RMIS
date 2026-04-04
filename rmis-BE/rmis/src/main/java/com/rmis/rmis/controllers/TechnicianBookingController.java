@@ -1,6 +1,8 @@
 package com.rmis.rmis.controllers;
+import com.rmis.rmis.domain.dtos.BookingStatusUpdateRequestDto;
 import com.rmis.rmis.domain.dtos.TechnicianBookingResponseDto;
 import com.rmis.rmis.services.interfaces.TechnicianBookingService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -59,6 +61,26 @@ public class TechnicianBookingController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "Booking not found"));
+        }
+    }
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> updateBookingStatus(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long id,
+            @Valid @RequestBody BookingStatusUpdateRequestDto dto) {
+
+        log.info("Technician {} updating ticket {} to {}", userDetails.getUsername(), id, dto.getStatus());
+        try {
+            TechnicianBookingResponseDto updated =
+                    technicianBookingService.updateBookingStatus(userDetails.getUsername(), id, dto);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error updating booking status", e);
+            return ResponseEntity.internalServerError().body(Map.of("error", "An unexpected error occurred"));
         }
     }
 }

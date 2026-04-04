@@ -5,6 +5,7 @@ import com.resend.services.emails.model.CreateEmailOptions;
 import com.rmis.rmis.domain.dtos.QuotaRequestAddQuotaDto;
 import com.rmis.rmis.domain.entities.MinistryOfficer;
 import com.rmis.rmis.domain.entities.QuotaRequest;
+import com.rmis.rmis.domain.entities.ServiceTicket;
 import com.rmis.rmis.repositories.MinistryOfficerRepository;
 import com.rmis.rmis.repositories.QuotaRequestRepository;
 import com.rmis.rmis.services.interfaces.EmailService;
@@ -173,6 +174,140 @@ public class EmailServiceImpl implements EmailService {
             System.err.println("Failed to send password reset email to " + quotaRequest.getCompany().getEmail() + ": " + e.getMessage());
             throw new RuntimeException("Failed to send email: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+
+    public void sendBookingStatusUpdateEmail(ServiceTicket ticket) {
+        String customerEmail = resolveCustomerEmail(ticket);
+        String customerName  = resolveCustomerName(ticket);
+        if (customerEmail == null) return;
+
+        String statusLabel = switch (ticket.getStatus()) {
+            case ACCEPTED    -> "Accepted";
+            case COMPLETED   -> "Completed";
+            default          -> ticket.getStatus().name();
+        };
+
+        String html = """
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;
+                            padding: 24px; border: 1px solid #ddd; border-radius: 10px;">
+                    <h2 style="color: #047857;">Booking Status Update</h2>
+                    <p>Dear %s,</p>
+                    <p>Your service booking <strong>%s</strong> has been updated.</p>
+                    <table style="width:100%%; border-collapse:collapse; margin: 16px 0;">
+                        <tr>
+                            <td style="padding:8px; color:#64748b; width:40%%;">Ticket Number</td>
+                            <td style="padding:8px; font-weight:bold;">%s</td>
+                        </tr>
+                        <tr style="background:#f8fafc;">
+                            <td style="padding:8px; color:#64748b;">Service</td>
+                            <td style="padding:8px;">%s</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px; color:#64748b;">New Status</td>
+                            <td style="padding:8px;">
+                                <span style="background:#ecfdf5; color:#047857; padding:3px 10px;
+                                             border-radius:99px; font-weight:bold; font-size:13px;">%s</span>
+                            </td>
+                        </tr>
+                        <tr style="background:#f8fafc;">
+                            <td style="padding:8px; color:#64748b;">Scheduled Date</td>
+                            <td style="padding:8px;">%s</td>
+                        </tr>
+                    </table>
+                    <hr style="border:none; border-top:1px solid #eee; margin:20px 0;">
+                    <p style="font-size:12px; color:#94a3b8;">RMIS · Ministry of Environment</p>
+                </div>
+                """.formatted(
+                customerName,
+                ticket.getTicketNumber(),
+                ticket.getTicketNumber(),
+                ticket.getServiceType(),
+                statusLabel,
+                ticket.getAvailability().getDate().toString()
+        );
+
+        sendEmail(customerEmail, "Your Service Booking is " + statusLabel + " - RMIS", html);
+    }
+
+    @Override
+
+    public void sendBookingCancellationEmail(ServiceTicket ticket) {
+        String customerEmail = resolveCustomerEmail(ticket);
+        String customerName  = resolveCustomerName(ticket);
+        if (customerEmail == null) return;
+
+        String reason = ticket.getCancellationReason() != null
+                ? ticket.getCancellationReason()
+                : "No reason provided.";
+
+        String html = """
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;
+                            padding: 24px; border: 1px solid #ddd; border-radius: 10px;">
+                    <h2 style="color: #dc2626;">Booking Cancelled</h2>
+                    <p>Dear %s,</p>
+                    <p>Your service booking <strong>%s</strong> has been cancelled.</p>
+                    <table style="width:100%%; border-collapse:collapse; margin: 16px 0;">
+                        <tr>
+                            <td style="padding:8px; color:#64748b; width:40%%;">Ticket Number</td>
+                            <td style="padding:8px; font-weight:bold;">%s</td>
+                        </tr>
+                        <tr style="background:#f8fafc;">
+                            <td style="padding:8px; color:#64748b;">Service</td>
+                            <td style="padding:8px;">%s</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px; color:#64748b;">Scheduled Date</td>
+                            <td style="padding:8px;">%s</td>
+                        </tr>
+                        <tr style="background:#fef2f2;">
+                            <td style="padding:8px; color:#64748b;">Cancellation Reason</td>
+                            <td style="padding:8px; color:#dc2626;">%s</td>
+                        </tr>
+                    </table>
+                    <hr style="border:none; border-top:1px solid #eee; margin:20px 0;">
+                    <p style="font-size:12px; color:#94a3b8;">RMIS · Ministry of Environment</p>
+                </div>
+                """.formatted(
+                customerName,
+                ticket.getTicketNumber(),
+                ticket.getTicketNumber(),
+                ticket.getServiceType(),
+                ticket.getAvailability().getDate().toString(),
+                reason
+        );
+
+        sendEmail(customerEmail, "Your Service Booking Has Been Cancelled - RMIS", html);
+
+    }
+
+    private void sendEmail(String to, String subject, String html) {
+        Resend resend = new Resend(resendApiKey);
+        CreateEmailOptions params = CreateEmailOptions.builder()
+                .from("RMIS Support <rmis.bookings@rmis.space>")
+                .to(to)
+                .subject(subject)
+                .html(html)
+                .build();
+        try {
+            resend.emails().send(params);
+        } catch (Exception e) {
+            System.err.println("Failed to send email to " + to + ": " + e.getMessage());
+        }
+    }
+
+    private String resolveCustomerEmail(ServiceTicket ticket) {
+        if (ticket.getPublicUser() != null) return ticket.getPublicUser().getEmail();
+        if (ticket.getCompany()    != null) return ticket.getCompany().getEmail();
+        return null;
+    }
+
+    private String resolveCustomerName(ServiceTicket ticket) {
+        if (ticket.getPublicUser() != null)
+            return ticket.getPublicUser().getFirstName() + " " + ticket.getPublicUser().getLastName();
+        if (ticket.getCompany() != null) return ticket.getCompany().getName();
+        return "Customer";
     }
 }
 
