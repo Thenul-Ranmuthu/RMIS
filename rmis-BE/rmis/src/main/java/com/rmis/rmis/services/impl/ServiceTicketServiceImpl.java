@@ -28,11 +28,9 @@ public class ServiceTicketServiceImpl implements ServiceTicketService {
     private final PublicUserRepository     publicUserRepository;
     private final CompanyRepository        companyRepository;
 
-    // Simple in-memory sequence; safe for single-instance deployments.
-    // For multi-instance, replace with a DB sequence or UUID suffix.
+
     private static final AtomicLong SEQUENCE = new AtomicLong(1);
 
-    // ── Public-user booking ───────────────────────────────────────────────────
 
     @Override
     @Transactional
@@ -51,7 +49,6 @@ public class ServiceTicketServiceImpl implements ServiceTicketService {
         return toResponseDto(saved);
     }
 
-    // ── Company booking ───────────────────────────────────────────────────────
 
     @Override
     @Transactional

@@ -16,15 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Endpoints for raising and viewing service tickets (booking requests).
- *
- * POST  /api/service-tickets/user          → raise ticket (public user)
- * POST  /api/service-tickets/company       → raise ticket (company)
- * GET   /api/service-tickets/user/my       → my tickets (public user)
- * GET   /api/service-tickets/company/my    → my tickets (company)
- * GET   /api/service-tickets/{id}          → single ticket (any authenticated role)
- */
 @RestController
 @RequestMapping("/api/service-tickets")
 @AllArgsConstructor
@@ -33,7 +24,6 @@ public class ServiceTicketController {
 
     private final ServiceTicketService serviceTicketService;
 
-    // ── Public-user endpoints ─────────────────────────────────────────────────
 
     @PostMapping("/user")
     @PreAuthorize("hasRole('CUSTOMER')")
@@ -67,7 +57,6 @@ public class ServiceTicketController {
                 serviceTicketService.getMyTicketsAsPublicUser(userDetails.getUsername()));
     }
 
-    // ── Company endpoints ─────────────────────────────────────────────────────
 
     @PostMapping("/company")
     @PreAuthorize("hasRole('COMPANY')")
@@ -100,7 +89,6 @@ public class ServiceTicketController {
                 serviceTicketService.getMyTicketsAsCompany(userDetails.getUsername()));
     }
 
-    // ── Shared endpoint ───────────────────────────────────────────────────────
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('CUSTOMER','COMPANY','TECHNICIAN','ADMIN')")
