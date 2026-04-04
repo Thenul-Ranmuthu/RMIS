@@ -421,7 +421,7 @@ export default function PublicDirectory() {
                       <button
                         className="btn-primary"
                         style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-                        onClick={() => router.push(`/public/technician/${tech.id}`)}
+                        onClick={() => router.push(`/public/book/${tech.id}`)}
                       >
                         Book Me →
                       </button>
