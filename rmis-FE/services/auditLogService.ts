@@ -3,7 +3,7 @@
 import { AuditLog, AuditLogFilters } from '@/types/auditLog';
 import { getToken } from '@/services/authService';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 const authHeaders = () => ({
     'Authorization': `Bearer ${getToken()}`,
