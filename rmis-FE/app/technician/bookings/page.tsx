@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getToken, getRole } from '@/services/authService';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
 
 interface Booking {
   id: number;
@@ -55,7 +55,7 @@ function statusMeta(status: string) {
   switch (status) {
     case 'PENDING':
       return { label: 'Pending', color: '#b45309', bg: '#fff7ed', border: '#fed7aa' };
-    case 'SCHEDULED':
+    case 'ACCEPTED':
       return { label: 'Scheduled', color: '#047857', bg: '#ecfdf5', border: '#a7f3d0' };
     case 'CANCELLED':
       return { label: 'Cancelled', color: '#dc2626', bg: '#fef2f2', border: '#fecaca' };
@@ -64,7 +64,7 @@ function statusMeta(status: string) {
   }
 }
 
-const STATUS_TABS = ['ALL', 'PENDING', 'SCHEDULED', 'CANCELLED'];
+const STATUS_TABS = ['ALL', 'PENDING', 'ACCEPTED', 'CANCELLED'];
 
 export default function TechnicianBookingsPage() {
   const router = useRouter();
@@ -132,7 +132,7 @@ export default function TechnicianBookingsPage() {
   }
 
   const pending = bookings.filter(b => b.status === 'PENDING').length;
-  const scheduled = bookings.filter(b => b.status === 'SCHEDULED').length;
+  const scheduled = bookings.filter(b => b.status === 'ACCEPTED').length;
   const cancelled = bookings.filter(b => b.status === 'CANCELLED').length;
 
   return (
@@ -209,7 +209,7 @@ export default function TechnicianBookingsPage() {
                   background: activeTab === tab ? '#047857' : '#e2e8f0',
                   color: activeTab === tab ? '#fff' : '#64748b',
                 }}>
-                  {tab === 'PENDING' ? pending : tab === 'SCHEDULED' ? scheduled : cancelled}
+                  {tab === 'PENDING' ? pending : tab === 'ACCEPTED' ? scheduled : cancelled}
                 </span>
               )}
             </button>
