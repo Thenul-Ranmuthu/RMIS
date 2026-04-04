@@ -121,6 +121,7 @@ public class SecurityConfig {
                     .requestMatchers("/ministry/quota-requests/**").hasRole("MINISTRY_OFFICER")
                     .requestMatchers("/technician/availability/**").hasRole("TECHNICIAN")
                     .requestMatchers("/api/service-tickets/**").authenticated()
+                    .requestMatchers("/technician/bookings/**").hasRole("TECHNICIAN")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
