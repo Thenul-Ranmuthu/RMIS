@@ -43,13 +43,42 @@ const authFetch = async (url: string, options: RequestInit = {}) => {
   return response.json();
 };
 
+export const raiseTicketAsUser = (
+  availabilityId: number,
+  serviceType: string,
+  description: string
+): Promise<ServiceTicketResponse> =>
+  authFetch(`${API_BASE_URL}/api/service-tickets/user`, {
+    method: "POST",
+    body: JSON.stringify({ availabilityId, serviceType, description }),
+  });
+
+export const raiseTicketAsCompany = (
+  availabilityId: number,
+  serviceType: string,
+  description: string
+): Promise<ServiceTicketResponse> =>
+  authFetch(`${API_BASE_URL}/api/service-tickets/company`, {
+    method: "POST",
+    body: JSON.stringify({ availabilityId, serviceType, description }),
+  });
+
 export const getMyTickets = (): Promise<ServiceTicketResponse[]> =>
   authFetch(`${API_BASE_URL}/api/service-tickets/user/my`);
+
+export const getMyCompanyTickets = (): Promise<ServiceTicketResponse[]> =>
+  authFetch(`${API_BASE_URL}/api/service-tickets/company/my`);
 
 export const getTicketById = (id: number): Promise<ServiceTicketResponse> =>
   authFetch(`${API_BASE_URL}/api/service-tickets/${id}`);
 
 export const cancelTicket = (id: number, reason: string): Promise<ServiceTicketResponse> =>
+  authFetch(`${API_BASE_URL}/api/service-tickets/${id}/cancel`, {
+    method: "PUT",
+    body: JSON.stringify({ reason }),
+  });
+
+export const cancelCompanyTicket = (id: number, reason: string): Promise<ServiceTicketResponse> =>
   authFetch(`${API_BASE_URL}/api/service-tickets/${id}/cancel`, {
     method: "PUT",
     body: JSON.stringify({ reason }),

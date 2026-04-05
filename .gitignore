@@ -1,35 +1,59 @@
-# --- IDE & VS Code ---
+# --- OS & IDE ---
 .vscode/
 .idea/
 *.swp
 *.swo
 .DS_Store
+Thumbs.db
+desktop.ini
 
-# --- Backend (Spring Boot / Maven) ---
-rmis-BE/rmis/target/
-rmis-BE/rmis/.mvn/wrapper/maven-wrapper.jar
-
-# --- Logic & Debug Logs (REMOVED: Specific log names) ---
-# Use wildcards to catch EVERYTHING
+# --- Logs & Debugging ---
 *.log
-rmis-BE/rmis/*.log
-rmis-FE/*.log
+logs/
+**/logs/
 **/npm-debug.log*
 **/yarn-debug.log*
+**/yarn-error.log*
+.pnpm-debug.log*
 
-# SECRETS: Ignore the local application.properties
+# --- Backend (Spring Boot / Maven) ---
+**/target/
+rmis-BE/rmis/target/
+.mvn/
+rmis-BE/rmis/.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.war
+*.ear
+
+# SECRETS & Config
 rmis-BE/rmis/src/main/resources/application.properties
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+rmis-FE/.env*
 
 # --- Frontend (Node.js / Next.js) ---
+**/node_modules/
 rmis-FE/node_modules/
+.next/
 rmis-FE/.next/
+out/
 rmis-FE/out/
+build/
 rmis-FE/build/
-rmis-FE/.env*
+.next-env.d.ts
+.vercel/
+.turbo/
+dist/
 
 # --- General ---
 /tmp/
 .gemini/
+.antigravity/
 
 # --- Temp/debug scripts ---
 rmis-FE/replace.js
+rmis-FE/backup/

@@ -24,4 +24,8 @@ public interface AvailabilityRepository extends JpaRepository<Availability, Long
             LocalDate date,
             java.time.LocalTime endTime,
             java.time.LocalTime startTime);
+
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("SELECT a FROM Availability a WHERE a.id = :id")
+    java.util.Optional<Availability> findByIdWithLock(Long id);
 }
