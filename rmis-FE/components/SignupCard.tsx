@@ -431,7 +431,7 @@ export default function SignupCard() {
           method: "GET",
         });
         setIsLoading(false);
-        window.location.href = "/verify-email";
+        router.push("/verify-email");
         return;
       } else {
         // STEP 1 - Store form data and redirect to verify page
@@ -453,7 +453,7 @@ export default function SignupCard() {
         });
 
         setIsLoading(false);
-        window.location.href = "/verify-email";
+        router.push("/verify-email");
         return;
       }
 

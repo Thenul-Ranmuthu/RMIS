@@ -76,6 +76,14 @@ export default function VerifyEmailPage() {
 
         // ── Your new DTO format: certifications[i].certificationName + certifications[i].file ──
         const certifications = (window as any).__pendingCertifications || [];
+        
+        // SAFETY CHECK: If files were lost from memory (due to refresh), show a clear error
+        if (certifications.length === 0) {
+          setError("Your certification files were lost due to a page refresh. Please go back and re-upload them.");
+          setIsLoading(false);
+          return;
+        }
+
         certifications.forEach((cert: any, index: number) => {
           formDataObj.append(`certifications[${index}].certificationName`, cert.certificationName);
           formDataObj.append(`certifications[${index}].issuingAuthority`, cert.issuingAuthority || "");
