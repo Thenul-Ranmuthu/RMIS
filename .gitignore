@@ -8,12 +8,16 @@
 # --- Backend (Spring Boot / Maven) ---
 rmis-BE/rmis/target/
 rmis-BE/rmis/.mvn/wrapper/maven-wrapper.jar
-rmis-BE/rmis/backend_debug.log
-rmis-BE/rmis/backend_trace.log
-rmis-BE/rmis/backend_relaunch_error.log
+
+# --- Logic & Debug Logs (REMOVED: Specific log names) ---
+# Use wildcards to catch EVERYTHING
+*.log
+rmis-BE/rmis/*.log
+rmis-FE/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
 
 # SECRETS: Ignore the local application.properties
-# (Normally we keep a template/sample and ignore the real one)
 rmis-BE/rmis/src/main/resources/application.properties
 
 # --- Frontend (Node.js / Next.js) ---
@@ -21,14 +25,7 @@ rmis-FE/node_modules/
 rmis-FE/.next/
 rmis-FE/out/
 rmis-FE/build/
-rmis-FE/.env
-rmis-FE/.env.local
-rmis-FE/.env.development.local
-rmis-FE/.env.test.local
-rmis-FE/.env.production.local
-rmis-FE/npm-debug.log*
-rmis-FE/yarn-debug.log*
-rmis-FE/yarn-error.log*
+rmis-FE/.env*
 
 # --- General ---
 /tmp/
