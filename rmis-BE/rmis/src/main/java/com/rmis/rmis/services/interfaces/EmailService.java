@@ -17,4 +17,6 @@ public interface EmailService {
     void sendBookingStatusUpdateEmail(ServiceTicket ticket);
 
     void sendBookingCancellationEmail(ServiceTicket ticket);
+
+    void sendBookingCancellationTechnicianEmail(ServiceTicket ticket);
 }

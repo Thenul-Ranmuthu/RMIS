@@ -45,14 +45,14 @@
 //   const getLoginEndpoint = (role: string): string => {
 //     switch (role) {
 //       case "Technician":
-//         return "http://localhost:5050/auth/technician/login";
+//         return "http://localhost:5055/auth/technician/login";
 //       case "Company":
-//         return "http://localhost:5050/auth/company/login";
+//         return "http://localhost:5055/auth/company/login";
 //       case "Public User":
 //         // Return a placeholder - you'll need to implement this endpoint
-//         return "http://localhost:5050/auth/user/login";
+//         return "http://localhost:5055/auth/user/login";
 //       default:
-//         return "http://localhost:5050/auth/technician/login";
+//         return "http://localhost:5055/auth/technician/login";
 //     }
 //   };
 
@@ -491,14 +491,14 @@ export default function LoginCard() {
   const getLoginEndpoint = (role: string): string => {
     switch (role) {
       case "Technician":
-        return "http://localhost:5050/auth/technician/login";
+        return "http://localhost:5055/auth/technician/login";
       case "Company":
-        return "http://localhost:5050/auth/company/login";
+        return "http://localhost:5055/auth/company/login";
       case "Public User":
         // Return a placeholder - you'll need to implement this endpoint
-        return "http://localhost:5050/auth/user/login";
+        return "http://localhost:5055/auth/user/login";
       default:
-        return "http://localhost:5050/auth/technician/login";
+        return "http://localhost:5055/auth/technician/login";
     }
   };
 
@@ -580,9 +580,9 @@ export default function LoginCard() {
       } else if (role === "Technician") {
         router.push("/technician/dashboard");
       } else if (role === "Public User") {
-        router.push("/dashboard");
+        router.push("/public-user");
       } else {
-        router.push("/dashboard");
+        router.push("/public-user");
       }
     } catch (error) {
       console.error("Login failed:", error);

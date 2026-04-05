@@ -1,6 +1,6 @@
 import { getToken } from "./authService";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5055";
 
 export interface ServiceTicketResponse {
   id: number;
@@ -18,6 +18,8 @@ export interface ServiceTicketResponse {
   serviceType: string;
   description: string;
   status: string;
+  cancellationReason?: string;
+  cancellationTimestamp?: string;
   createdAt: string;
   updatedAt: string;
 }

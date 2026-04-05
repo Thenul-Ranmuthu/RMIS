@@ -41,6 +41,12 @@ export function BookingCard({ ticket, onViewDetails, onCancel }: BookingCardProp
                         <p className="text-gray-600 mt-1 line-clamp-2 italic">
                             "{ticket.description}"
                         </p>
+                        {ticket.status.toUpperCase() === "CANCELLED" && ticket.cancellationReason && (
+                            <div className="mt-3 bg-red-50 border border-red-100 p-3 rounded-xl">
+                                <p className="text-[10px] uppercase font-bold text-red-400 tracking-wider mb-1">Cancellation Reason</p>
+                                <p className="text-red-700 text-sm font-medium italic">"{ticket.cancellationReason}"</p>
+                            </div>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">

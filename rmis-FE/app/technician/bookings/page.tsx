@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getToken, getRole } from '@/services/authService';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5055';
 
 interface Booking {
   id: number;
@@ -21,6 +21,7 @@ interface Booking {
   scheduledStartTime: string;
   scheduledEndTime: string;
   createdAt: string;
+  cancellationReason?: string;
 }
 
 function authFetch(url: string, options: RequestInit = {}) {
@@ -270,6 +271,12 @@ export default function TechnicianBookingsPage() {
                       label="Type"
                       value={booking.customerType === 'COMPANY' ? 'Company' : 'Individual'}
                     />
+                    {booking.status === 'CANCELLED' && booking.cancellationReason && (
+                      <div style={{ marginTop: 8, padding: 10, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10 }}>
+                        <div style={{ fontSize: 9, color: '#f87171', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4 }}>Reason</div>
+                        <div style={{ fontSize: 12, color: '#dc2626', fontWeight: 600, fontStyle: 'italic' }}>"{booking.cancellationReason}"</div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Card footer */}

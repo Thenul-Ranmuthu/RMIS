@@ -282,6 +282,59 @@ public class EmailServiceImpl implements EmailService {
 
     }
 
+    @Override
+    public void sendBookingCancellationTechnicianEmail(ServiceTicket ticket) {
+        String technicianEmail = ticket.getTechnician().getEmail();
+        String technicianName  = ticket.getTechnician().getFirstName() + " " + ticket.getTechnician().getLastName();
+        String customerName    = resolveCustomerName(ticket);
+
+        String reason = ticket.getCancellationReason() != null
+                ? ticket.getCancellationReason()
+                : "No reason provided by customer.";
+
+        String html = """
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;
+                            padding: 24px; border: 1px solid #ddd; border-radius: 10px;">
+                    <h2 style="color: #dc2626;">Booking Cancelled by Customer</h2>
+                    <p>Dear %s,</p>
+                    <p>The service booking <strong>%s</strong> scheduled for <strong>%s</strong> has been cancelled by the customer (%s).</p>
+                    <table style="width:100%%; border-collapse:collapse; margin: 16px 0;">
+                        <tr>
+                            <td style="padding:8px; color:#64748b; width:40%%;">Ticket Number</td>
+                            <td style="padding:8px; font-weight:bold;">%s</td>
+                        </tr>
+                        <tr style="background:#f8fafc;">
+                            <td style="padding:8px; color:#64748b;">Service</td>
+                            <td style="padding:8px;">%s</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px; color:#64748b;">Scheduled Time</td>
+                            <td style="padding:8px;">%s - %s</td>
+                        </tr>
+                        <tr style="background:#fef2f2;">
+                            <td style="padding:8px; color:#64748b;">Cancellation Reason</td>
+                            <td style="padding:8px; color:#dc2626;">%s</td>
+                        </tr>
+                    </table>
+                    <p>The time slot has been released and is now available for other customers.</p>
+                    <hr style="border:none; border-top:1px solid #eee; margin:20px 0;">
+                    <p style="font-size:12px; color:#94a3b8;">RMIS · Ministry of Environment</p>
+                </div>
+                """.formatted(
+                technicianName,
+                ticket.getTicketNumber(),
+                ticket.getAvailability().getDate().toString(),
+                customerName,
+                ticket.getTicketNumber(),
+                ticket.getServiceType(),
+                ticket.getAvailability().getStartTime().toString(),
+                ticket.getAvailability().getEndTime().toString(),
+                reason
+        );
+
+        sendEmail(technicianEmail, "URGENT: Booking " + ticket.getTicketNumber() + " Cancelled by Customer - RMIS", html);
+    }
+
     private void sendEmail(String to, String subject, String html) {
         Resend resend = new Resend(resendApiKey);
         CreateEmailOptions params = CreateEmailOptions.builder()

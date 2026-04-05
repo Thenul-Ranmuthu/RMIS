@@ -6,9 +6,10 @@ import com.rmis.rmis.domain.entities.*;
 import com.rmis.rmis.domain.enums.ServiceTicketStatus;
 import com.rmis.rmis.exceptions.ResourceNotFoundException;
 import com.rmis.rmis.repositories.*;
+import com.rmis.rmis.services.interfaces.EmailService;
 import com.rmis.rmis.services.interfaces.ServiceTicketService;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,14 +21,25 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
 @Slf4j
 public class ServiceTicketServiceImpl implements ServiceTicketService {
-
     private final ServiceTicketRepository serviceTicketRepository;
     private final AvailabilityRepository   availabilityRepository;
     private final PublicUserRepository     publicUserRepository;
     private final CompanyRepository        companyRepository;
+    private final EmailService             emailService;
+
+    public ServiceTicketServiceImpl(ServiceTicketRepository serviceTicketRepository,
+                                    AvailabilityRepository availabilityRepository,
+                                    PublicUserRepository publicUserRepository,
+                                    CompanyRepository companyRepository,
+                                    @Lazy EmailService emailService) {
+        this.serviceTicketRepository = serviceTicketRepository;
+        this.availabilityRepository = availabilityRepository;
+        this.publicUserRepository = publicUserRepository;
+        this.companyRepository = companyRepository;
+        this.emailService = emailService;
+    }
 
 
     private static final AtomicLong SEQUENCE = new AtomicLong(1);
@@ -126,6 +138,15 @@ public class ServiceTicketServiceImpl implements ServiceTicketService {
 
         ServiceTicket saved = serviceTicketRepository.save(ticket);
         log.info("Service ticket {} cancelled by {}", saved.getTicketNumber(), userEmail);
+
+        // Scenario 4: Notify Technician & Scenario 1: Confirm to Customer
+        try {
+            emailService.sendBookingCancellationEmail(saved);
+            emailService.sendBookingCancellationTechnicianEmail(saved);
+        } catch (Exception e) {
+            log.warn("Email notification failed for cancelled ticket {}: {}", saved.getTicketNumber(), e.getMessage());
+        }
+
         return toResponseDto(saved);
     }
 

@@ -53,7 +53,7 @@ export default function PublicUserDashboard() {
                     Browse and report environmental issues in your area.
                 </p>
                 <button
-                    onClick={() => router.push('/dashboard/bookings')}
+                    onClick={() => router.push('/public-user/bookings')}
                     className="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold transition mb-4 flex items-center justify-center gap-2"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

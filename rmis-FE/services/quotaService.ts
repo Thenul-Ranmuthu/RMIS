@@ -3,7 +3,7 @@
 import { QuotaFilters, QuotaPaginatedResponse, QuotaRequestDetail } from "@/types/quota";
 import { getToken } from "@/services/authService";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5055";
 
 // ── Helper: build auth headers ─────────────────────────────────────────────
 const authHeaders = (token?: string | null) => ({

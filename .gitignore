@@ -30,3 +30,6 @@ rmis-FE/.env*
 # --- General ---
 /tmp/
 .gemini/
+
+# --- Temp/debug scripts ---
+rmis-FE/replace.js
