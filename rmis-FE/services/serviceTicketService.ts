@@ -46,3 +46,9 @@ export const getMyTickets = (): Promise<ServiceTicketResponse[]> =>
 
 export const getTicketById = (id: number): Promise<ServiceTicketResponse> =>
   authFetch(`${API_BASE_URL}/api/service-tickets/${id}`);
+
+export const cancelTicket = (id: number, reason: string): Promise<ServiceTicketResponse> =>
+  authFetch(`${API_BASE_URL}/api/service-tickets/${id}/cancel`, {
+    method: "PUT",
+    body: JSON.stringify({ reason }),
+  });

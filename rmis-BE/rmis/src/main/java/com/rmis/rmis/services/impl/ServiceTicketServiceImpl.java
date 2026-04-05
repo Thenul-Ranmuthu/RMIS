@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -93,6 +94,41 @@ public class ServiceTicketServiceImpl implements ServiceTicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("Service ticket not found")));
     }
 
+    @Override
+    @Transactional
+    public ServiceTicketResponseDto cancelTicket(Long ticketId, String reason, String userEmail) {
+        ServiceTicket ticket = serviceTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResourceNotFoundException("Service ticket not found"));
+
+        // Validation: Verify ownership (Simplified for now - can be more advanced)
+        // If ticket.getPublicUser is not null, compare with userEmail. Same for company.
+        if (ticket.getPublicUser() != null && !ticket.getPublicUser().getEmail().equals(userEmail)) {
+            throw new IllegalStateException("Unauthorized to cancel this ticket");
+        } else if (ticket.getCompany() != null && !ticket.getCompany().getEmail().equals(userEmail)) {
+            throw new IllegalStateException("Unauthorized to cancel this ticket");
+        }
+
+        // Validation: Scenario 3 – Restrict Cancellation After Service Starts
+        if (ticket.getStatus() != ServiceTicketStatus.PENDING) {
+            throw new IllegalStateException("Cannot cancel booking. Status is " + ticket.getStatus() +
+                    ". Only Pending bookings can be cancelled.");
+        }
+
+        // Implementation: Scenario 1
+        ticket.setStatus(ServiceTicketStatus.CANCELLED);
+        ticket.setCancellationReason(reason);
+        ticket.setCancellationTimestamp(LocalDateTime.now());
+
+        // Implementation: Scenario 2 – Release Time Slot
+        Availability slot = ticket.getAvailability();
+        slot.setStatus("AVAILABLE");
+        availabilityRepository.save(slot);
+
+        ServiceTicket saved = serviceTicketRepository.save(ticket);
+        log.info("Service ticket {} cancelled by {}", saved.getTicketNumber(), userEmail);
+        return toResponseDto(saved);
+    }
+
     // ── Private helpers ───────────────────────────────────────────────────────
 
     /**
@@ -148,6 +184,8 @@ public class ServiceTicketServiceImpl implements ServiceTicketService {
         dto.setStatus(t.getStatus().name());
         dto.setServiceType(t.getServiceType());
         dto.setDescription(t.getDescription());
+        dto.setCancellationReason(t.getCancellationReason());
+        dto.setCancellationTimestamp(t.getCancellationTimestamp());
         dto.setCreatedAt(t.getCreatedAt());
         dto.setUpdatedAt(t.getUpdatedAt());
 

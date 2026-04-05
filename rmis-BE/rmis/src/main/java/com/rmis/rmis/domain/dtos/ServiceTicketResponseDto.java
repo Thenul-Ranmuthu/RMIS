@@ -36,6 +36,8 @@ public class ServiceTicketResponseDto {
 
     // Status & audit
     private String status;
+    private String cancellationReason;
+    private LocalDateTime cancellationTimestamp;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

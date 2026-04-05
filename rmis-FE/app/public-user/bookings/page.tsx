@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MyBookingsList } from "@/components/MyBookingsList";
-import { getMyTickets, ServiceTicketResponse } from "../../../services/serviceTicketService";
+import { getMyTickets, cancelTicket, ServiceTicketResponse } from "../../../services/serviceTicketService";
 
 /**
  * SRP: This page component is only responsible for page-level state management 
@@ -26,6 +26,21 @@ export default function MyBookingsPage() {
             setError("Failed to load your booking history. Please try again.");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleCancel = async (id: number) => {
+        const confirmCancel = window.confirm("Are you sure you want to cancel this booking?");
+        if (!confirmCancel) return;
+
+        try {
+            const reason = window.prompt("Reason for cancellation (optional):") || "Cancelled by user";
+            await cancelTicket(id, reason);
+            alert("Booking cancelled successfully.");
+            fetchTickets(); // Refresh list
+        } catch (err: any) {
+            console.error("Error cancelling ticket:", err);
+            alert(err.error || "Failed to cancel booking. Please try again.");
         }
     };
 
@@ -80,6 +95,7 @@ export default function MyBookingsPage() {
                             loading={loading} 
                             onViewDirectory={() => router.push('/public/directory')}
                             onViewDetails={(ticketNum: string) => alert(`Details for ticket ${ticketNum}`)}
+                            onCancel={handleCancel}
                         />
                     )}
                 </div>

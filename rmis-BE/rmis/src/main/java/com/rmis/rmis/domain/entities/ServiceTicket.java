@@ -55,6 +55,8 @@ public class ServiceTicket {
     @Column(length = 500)
     private String cancellationReason;
 
+    private LocalDateTime cancellationTimestamp;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

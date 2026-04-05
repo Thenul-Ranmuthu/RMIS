@@ -6,13 +6,14 @@ interface MyBookingsListProps {
     loading: boolean;
     onViewDirectory: () => void;
     onViewDetails: (ticketNumber: string) => void;
+    onCancel: (id: number) => void;
 }
 
 /**
  * SRP: This component is only responsible for rendering the list of bookings 
  * and handling the empty state.
  */
-export function MyBookingsList({ tickets, loading, onViewDirectory, onViewDetails }: MyBookingsListProps) {
+export function MyBookingsList({ tickets, loading, onViewDirectory, onViewDetails, onCancel }: MyBookingsListProps) {
     if (!loading && tickets.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm text-center px-6">
@@ -38,6 +39,7 @@ export function MyBookingsList({ tickets, loading, onViewDirectory, onViewDetail
                     key={ticket.id} 
                     ticket={ticket} 
                     onViewDetails={onViewDetails} 
+                    onCancel={onCancel}
                 />
             ))}
         </div>

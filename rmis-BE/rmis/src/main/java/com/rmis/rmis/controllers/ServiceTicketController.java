@@ -100,4 +100,24 @@ public class ServiceTicketController {
                     .body(Map.of("error", "Service ticket not found"));
         }
     }
+
+    @PutMapping("/{id}/cancel")
+    @PreAuthorize("hasAnyRole('CUSTOMER','COMPANY')")
+    public ResponseEntity<?> cancelTicket(@PathVariable Long id,
+                                          @RequestBody(required = false) Map<String, String> body,
+                                          @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            String reason = (body != null) ? body.get("reason") : "Cancelled by user";
+            ServiceTicketResponseDto response = serviceTicketService.cancelTicket(id, reason, userDetails.getUsername());
+            return ResponseEntity.ok(response);
+        } catch (IllegalStateException e) {
+            // Scenario 3 validation failure (or authorization)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error cancelling service ticket", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An unexpected error occurred"));
+        }
+    }
 }

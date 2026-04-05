@@ -10,14 +10,16 @@ const STATUS_STYLES: Record<string, string> = {
 interface BookingCardProps {
     ticket: ServiceTicketResponse;
     onViewDetails: (ticketNumber: string) => void;
+    onCancel: (id: number) => void;
 }
 
 /**
  * SRP: This component is only responsible for rendering a single booking card.
  * OCP: The status styles are defined in a map, making it easy to add new statuses.
  */
-export function BookingCard({ ticket, onViewDetails }: BookingCardProps) {
+export function BookingCard({ ticket, onViewDetails, onCancel }: BookingCardProps) {
     const statusStyle = STATUS_STYLES[ticket.status.toUpperCase()] || "bg-gray-100 text-gray-700 border-gray-200";
+    const isCancelable = ticket.status.toUpperCase() === "PENDING";
 
     return (
         <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
@@ -68,7 +70,7 @@ export function BookingCard({ ticket, onViewDetails }: BookingCardProps) {
                 </div>
 
                 <div className="lg:w-48 lg:border-l lg:pl-6 flex flex-col justify-center gap-3 border-t lg:border-t-0 pt-4 lg:pt-0">
-                    <div className="flex items-center gap-2 text-gray-500">
+                    <div className="flex items-center gap-2 text-gray-500 mb-1">
                         <span className="material-symbols-outlined text-lg">schedule</span>
                         <span className="text-sm font-bold tracking-tight">
                             {ticket.scheduledStartTime.substring(0, 5)} - {ticket.scheduledEndTime.substring(0, 5)}
@@ -80,6 +82,14 @@ export function BookingCard({ ticket, onViewDetails }: BookingCardProps) {
                     >
                         View Details
                     </button>
+                    {isCancelable && (
+                        <button 
+                            className="w-full bg-red-50 hover:bg-red-100 text-red-600 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition border border-red-100"
+                            onClick={() => onCancel(ticket.id)}
+                        >
+                            Cancel Booking
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
