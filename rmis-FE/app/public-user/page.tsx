@@ -59,85 +59,106 @@ export default function PublicUserDashboard() {
     };
 
     return (
-        <main className="min-h-screen bg-gray-50 flex flex-col md:flex-row font-['Public_Sans']">
-            {/* Sidebar / Profile Section */}
-            <aside className="w-full md:w-80 bg-white border-r border-gray-100 flex flex-col p-8 shrink-0">
+        <main className="min-h-screen bg-slate-100 font-['Public_Sans'] relative overflow-hidden flex flex-col md:flex-row">
+            {/* Background Texture */}
+            <div className="absolute inset-0 z-0 opacity-40 pointer-events-none" 
+                 style={{ backgroundImage: 'url("/bg.png")', backgroundSize: 'cover', backgroundAttachment: 'fixed' }} />
+
+            {/* Sidebar - Glass Design */}
+            <aside className="w-full md:w-80 backdrop-blur-3xl bg-[#0a2814]/60 border-r border-white/10 flex flex-col p-8 shrink-0 z-10 text-white shadow-2xl relative">
                 <div className="flex-1">
-                    <div className="flex justify-center mb-6">
-                        <div className="bg-emerald-100 rounded-3xl p-5 shadow-inner">
-                            <span className="material-symbols-outlined text-4xl text-emerald-600">person</span>
+                    <div className="flex justify-center mb-8">
+                        <div className="bg-emerald-500/20 rounded-[32px] p-6 border border-white/10 shadow-inner backdrop-blur-md">
+                            <span className="material-symbols-outlined text-5xl text-emerald-400">account_circle</span>
                         </div>
                     </div>
                     
-                    <div className="text-center mb-10">
-                        <h1 className="text-2xl font-black text-gray-900 tracking-tight">Public Portal</h1>
-                        <p className="text-sm font-bold text-gray-400 mt-1 uppercase tracking-widest">Customer Dashboard</p>
+                    <div className="text-center mb-12">
+                        <h1 className="text-2xl font-black tracking-tight text-slate-50">Public Portal</h1>
+                        <p className="text-[10px] font-black text-emerald-400/60 mt-1 uppercase tracking-[0.3em]">Environment Ministry</p>
                     </div>
 
-                    <div className="bg-gray-50 rounded-2xl p-5 mb-8 border border-gray-100">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Authenticated Account</p>
-                        <p className="text-emerald-700 font-bold truncate text-sm">{user?.email}</p>
+                    <div className="bg-white/5 rounded-2xl p-5 mb-10 border border-white/5 backdrop-blur-sm group hover:bg-white/10 transition-colors">
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                             Verified Customer
+                        </p>
+                        <p className="text-slate-100 font-bold truncate text-sm">{user?.email}</p>
                     </div>
 
-                    <nav className="space-y-2">
+                    <nav className="space-y-3">
                         <button
                             onClick={() => router.push('/public/directory')}
-                            className="w-full flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-4 rounded-xl font-bold transition shadow-lg shadow-emerald-600/20"
+                            className="w-full flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white px-6 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-xl shadow-emerald-900/40"
                         >
-                            <span className="material-symbols-outlined">add_circle</span>
+                            <span className="material-symbols-outlined">add_task</span>
                             Book Service
                         </button>
                         <button
                             onClick={handleSignOut}
-                            className="w-full flex items-center gap-3 bg-white hover:bg-red-50 text-red-500 border border-gray-100 px-5 py-4 rounded-xl font-bold transition"
+                            className="w-full flex items-center gap-3 bg-white/5 hover:bg-red-500/10 text-slate-300 hover:text-red-400 border border-white/5 px-6 py-4 rounded-2xl font-bold text-sm transition-all"
                         >
-                            <span className="material-symbols-outlined">logout</span>
+                            <span className="material-symbols-outlined">power_settings_new</span>
                             Sign Out
                         </button>
                     </nav>
                 </div>
                 
-                <div className="mt-8 pt-8 border-t border-gray-50 flex flex-col gap-2">
-                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Version 2.1.0-STABLE</p>
+                <div className="mt-8 pt-8 border-t border-white/5">
+                   <p className="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em] text-center">RMIS v2.1.0-STABLE</p>
                 </div>
             </aside>
 
-            {/* Main Content / Bookings List */}
-            <section className="flex-1 p-6 md:p-12 max-w-5xl">
-                <div className="flex items-center justify-between mb-8">
+            {/* Main Content - Minimalist Grid */}
+            <section className="flex-1 p-6 md:p-12 max-w-6xl z-10 relative overflow-y-auto h-screen scrollbar-hide">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                     <div>
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tight">Your Service History</h2>
-                        <p className="text-gray-500 mt-1">Manage and track your active service tickets</p>
+                        <div className="flex items-center gap-3 mb-2">
+                             <span className="h-1 w-12 bg-emerald-600 rounded-full" />
+                             <span className="text-[10px] font-black text-emerald-700 uppercase tracking-[0.4em]">Activity Monitor</span>
+                        </div>
+                        <h2 className="text-4xl font-black text-slate-900 tracking-tight">Your Service History</h2>
+                        <p className="text-slate-500 mt-2 font-medium tracking-wide">Manage and track your active environment service tickets</p>
                     </div>
                     {tickets.length > 0 && (
                         <button 
                             onClick={fetchTickets}
-                            className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-4 py-2 rounded-xl font-bold transition text-xs flex items-center gap-2"
+                            disabled={loading}
+                            className="bg-white/80 backdrop-blur-md hover:bg-white text-slate-700 border border-slate-200 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-3 shadow-lg shadow-black/5 disabled:opacity-50"
                         >
-                            <span className={`material-symbols-outlined text-base ${loading ? 'animate-spin' : ''}`}>sync</span>
-                            Refresh
+                            <span className={`material-symbols-outlined text-lg ${loading ? 'animate-spin' : ''}`}>sync</span>
+                            Refresh Stats
                         </button>
                     )}
                 </div>
 
                 {error && (
-                    <div className="bg-red-50 border border-red-100 text-red-700 p-4 rounded-xl mb-8 flex items-center gap-3">
-                        <span className="material-symbols-outlined">error</span>
-                        <p className="text-sm font-bold">{error}</p>
+                    <div className="bg-red-50/80 backdrop-blur-md border border-red-100 text-red-700 p-5 rounded-3xl mb-12 flex items-center gap-4 animate-in fade-in slide-in-from-top-4">
+                        <span className="material-symbols-outlined text-red-500 text-3xl">report</span>
+                        <div>
+                            <p className="text-sm font-black uppercase tracking-widest mb-1">Error Occurred</p>
+                            <p className="text-sm font-medium opacity-80">{error}</p>
+                        </div>
                     </div>
                 )}
 
-                <div className="min-h-[500px]">
+                <div className="min-h-[600px] pb-20">
                     {loading && tickets.length === 0 ? (
-                        <div className="py-20 flex flex-col items-center justify-center">
-                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600"></div>
+                        <div className="py-40 flex flex-col items-center justify-center">
+                            <div className="relative">
+                                <div className="h-16 w-16 rounded-full border-t-4 border-emerald-600 animate-spin" />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="h-3 w-3 bg-emerald-600 rounded-full animate-ping" />
+                                </div>
+                            </div>
+                            <p className="mt-6 text-[10px] font-black text-emerald-800 uppercase tracking-[0.5em]">Syncing Data</p>
                         </div>
                     ) : (
                         <MyBookingsList 
                             tickets={tickets} 
                             loading={loading} 
                             onViewDirectory={() => router.push('/public/directory')}
-                            onViewDetails={(num) => alert(`Ticket ${num} active.`)}
+                            onViewDetails={(num) => alert(`Ticket ${num} is being processed.`)}
                             onCancel={handleCancel}
                         />
                     )}
