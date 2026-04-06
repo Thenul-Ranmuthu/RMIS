@@ -4,12 +4,14 @@ import com.rmis.rmis.domain.dtos.*;
 import com.rmis.rmis.domain.entities.Certification;
 import com.rmis.rmis.domain.entities.Role;
 import com.rmis.rmis.domain.entities.Technician;
+import com.rmis.rmis.domain.enums.ServiceTicketStatus;
 import com.rmis.rmis.domain.enums.SkillLevel;
 import com.rmis.rmis.exceptions.RegisterUserAlreadyExistsException;
 import com.rmis.rmis.exceptions.ResourceNotFoundException;
 import com.rmis.rmis.exceptions.UnregisteredUserException;
 import com.rmis.rmis.repositories.CertificationRepository;
 import com.rmis.rmis.repositories.RoleRepository;
+import com.rmis.rmis.repositories.ServiceTicketRepository;
 import com.rmis.rmis.repositories.TechnicianRepository;
 import com.rmis.rmis.services.interfaces.TechnicianAuthService;
 import com.rmis.rmis.utils.JwtTokenProvider;
@@ -43,6 +45,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
     private final AuthenticationProvider authenticationProvider;
     private final FileStorageServiceImpl fileStorageServiceImpl;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ServiceTicketRepository serviceTicketRepository;
 
     public TechnicianAuthServiceImpl(
             TechnicianRepository technicianRepository,
@@ -52,7 +55,8 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
             FileStorageServiceImpl fileStorageServiceImpl,
             @Qualifier("technicianAuthenticationProvider")
             AuthenticationProvider authenticationProvider,
-            JwtTokenProvider jwtTokenProvider
+            JwtTokenProvider jwtTokenProvider,
+            ServiceTicketRepository serviceTicketRepository
     ) {
         this.technicianRepository = technicianRepository;
         this.certificationRepository = certificationRepository;
@@ -61,6 +65,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
         this.fileStorageServiceImpl = fileStorageServiceImpl;
         this.authenticationProvider = authenticationProvider;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.serviceTicketRepository = serviceTicketRepository;
     }
 
     @Override
@@ -202,6 +207,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
                 .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
     }
+    // In TechnicianAuthServiceImpl.deleteTechnician():
 
     @Override
     @Transactional
@@ -209,6 +215,26 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
         log.info("Deleting technician with ID: {}", id);
         Technician technician = technicianRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Technician not found with id: " + id));
+
+        // Block deletion if any active tickets exist
+        boolean hasActiveTickets = serviceTicketRepository
+                .existsByTechnicianIdAndStatusIn(
+                        id,
+                        List.of(ServiceTicketStatus.PENDING, ServiceTicketStatus.ACCEPTED)
+                );
+        if (hasActiveTickets) {
+            throw new IllegalStateException(
+                    "Cannot delete technician with active service tickets. Resolve or cancel them first.");
+        }
+
+        // Nullify availability reference on all historical (cancelled/completed) tickets
+        // so the FK constraint doesn't block the availability deletion
+        serviceTicketRepository.findByTechnicianId(id).forEach(ticket -> {
+            ticket.setAvailability(null);
+            ticket.setTechnician(null);
+            serviceTicketRepository.save(ticket);
+        });
+
         if (technician.getCertifications() != null) {
             for (Certification cert : technician.getCertifications()) {
                 fileStorageServiceImpl.deleteFile(cert.getFilePath());
@@ -259,7 +285,7 @@ public class TechnicianAuthServiceImpl implements TechnicianAuthService {
                         c.setIssuingAuthority(cert.getIssuingAuthority());
                         c.setFileType(cert.getFileType());
                         c.setOriginalFileName(cert.getOriginalFileName());
-                        c.setFileUrl("/uploads/" + cert.getFilePath());
+                        c.setFileUrl("/" + cert.getFilePath());
                         return c;
                     })
                     .collect(Collectors.toList());

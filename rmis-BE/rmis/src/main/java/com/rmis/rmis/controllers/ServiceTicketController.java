@@ -120,4 +120,24 @@ public class ServiceTicketController {
                     .body(Map.of("error", "An unexpected error occurred"));
         }
     }
+
+    @GetMapping("/admin/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllBookings(
+            @RequestParam(required = false) String status) {
+        log.info("Admin fetching all bookings, status filter: {}", status);
+        try {
+            List<ServiceTicketResponseDto> tickets = (status != null && !status.isBlank())
+                    ? serviceTicketService.getAllTicketsByStatus(status)
+                    : serviceTicketService.getAllTickets();
+            return ResponseEntity.ok(tickets);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error fetching all bookings for admin", e);
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "An unexpected error occurred"));
+        }
+    }
 }

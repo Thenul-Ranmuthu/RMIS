@@ -15,6 +15,10 @@ public interface ServiceTicketService {
 
     List<ServiceTicketResponseDto> getMyTicketsAsCompany(String companyEmail);
 
+    List<ServiceTicketResponseDto> getAllTickets();
+
+    List<ServiceTicketResponseDto> getAllTicketsByStatus(String status);
+
     ServiceTicketResponseDto getTicketById(Long ticketId);
 
     ServiceTicketResponseDto cancelTicket(Long ticketId,  String reason, String userEmail); // Scenario 1 & 2

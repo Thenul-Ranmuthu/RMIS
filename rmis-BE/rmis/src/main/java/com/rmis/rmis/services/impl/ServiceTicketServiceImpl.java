@@ -124,6 +124,29 @@ public class ServiceTicketServiceImpl implements ServiceTicketService {
     }
 
     @Override
+    public List<ServiceTicketResponseDto> getAllTickets() {
+        return serviceTicketRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(serviceTicketMapper::mapTo)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ServiceTicketResponseDto> getAllTicketsByStatus(String status) {
+        ServiceTicketStatus statusEnum;
+        try {
+            statusEnum = ServiceTicketStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Invalid status. Allowed: PENDING, ACCEPTED, COMPLETED, CANCELLED");
+        }
+        return serviceTicketRepository.findByStatusOrderByCreatedAtDesc(statusEnum)
+                .stream()
+                .map(serviceTicketMapper::mapTo)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public ServiceTicketResponseDto cancelTicket(Long ticketId, String reason, String userEmail) {
         ServiceTicket ticket = serviceTicketRepository.findById(ticketId)

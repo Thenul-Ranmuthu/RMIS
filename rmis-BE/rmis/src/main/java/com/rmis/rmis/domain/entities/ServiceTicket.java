@@ -33,12 +33,12 @@ public class ServiceTicket {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "technician_id", nullable = false)
+    @JoinColumn(name = "technician_id", nullable = true)
     private Technician technician;
 
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "availability_id", nullable = false, unique = true)
+    @JoinColumn(name = "availability_id", nullable = true, unique = true)
     private Availability availability;
 
 

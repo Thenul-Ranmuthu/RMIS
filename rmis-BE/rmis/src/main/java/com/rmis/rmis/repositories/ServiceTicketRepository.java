@@ -19,5 +19,13 @@ public interface ServiceTicketRepository extends JpaRepository<ServiceTicket, Lo
     List<ServiceTicket> findByTechnicianIdAndStatusOrderByCreatedAtDesc(
             Long technicianId, ServiceTicketStatus status);
 
+    List<ServiceTicket> findAllByOrderByCreatedAtDesc();
+
+    List<ServiceTicket> findByStatusOrderByCreatedAtDesc(ServiceTicketStatus status);
+
     boolean existsByAvailabilityId(Long availabilityId);
+
+    boolean existsByTechnicianIdAndStatusIn(Long technicianId, List<ServiceTicketStatus> statuses);//fix
+
+    List<ServiceTicket> findByTechnicianId(Long technicianId);//fix
 }

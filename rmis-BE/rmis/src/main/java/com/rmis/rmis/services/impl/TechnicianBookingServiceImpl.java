@@ -8,6 +8,7 @@ import com.rmis.rmis.domain.entities.ServiceTicket;
 import com.rmis.rmis.domain.entities.Technician;
 import com.rmis.rmis.domain.enums.ServiceTicketStatus;
 import com.rmis.rmis.exceptions.ResourceNotFoundException;
+import com.rmis.rmis.repositories.AvailabilityRepository;
 import com.rmis.rmis.repositories.ServiceTicketRepository;
 import com.rmis.rmis.repositories.TechnicianRepository;
 import com.rmis.rmis.services.interfaces.EmailService;
@@ -17,6 +18,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import com.rmis.rmis.domain.dtos.BookingStatusUpdateRequestDto;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 @Service
@@ -27,6 +30,7 @@ public class TechnicianBookingServiceImpl implements TechnicianBookingService
     private final ServiceTicketRepository serviceTicketRepository;
     private final TechnicianRepository technicianRepository;
     private final EmailService emailService;
+    private final AvailabilityRepository availabilityRepository;
 
     @Override
     public List<TechnicianBookingResponseDto> getMyBookings(String
@@ -90,11 +94,17 @@ public class TechnicianBookingServiceImpl implements TechnicianBookingService
                 (dto.getCancellationReason() == null || dto.getCancellationReason().isBlank())) {
             throw new IllegalArgumentException("A cancellation reason is required.");
         }
-
+        //fix
         ticket.setStatus(newStatus);
 
         if (newStatus == ServiceTicketStatus.CANCELLED) {
             ticket.setCancellationReason(dto.getCancellationReason());
+            ticket.setCancellationTimestamp(LocalDateTime.now()); // also missing, for consistency
+
+            // Release the time slot so it can be booked again
+            Availability slot = ticket.getAvailability();
+            slot.setStatus("AVAILABLE");
+            availabilityRepository.save(slot);
         }
 
         ServiceTicket saved = serviceTicketRepository.save(ticket);
