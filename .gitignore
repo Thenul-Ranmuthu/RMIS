@@ -26,6 +26,10 @@ rmis-BE/rmis/.mvn/wrapper/maven-wrapper.jar
 *.war
 *.ear
 
+# Backend debug/startup log artifacts
+rmis-BE/rmis/*.log
+rmis-BE/rmis/*.txt
+
 # SECRETS & Config
 rmis-BE/rmis/src/main/resources/application.properties
 .env

@@ -322,6 +322,15 @@ export default function BookTechnicianPage() {
           <div className="form-header">
             <h1>Book a Service Appointment</h1>
             <p>Select an available time slot, choose your service type, and confirm your booking.</p>
+            <div className="step-breadcrumb">
+              <span className="crumb-active">Step 1 of 3</span>
+              <span className="crumb-sep"> · </span>
+              <span className="crumb-active">Time</span>
+              <span className="crumb-sep"> → </span>
+              <span className="crumb-dim">Service</span>
+              <span className="crumb-sep"> → </span>
+              <span className="crumb-dim">Confirm</span>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} noValidate>
@@ -376,18 +385,23 @@ export default function BookTechnicianPage() {
                 <span className="step-num">2</span>
                 Service Type <span className="required">*</span>
               </div>
-              <select
-                id="serviceType"
-                value={serviceType}
-                onChange={(e) => setServiceType(e.target.value)}
-                required
-                className="form-select"
-              >
-                <option value="">— Select service type —</option>
-                {SERVICE_TYPES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
+              <div className="form-select-wrap">
+                <span className="form-select-icon">
+                  🔧
+                </span>
+                <select
+                  id="serviceType"
+                  value={serviceType}
+                  onChange={(e) => setServiceType(e.target.value)}
+                  required
+                  className="form-select"
+                >
+                  <option value="">Choose a service</option>
+                  {SERVICE_TYPES.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* ── Step 3: Description ──────────────────── */}
@@ -433,11 +447,8 @@ export default function BookTechnicianPage() {
                 </>
               ) : (
                 <>
-                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Confirm Booking
+                  Confirm &amp; Book Appointment
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                 </>
               )}
             </button>
@@ -451,14 +462,14 @@ export default function BookTechnicianPage() {
 }
 
 const pageStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-  * { box-sizing: border-box; }
-  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
   .book-page {
     min-height: 100vh;
-    background-color: #011b0e !important;
-    font-family: 'Public Sans', sans-serif;
+    background: #0d1f12;
+    font-family: 'Inter', system-ui, sans-serif;
     position: relative;
     overflow-x: hidden;
   }
@@ -469,7 +480,7 @@ const pageStyles = `
     background-image: url("/bg.png");
     background-size: cover;
     background-position: center;
-    opacity: 0.2;
+    opacity: 0.18;
     z-index: 0;
     pointer-events: none;
   }
@@ -477,195 +488,224 @@ const pageStyles = `
   /* ── Layout ──────────────────────────────────── */
   .book-layout {
     display: grid;
-    grid-template-columns: 310px 1fr;
-    gap: 32px;
-    max-width: 1100px;
-    margin: 40px auto;
-    padding: 0 32px 80px;
+    grid-template-columns: 300px 1fr;
+    gap: 28px;
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 36px 28px 80px;
     position: relative;
     z-index: 10;
+    align-items: start;
   }
   .layout-header {
     grid-column: 1 / -1;
-    margin-bottom: -10px;
+    margin-bottom: 4px;
   }
   .back-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    color: #1a4a38;
-    border-radius: 12px;
-    padding: 10px 20px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(74, 222, 128, 0.18);
+    color: #bbf7d0;
+    border-radius: 10px;
+    padding: 9px 18px;
     font-size: 13px;
-    font-weight: 800;
+    font-weight: 600;
     cursor: pointer;
-    transition: 0.2s;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: all 0.2s;
   }
-  .back-btn:hover { background: #f1f5f9; transform: translateX(-3px); }
+  .back-btn:hover { background: rgba(74, 222, 128, 0.1); color: #f0fdf4; transform: translateX(-3px); }
 
-  /* ── SOLID WHITE CARDS ───────────────────────── */
-  .tech-pane, .form-pane {
-    background: #ffffff !important;
-    opacity: 1 !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border-radius: 36px;
-    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.5);
-  }
-
+  /* ── LEFT: Technician Card ───────────────────── */
   .tech-pane {
-    padding: 40px 24px;
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 36px 22px 28px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     position: sticky;
     top: 32px;
-    align-self: start;
-    color: #0f172a !important;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
   }
+
   .tech-avatar {
-    width: 90px;
-    height: 90px;
-    border-radius: 32px;
-    background: #1a4a38;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #14532d, #166534);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
-    font-weight: 900;
+    font-size: 30px;
+    font-weight: 800;
     color: #fff;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+    border: 3px solid rgba(74, 222, 128, 0.3);
+    box-shadow: 0 8px 24px rgba(22,101,52,0.35);
   }
-  .tech-name { font-size: 22px; font-weight: 950; color: #012d1b !important; margin: 0; }
-  .tech-spec { font-size: 13px; color: #059669 !important; margin: 6px 0 24px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; }
+
+  .tech-name { font-size: 20px; font-weight: 800; color: #0d1f12; margin-bottom: 4px; }
+  .tech-spec { font-size: 11px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 22px; }
+
+  .tech-meta-list { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
 
   .tech-meta-row {
-    width: 100%;
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: #f8fafc;
-    border: 1px solid #f1f5f9;
-    border-radius: 16px;
-    padding: 14px 18px;
-    margin-bottom: 10px;
+    gap: 10px;
+    background: #f0fdf4;
+    border: 1px solid #dcfce7;
+    border-radius: 12px;
+    padding: 12px 14px;
     text-align: left;
   }
-  .meta-label { font-size: 10px; color: #64748b !important; text-transform: uppercase; font-weight: 900; flex: 1; }
-  .meta-val { font-size: 14px; color: #0f172a !important; font-weight: 900; }
+  .meta-icon { font-size: 14px; flex-shrink: 0; }
+  .meta-label { font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; flex: 1; }
+  .meta-val { font-size: 13px; color: #0d1f12; font-weight: 700; }
 
-  /* ── FORM PANE ───────────────────────────────── */
+  .slot-count-badge { font-size: 12px; color: #64748b; font-weight: 500; }
+
+  /* ── RIGHT: Form Pane ────────────────────────── */
   .form-pane {
-    padding: 56px;
-    color: #0f172a !important;
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 44px 48px 48px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    color: #0f172a;
   }
-  .form-header { margin-bottom: 40px; border-bottom: 2px solid #f1f5f9; padding-bottom: 24px; }
-  .form-header h1 { font-size: 36px; font-weight: 950; color: #012d1b !important; margin: 0 0 12px; letter-spacing: -0.04em; }
-  .form-header p { font-size: 16px; color: #475569 !important; margin: 0; font-weight: 700; line-height: 1.4; }
+  .form-header { margin-bottom: 22px; }
+  .form-header h1 { font-size: 26px; font-weight: 800; color: #0d1f12; margin-bottom: 8px; letter-spacing: -0.02em; }
+  .form-header p { font-size: 14px; color: #475569; line-height: 1.55; font-weight: 500; margin-bottom: 16px; }
 
-  .form-section { margin-bottom: 40px; }
+  .step-breadcrumb {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #f0fdf4; border: 1px solid #bbf7d0;
+    border-radius: 999px; padding: 7px 16px;
+    font-size: 12px; font-weight: 600; color: #166534; margin-bottom: 24px;
+  }
+  .crumb-active { color: #15803d; font-weight: 700; }
+  .crumb-sep { color: #86efac; }
+  .crumb-dim { color: #86efac; }
+
+  .form-divider { height: 1px; background: #f1f5f9; margin: 0 0 28px; }
+
+  .form-section { margin-bottom: 28px; }
   .section-label {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    font-size: 14px;
-    font-weight: 950;
-    color: #1a4a38 !important;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 11px; font-weight: 700; color: #0d1f12;
+    text-transform: uppercase; letter-spacing: 0.16em; margin-bottom: 14px;
   }
   .step-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 12px;
-    background: #1a4a38;
-    color: #fff;
-    font-size: 15px;
-    font-weight: 950;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 8px;
+    background: #14532d; color: #fff;
+    font-size: 13px; font-weight: 800; flex-shrink: 0;
   }
+  .required { color: #ef4444; margin-left: 2px; }
+  .optional { color: #94a3b8; font-size: 10px; font-weight: 500; text-transform: none; letter-spacing: 0; }
 
+  .slots-container { display: flex; flex-direction: column; gap: 16px; }
   .date-header {
-    font-size: 14px;
-    font-weight: 950;
-    color: #0f172a !important;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    font-size: 11px; font-weight: 800; color: #374151;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 10px;
   }
-  .date-header::after { content: ''; flex: 1; height: 2px; background: #f1f5f9; }
+  .date-header::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
+  .slots-row { display: flex; flex-wrap: wrap; gap: 10px; }
 
   .slot-chip {
-    background: #f1f5f9 !important;
-    border: 2px solid #cbd5e1 !important;
-    color: #1e293b !important;
-    border-radius: 14px;
-    padding: 16px 24px;
-    font-size: 14px;
-    font-weight: 800;
+    background: #f8fafc;
+    border: 1.5px solid #d1d5db;
+    color: #374151;
+    border-radius: 12px;
+    padding: 11px 18px;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.18s;
+    white-space: nowrap;
   }
-  .slot-chip:hover:not(.slot-chip-selected) { border-color: #10b981 !important; background: #ffffff !important; transform: translateY(-3px); }
+  .slot-chip:hover:not(.slot-chip-selected) {
+    border-color: #16a34a; background: #f0fdf4; color: #14532d; transform: translateY(-2px);
+  }
   .slot-chip-selected {
-    background: #1a4a38 !important;
-    border-color: #1a4a38 !important;
-    color: #ffffff !important;
-    box-shadow: 0 10px 20px rgba(26, 74, 56, 0.3);
-    transform: translateY(-3px);
+    background: #14532d; border-color: #14532d; color: #fff;
+    box-shadow: 0 6px 16px rgba(20,83,45,0.28); transform: translateY(-2px);
+  }
+
+  .no-slots {
+    display: flex; align-items: center; gap: 12px;
+    background: #fafafa; border: 1.5px dashed #d1d5db;
+    border-radius: 12px; padding: 18px; color: #6b7280;
+    font-size: 13px; font-weight: 500;
+  }
+
+  .selected-slot-badge { margin-top: 10px; font-size: 12px; color: #16a34a; font-weight: 600; }
+
+  .form-select-wrap { position: relative; }
+  .form-select-icon {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    font-size: 15px; pointer-events: none;
   }
 
   .form-select, .form-textarea {
     width: 100%;
-    background: #f8fafc !important;
-    border: 2px solid #cbd5e1 !important;
-    color: #0f172a !important;
-    border-radius: 16px;
-    padding: 18px 20px;
-    font-size: 16px;
-    font-weight: 800;
+    background: #f8fafc;
+    border: 1.5px solid #d1d5db;
+    color: #0f172a;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 14px;
+    font-weight: 600;
     outline: none;
-    transition: 0.2s;
+    transition: border-color 0.18s, box-shadow 0.18s;
     appearance: none;
+    font-family: 'Inter', sans-serif;
   }
-  .form-select {
-    cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23334155'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='4' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 24px center !important;
-    background-size: 16px !important;
+  .form-select { padding-left: 42px; cursor: pointer; }
+  .form-select:focus, .form-textarea:focus {
+    border-color: #16a34a; box-shadow: 0 0 0 3px rgba(22,163,74,0.1); background: #fff;
   }
-  .form-textarea { min-height: 140px; }
-  .form-textarea::placeholder { color: #94a3b8 !important; }
+  .form-textarea { min-height: 128px; resize: vertical; }
+  .form-textarea::placeholder { color: #9ca3af; font-weight: 400; }
+  .char-count { font-size: 11px; color: #9ca3af; text-align: right; margin-top: 6px; font-weight: 500; }
+
+  .submit-error {
+    display: flex; align-items: center; gap: 8px;
+    background: #fef2f2; border: 1px solid #fecaca;
+    border-radius: 12px; padding: 12px 16px;
+    font-size: 13px; color: #dc2626; font-weight: 600; margin-bottom: 16px;
+  }
 
   .submit-btn {
     width: 100%;
-    background: #1a4a38 !important;
-    color: #ffffff !important;
-    border-radius: 24px;
-    padding: 22px 0;
-    font-size: 18px;
-    font-weight: 950;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
+    background: linear-gradient(135deg, #14532d 0%, #166534 100%);
+    color: #ffffff;
+    border-radius: 16px;
+    padding: 18px 0;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.25s;
     border: none;
-    box-shadow: 0 20px 40px rgba(26, 74, 56, 0.4);
+    box-shadow: 0 10px 28px rgba(20,83,45,0.35);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    letter-spacing: 0.02em;
   }
-  .submit-btn:hover:not(:disabled) { background: #064e3b !important; transform: translateY(-3px); box-shadow: 0 25px 50px rgba(26, 74, 56, 0.5); }
-  .submit-btn:disabled { opacity: 0.5; filter: grayscale(1); }
-  .btn-spinner { width: 22px; height: 22px; border: 4px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
+  .submit-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+    transform: translateY(-2px); box-shadow: 0 16px 40px rgba(20,83,45,0.45);
+  }
+  .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-spinner {
+    width: 18px; height: 18px;
+    border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff;
+    border-radius: 50%; animation: spin 1s linear infinite; flex-shrink: 0;
+  }
 
   /* ── Success ─────────────────────────────────── */
   .success-wrap {
