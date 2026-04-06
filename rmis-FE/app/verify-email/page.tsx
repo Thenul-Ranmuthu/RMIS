@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { pendingCertifications } from "../../components/SignupCard";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -74,17 +75,15 @@ export default function VerifyEmailPage() {
           formDataObj.append("yearsOfExperience", userData.yearsOfExperience.toString());
         }
 
-        // ── Your new DTO format: certifications[i].certificationName + certifications[i].file ──
-        const certifications = (window as any).__pendingCertifications || [];
         
         // SAFETY CHECK: If files were lost from memory (due to refresh), show a clear error
-        if (certifications.length === 0) {
-          setError("Your certification files were lost due to a page refresh. Please go back and re-upload them.");
+        if (pendingCertifications.length === 0) {
+          setError("Your certification files were lost. Please go back and re-upload them.");
           setIsLoading(false);
           return;
         }
 
-        certifications.forEach((cert: any, index: number) => {
+        pendingCertifications.forEach((cert: any, index: number) => {
           formDataObj.append(`certifications[${index}].certificationName`, cert.certificationName);
           formDataObj.append(`certifications[${index}].issuingAuthority`, cert.issuingAuthority || "");
           formDataObj.append(`certifications[${index}].file`, cert.file);
@@ -109,8 +108,9 @@ export default function VerifyEmailPage() {
         throw new Error(data.message || data.error || "Verification failed");
       }
 
+      // ✅ FIX
       sessionStorage.removeItem("pendingRegistration");
-      (window as any).__pendingCertifications = null;
+      pendingCertifications.length = 0;
 
       if (data.accessToken) {
         localStorage.setItem("accessToken", data.accessToken);  

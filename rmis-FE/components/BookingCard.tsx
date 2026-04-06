@@ -79,7 +79,10 @@ export function BookingCard({ ticket, onViewDetails, onCancel }: BookingCardProp
                     <div className="flex items-center gap-2 text-gray-500 mb-1">
                         <span className="material-symbols-outlined text-lg">schedule</span>
                         <span className="text-sm font-bold tracking-tight">
-                            {ticket.scheduledStartTime.substring(0, 5)} - {ticket.scheduledEndTime.substring(0, 5)}
+                            {ticket.scheduledStartTime && ticket.scheduledEndTime 
+                                ? `${ticket.scheduledStartTime.substring(0, 5)} - ${ticket.scheduledEndTime.substring(0, 5)}`
+                                : "Technician no longer available"
+                            }
                         </span>
                     </div>
                     <button 

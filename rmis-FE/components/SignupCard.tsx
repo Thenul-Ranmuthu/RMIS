@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+export const pendingCertifications: any[] = [];
+
 interface CertificationFile {
   name: string;
   file: File;
@@ -393,14 +395,19 @@ export default function SignupCard() {
         // Store certifications separately since they contain File objects
         // which can't be serialized to sessionStorage
         // We'll keep them in a module-level variable temporarily
-        (window as any).__pendingCertifications = formData.certifications;
+        // ✅ FIX 
+        // Store files in module-level variable (survives router.push soft navigation)
+        pendingCertifications.length = 0;
+        formData.certifications.forEach((cert) => {
+         pendingCertifications.push(cert);
+        });
 
         // Send verification email
         await fetch(`http://localhost:5055/sendMail/${formData.email}`, {
           method: "GET",
         });
 
-        setIsLoading(false);
+        //setIsLoading(false);
         // window.location.href = "/verify-email";
         router.push("/verify-email");
         return;
