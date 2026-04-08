@@ -92,12 +92,11 @@ public class EmailServiceImpl implements EmailService {
                     .formatted(quotaRequestHeaderDto.getCompanyEmail(),"http://localhost:3000")
                 ).build();
 
+            // Fixed
             try {
                 resend.emails().send(params);
             } catch (Exception e) {
-                // Log the error and rethrow to allow the caller (Controller) to handle it
-                System.err.println("Failed to send password reset email to " + o.getEmail() + ": " + e.getMessage());
-                throw new RuntimeException("Failed to send email: " + e.getMessage(), e);
+                System.err.println("Failed to send notification email to " + o.getEmail() + ": " + e.getMessage());
             }
         }
     }

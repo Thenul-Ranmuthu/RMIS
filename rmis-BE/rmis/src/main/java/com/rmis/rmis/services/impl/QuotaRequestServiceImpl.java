@@ -138,7 +138,12 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
         if(quotaRequestHeaderDto.getRequestedQuota().compareTo(company.getQuota()) > 0){
             return "Error: Insuffitient quota balance!!";
         }
-        
+
+        boolean hasPending = quotaRequestRepository.existsByCompanyAndStatus(
+                company, QuotaRequestStatus.PENDING);
+        if (hasPending) {
+            return "Error: You already have a pending quota request!!";
+        }
 
         QuotaRequest entity = new QuotaRequest();
 

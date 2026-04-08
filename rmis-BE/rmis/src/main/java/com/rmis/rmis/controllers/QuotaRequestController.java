@@ -27,12 +27,12 @@ public class QuotaRequestController {
 
     @PostMapping(path = "/addQuota")
     public ResponseEntity<String> addQuotaRequest(@RequestBody QuotaRequestAddQuotaDto quotaRequestAddQuotaDto) {
-        emailService.sendNotificationNewRequestSubmission(quotaRequestAddQuotaDto);
-        String response = quotaRequestService.addQuotaRequest(quotaRequestAddQuotaDto);
-        if(response.equalsIgnoreCase("Error: Insuffitient quota balance!!")){
-            return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+        String response = quotaRequestService.addQuotaRequest(quotaRequestAddQuotaDto); // duplicate check runs first
+        if (response.toLowerCase().startsWith("error:")) {
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(response,HttpStatus.OK);
+        emailService.sendNotificationNewRequestSubmission(quotaRequestAddQuotaDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
     
