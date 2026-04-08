@@ -84,7 +84,7 @@ const parseQuotaListResponse = (data: unknown): QuotaListResponse => {
 // ─── Company-side API ─────────────────────────────────────────────────────
 
 export const getQuotas = async (token: string): Promise<QuotaListResponse> => {
-    // FIX 1: changed /quotaHeader/getQuotas → /company/getQuotas
+    // fix 1: changed /quotaHeader/getQuotas to /company/getQuotas
     const response = await fetch(`${BASE_URL}/company/getQuotas`, {
         method: "GET",
         headers: authHeaders(token),
@@ -99,7 +99,7 @@ export const getQuotas = async (token: string): Promise<QuotaListResponse> => {
     return parseQuotaListResponse(data);
 };
 
-// FIX 2: added missing getQuotaDetails function
+// fix 2: added missing getQuotaDetails function
 export const getQuotaDetails = async (token: string): Promise<{ quota: number; remainingQuota: number }> => {
     const response = await fetch(`${BASE_URL}/company/getQuotaDetails`, {
         method: "GET",
@@ -125,7 +125,7 @@ export const addQuota = async (
     if (!response.ok) {
         let message = `Request failed: ${response.status}`;
         try {
-            const errorText = await response.text(); // ← renamed to errorText
+            const errorText = await response.text(); // renamed to errorText
             try {
                 const err = JSON.parse(errorText);
                 message = err.message || err.error || errorText;
@@ -164,8 +164,6 @@ export const getQuotaRequests = async (
     const endpoint = hasFilters ? "filter" : "paginated";
     const url = `${BASE_URL}/ministry/quota-requests/${endpoint}?${params}`;
 
-    // FIX 4: was authHeaders() with no token — now getToken() is called inside authHeaders via the fallback
-    // This works correctly now that getToken() checks both localStorage and sessionStorage (authService fix)
     const response = await fetch(url, { headers: authHeaders() });
 
     if (!response.ok) {
