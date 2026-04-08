@@ -7,8 +7,8 @@ import AddQuotaModal from "@/components/AddQuotaModal";
 // import type { QuotaRequest, QuotaSummary } from "@/services/quotaService";
 
 import { getQuotas, getQuotaDetails } from "@/services/quotaService";
-import type { QuotaRequest, QuotaSummary } from "@/services/quotaService";
-
+import type { CompanyQuotaRequest, QuotaSummary } from "@/services/quotaService";
+//fix
 // ─── Status badge helper ───────────────────────────────────────
 
 function StatusBadge({ status }: { status?: string }) {
@@ -117,7 +117,7 @@ export default function CompanyDashboard() {
     currentAvailableQuota: null,
     remainingYearlyQuota: null,
   });
-  const [requests, setRequests] = useState<QuotaRequest[]>([]);
+  const [requests, setRequests] = useState<CompanyQuotaRequest[]>([]);
   const [quotaLoading, setQuotaLoading] = useState(true);
   const [quotaError, setQuotaError] = useState<string>("");
 

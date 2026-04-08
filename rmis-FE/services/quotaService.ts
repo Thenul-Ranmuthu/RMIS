@@ -3,7 +3,7 @@
 import { QuotaFilters, QuotaPaginatedResponse, QuotaRequestDetail } from "@/types/quota";
 import { getToken } from "@/services/authService";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5055";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 // ── Helper: build auth headers ─────────────────────────────────────────────
 const authHeaders = (token?: string | null) => ({
@@ -15,6 +15,9 @@ const authHeaders = (token?: string | null) => ({
 
 export interface CompanyQuotaRequest {
     id?: number | string;
+    requestId?: string;        // ← add
+    requestNumber?: string;    // ← add
+    submissionDate?: string 
     companyEmail?: string;
     requestedQuota: number;
     status?: string;
@@ -81,7 +84,8 @@ const parseQuotaListResponse = (data: unknown): QuotaListResponse => {
 // ─── Company-side API ─────────────────────────────────────────────────────
 
 export const getQuotas = async (token: string): Promise<QuotaListResponse> => {
-    const response = await fetch(`${BASE_URL}/quotaHeader/getQuotas`, {
+    // FIX 1: changed /quotaHeader/getQuotas → /company/getQuotas
+    const response = await fetch(`${BASE_URL}/company/getQuotas`, {
         method: "GET",
         headers: authHeaders(token),
     });
@@ -90,8 +94,23 @@ export const getQuotas = async (token: string): Promise<QuotaListResponse> => {
         (err as Error & { status: number }).status = response.status;
         throw err;
     }
-    const data = await response.json();
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : [];
     return parseQuotaListResponse(data);
+};
+
+// FIX 2: added missing getQuotaDetails function
+export const getQuotaDetails = async (token: string): Promise<{ quota: number; remainingQuota: number }> => {
+    const response = await fetch(`${BASE_URL}/company/getQuotaDetails`, {
+        method: "GET",
+        headers: authHeaders(token),
+    });
+    if (!response.ok) {
+        const err = new Error(`Failed to fetch quota details: ${response.status}`);
+        (err as Error & { status: number }).status = response.status;
+        throw err;
+    }
+    return response.json();
 };
 
 export const addQuota = async (
@@ -106,8 +125,13 @@ export const addQuota = async (
     if (!response.ok) {
         let message = `Request failed: ${response.status}`;
         try {
-            const err = await response.json();
-            message = err.message || err.error || message;
+            const errorText = await response.text(); // ← renamed to errorText
+            try {
+                const err = JSON.parse(errorText);
+                message = err.message || err.error || errorText;
+            } catch {
+                message = errorText;
+            }
         } catch {
             /* keep default */
         }
@@ -123,7 +147,6 @@ export const addQuota = async (
 
 // ─── Ministry-side API ────────────────────────────────────────────────────
 
-// ── Get paginated / filtered list ──────────────────────────────────────────
 export const getQuotaRequests = async (
     filters: QuotaFilters,
     page: number = 1,
@@ -141,6 +164,8 @@ export const getQuotaRequests = async (
     const endpoint = hasFilters ? "filter" : "paginated";
     const url = `${BASE_URL}/ministry/quota-requests/${endpoint}?${params}`;
 
+    // FIX 4: was authHeaders() with no token — now getToken() is called inside authHeaders via the fallback
+    // This works correctly now that getToken() checks both localStorage and sessionStorage (authService fix)
     const response = await fetch(url, { headers: authHeaders() });
 
     if (!response.ok) {
@@ -152,7 +177,6 @@ export const getQuotaRequests = async (
     return response.json();
 };
 
-// ── Get single request detail by UUID ─────────────────────────────────────
 export const getQuotaRequestById = async (id: string): Promise<QuotaRequestDetail> => {
     const url = `${BASE_URL}/ministry/quota-requests/${id}`;
     const response = await fetch(url, { headers: authHeaders() });
@@ -160,7 +184,6 @@ export const getQuotaRequestById = async (id: string): Promise<QuotaRequestDetai
     return response.json();
 };
 
-// ── Approve a quota request ────────────────────────────────────────────────
 export const approveRequest = async (
     token: string,
     id: string
@@ -179,7 +202,6 @@ export const approveRequest = async (
     return text;
 };
 
-// ── Reject a quota request ─────────────────────────────────────────────────
 export const rejectRequest = async (
     token: string,
     id: string

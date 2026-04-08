@@ -1,6 +1,6 @@
 // // RMIS/files/services/authService.ts
 
-// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5055";
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 // // ─── Interfaces ───────────────────────────────────────────────
 
@@ -118,7 +118,7 @@
 // export const loginCompany = (email: string, password: string) =>
 //   post(`${API_BASE_URL}/auth/company/login`, { email, password });
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5055";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 // ─── Interfaces ───────────────────────────────────────────────
 
@@ -168,9 +168,9 @@ export const saveToken = (token: string) => {
   localStorage.setItem("accessToken", token);
 };
 
-export const getToken = (): string | null => {
-  return localStorage.getItem("accessToken");
-};
+//export const getToken = (): string | null => {
+//  return localStorage.getItem("accessToken");
+//};
 
 export const getRole = (): string | null => {
   const token = getToken();
@@ -178,8 +178,14 @@ export const getRole = (): string | null => {
   return getRoleFromToken(token);
 };
 
+//fix
+export const getToken = (): string | null => {
+  return localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+};
+
 export const logout = () => {
   localStorage.removeItem("accessToken");
+  sessionStorage.removeItem("accessToken");
 };
 
 // ─── Helper ───────────────────────────────────────────────────
@@ -223,7 +229,7 @@ export const loginCompany = (email: string, password: string) =>
 
 // ─── Technician Admin API ─────────────────────────────────────
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5055";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 const authFetch = (url: string, options: RequestInit = {}) => {
   const token = getToken();
