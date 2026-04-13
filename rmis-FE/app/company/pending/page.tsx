@@ -29,7 +29,7 @@ export default function CompanyPendingPage() {
   }, [router]);
 
   const handleSignOut = () => {
-    ["token", "user"].forEach((key) => {
+    ["accessToken", "user"].forEach((key) => {
       localStorage.removeItem(key);
       sessionStorage.removeItem(key);
     });

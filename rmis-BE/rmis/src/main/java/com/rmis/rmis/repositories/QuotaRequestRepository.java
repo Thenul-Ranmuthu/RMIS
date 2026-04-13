@@ -21,4 +21,9 @@ public interface QuotaRequestRepository extends JpaRepository<QuotaRequest, UUID
 
     @Query("SELECT q FROM QuotaRequest q JOIN FETCH q.company WHERE q.requestId = :id")
     Optional<QuotaRequest> findByIdWithCompany(@Param("id") UUID id);
+
+    boolean existsByCompanyAndStatus(
+            @Param("company") com.rmis.rmis.domain.entities.Company company,
+            @Param("status") com.rmis.rmis.enums.QuotaRequestStatus status
+    );
 }

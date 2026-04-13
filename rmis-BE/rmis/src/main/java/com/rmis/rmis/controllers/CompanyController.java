@@ -32,10 +32,11 @@ public class CompanyController {
         
         List<QuotaRequestHeaderDto> dtos = companyService.listQuotas(email);
 
-        if(dtos.isEmpty()){
-            return new ResponseEntity<>(dtos,HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(dtos,HttpStatus.OK);
+        //if(dtos.isEmpty()){
+        //    return new ResponseEntity<>(dtos,HttpStatus.NO_CONTENT);
+        //}
+        //return new ResponseEntity<>(dtos,HttpStatus.OK);
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/getQuotaDetails")

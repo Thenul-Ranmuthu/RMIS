@@ -19,15 +19,21 @@ public class Certification {
     private Long id;
 
     @Column(nullable = false)
-    private String name;          // e.g. "AWS Certified Developer"
+    private String certificationName;
 
     @Column(nullable = false)
-    private String fileName;      // e.g. "a1b2c3d4.pdf" - stored in DB
+    private String filePath;
+
+    private String originalFileName;
 
     @Column(nullable = false)
-    private String filePath;      // e.g. "uploads/certifications/1/a1b2c3d4.pdf"
+    private String fileType;
 
-    private String fileType;      // e.g. "application/pdf"
+    @Column(nullable = false)
+    private String issuingAuthority;
+
+    @Column(nullable = false)
+    private Long fileSize;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "technician_id", nullable = false)

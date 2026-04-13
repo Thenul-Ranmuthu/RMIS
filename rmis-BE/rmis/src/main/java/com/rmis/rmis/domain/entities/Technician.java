@@ -1,26 +1,15 @@
 package com.rmis.rmis.domain.entities;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import com.rmis.rmis.domain.enums.SkillLevel;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -49,22 +38,38 @@ public class Technician {
     @Column(nullable = false)
     private String phoneNumber;
 
+    private String address;
+
+    private String district;
+
     private String specialization;
 
+    private Integer yearsOfExperience;
+
+    @Enumerated(EnumType.STRING)
+    private SkillLevel skillLevel;
+
     @Column(nullable = false)
-    private String status; // PENDING_APPROVAL, ACTIVE, REJECTED
+    private String status; // PENDING, ACTIVE, REJECTED
 
     @Column(nullable = false)
     private LocalDateTime registrationDate;
+
+    private LocalDateTime approvalDate;
+
+    private String rejectionReason;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user_role"))
     private Role role;
 
-    // One technician can have many certifications
-    @OneToMany(mappedBy = "technician", cascade = CascadeType.ALL, 
-               orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "technician", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Certification> certifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "technician", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Availability> availabilities = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

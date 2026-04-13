@@ -8,7 +8,7 @@ import AddQuotaModal from "@/components/AddQuotaModal";
 
 import { getQuotas, getQuotaDetails } from "@/services/quotaService";
 import type { CompanyQuotaRequest, QuotaSummary } from "@/services/quotaService";
-
+//fix
 // ─── Status badge helper ───────────────────────────────────────
 
 function StatusBadge({ status }: { status?: string }) {
@@ -128,7 +128,7 @@ export default function CompanyDashboard() {
   useEffect(() => {
     const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
     const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+      localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
 
     if (!raw || !token) {
       router.push("/");
@@ -191,7 +191,7 @@ export default function CompanyDashboard() {
   // ── Sign out ─────────────────────────────────────────────────
 
   const handleSignOut = () => {
-    ["token", "user"].forEach((key) => {
+    ["accessToken", "user"].forEach((key) => {
       localStorage.removeItem(key);
       sessionStorage.removeItem(key);
     });
@@ -203,7 +203,7 @@ export default function CompanyDashboard() {
   const handleQuotaAdded = () => {
     setShowModal(false);
     const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+      localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
     if (token) fetchQuotas(token);
   };
 
@@ -270,6 +270,26 @@ export default function CompanyDashboard() {
 
             {/* User + sign out */}
             <div className="flex items-center gap-4">
+              {/* Service booking nav links */}
+              <button
+                onClick={() => router.push("/public/directory")}
+                className="hidden md:flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                Book Service
+              </button>
+              <button
+                onClick={() => router.push("/company/bookings")}
+                className="hidden md:flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold px-4 py-2 rounded-xl transition"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                My Bookings
+              </button>
+
               {user && (
                 <div className="hidden sm:flex items-center gap-2.5">
                   <div className="h-8 w-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm font-bold">
@@ -432,8 +452,8 @@ export default function CompanyDashboard() {
                   <button
                     onClick={() => {
                       const token =
-                        localStorage.getItem("token") ||
-                        sessionStorage.getItem("token");
+                        localStorage.getItem("accessToken") ||
+                        sessionStorage.getItem("accessToken");
                       if (token) fetchQuotas(token);
                     }}
                     className="mt-2 text-xs font-semibold text-amber-700 underline underline-offset-2 hover:text-amber-900 transition"
@@ -508,7 +528,7 @@ export default function CompanyDashboard() {
                       {requests.map((req, idx) => (
                         <tr
                           // key={req.id ?? idx}
-                          key={req.id ?? idx}
+                          key={req.requestId ?? idx}
                           className="hover:bg-gray-50/60 transition"
                         >
                           <td className="py-3.5 pr-4 text-gray-400 font-medium text-xs">

@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+export const pendingCertifications: any[] = [];
+
 interface CertificationFile {
   name: string;
   file: File;
@@ -157,7 +159,7 @@ export default function SignupCard() {
   const addCertification = () => {
     if (
       !currentCert.certificationName ||
-      //   !currentCert.issuingAuthority ||
+      !currentCert.issuingAuthority ||
       !currentCert.file
     ) {
       alert("Please fill all certification fields and upload a file");
@@ -276,10 +278,10 @@ export default function SignupCard() {
         alert("Phone number must be 10-15 digits");
         return;
       }
-      //   if (!formData.street || !formData.city || !formData.district) {
-      //     alert("Please fill in street, city, and select a district");
-      //     return;
-      //   }
+      if (!formData.street || !formData.city || !formData.district) {
+        alert("Please fill in street, city, and select a district");
+        return;
+      }
       if (formData.certifications.length === 0) {
         alert("At least one certification is required");
         return;
@@ -380,6 +382,7 @@ export default function SignupCard() {
             phoneNumber: formData.phoneNumber,
             password: formData.password,
             address: combineAddress(),
+            district: formData.district, 
             specialization: formData.specialization || "",
             yearsOfExperience:
               formData.yearsOfExperience !== ""
@@ -392,14 +395,19 @@ export default function SignupCard() {
         // Store certifications separately since they contain File objects
         // which can't be serialized to sessionStorage
         // We'll keep them in a module-level variable temporarily
-        (window as any).__pendingCertifications = formData.certifications;
+        // ✅ FIX 
+        // Store files in module-level variable (survives router.push soft navigation)
+        pendingCertifications.length = 0;
+        formData.certifications.forEach((cert) => {
+         pendingCertifications.push(cert);
+        });
 
         // Send verification email
         await fetch(`http://localhost:5050/sendMail/${formData.email}`, {
           method: "GET",
         });
 
-        setIsLoading(false);
+        //setIsLoading(false);
         // window.location.href = "/verify-email";
         router.push("/verify-email");
         return;
@@ -430,7 +438,7 @@ export default function SignupCard() {
           method: "GET",
         });
         setIsLoading(false);
-        window.location.href = "/verify-email";
+        router.push("/verify-email");
         return;
       } else {
         // STEP 1 - Store form data and redirect to verify page
@@ -452,7 +460,7 @@ export default function SignupCard() {
         });
 
         setIsLoading(false);
-        window.location.href = "/verify-email";
+        router.push("/verify-email");
         return;
       }
 
@@ -473,7 +481,7 @@ export default function SignupCard() {
       console.log("Registration successful:", data);
 
       if (data.accessToken) {
-        localStorage.setItem("token", data.accessToken);
+        localStorage.setItem("accessToken", data.accessToken);  
         localStorage.setItem("user", JSON.stringify(data));
       }
 
@@ -679,7 +687,7 @@ export default function SignupCard() {
           </div>
         </div>
 
-        {/* <div className="mb-4">
+        <div className="mb-4">
           <label className="block text-sm font-semibold text-gray-700 mb-1.5">
             Street Address *
           </label>
@@ -710,9 +718,9 @@ export default function SignupCard() {
               required
             />
           </div>
-        </div> */}
+        </div>
 
-        {/* <div className="mb-4">
+        <div className="mb-4">
           <label className="block text-sm font-semibold text-gray-700 mb-1.5">
             City *
           </label>
@@ -743,9 +751,9 @@ export default function SignupCard() {
               required
             />
           </div>
-        </div> */}
+        </div>
 
-        {/* <div className="mb-4">
+        <div className="mb-4">
           <label className="block text-sm font-semibold text-gray-700 mb-1.5">
             District *
           </label>
@@ -799,9 +807,9 @@ export default function SignupCard() {
               </svg>
             </div>
           </div>
-        </div> */}
+        </div>
 
-        {/* {(formData.street || formData.city || formData.district) && (
+        {(formData.street || formData.city || formData.district) && (
           <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
             <p className="text-xs text-gray-500 mb-1">
               Address preview (will be stored as):
@@ -810,7 +818,7 @@ export default function SignupCard() {
               {combineAddress()}
             </p>
           </div>
-        )} */}
+        )}
 
         <div className="mb-4">
           <label className="block text-sm font-semibold text-gray-700 mb-1.5">
@@ -844,7 +852,7 @@ export default function SignupCard() {
           </div>
         </div>
 
-        {/* <div className="mb-4">
+        <div className="mb-4">
           <label className="block text-sm font-semibold text-gray-700 mb-1.5">
             Years of Experience
           </label>
@@ -876,7 +884,7 @@ export default function SignupCard() {
               className="w-full rounded-xl border border-gray-200 bg-gray-50 pl-11 pr-4 py-3.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition placeholder-gray-400"
             />
           </div>
-        </div> */}
+        </div>
 
         <div className="mb-6">
           <label className="block text-sm font-semibold text-gray-700 mb-3">
@@ -936,7 +944,7 @@ export default function SignupCard() {
                 className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
               />
             </div>
-            {/* <div className="mb-3">
+            <div className="mb-3">
               <input
                 type="text"
                 name="issuingAuthority"
@@ -945,7 +953,7 @@ export default function SignupCard() {
                 placeholder="Issuing Authority"
                 className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
               />
-            </div> */}
+            </div>
             <div className="mb-3">
               <input
                 type="file"
@@ -972,7 +980,7 @@ export default function SignupCard() {
               onClick={addCertification}
               disabled={
                 !currentCert.certificationName ||
-                // !currentCert.issuingAuthority ||
+                !currentCert.issuingAuthority ||
                 !currentCert.file
               }
               className="w-full bg-emerald-100 text-emerald-700 hover:bg-emerald-200 py-2 rounded-lg text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"

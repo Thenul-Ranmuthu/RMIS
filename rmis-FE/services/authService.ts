@@ -168,9 +168,9 @@ export const saveToken = (token: string) => {
   localStorage.setItem("accessToken", token);
 };
 
-export const getToken = (): string | null => {
-  return localStorage.getItem("accessToken");
-};
+//export const getToken = (): string | null => {
+//  return localStorage.getItem("accessToken");
+//};
 
 export const getRole = (): string | null => {
   const token = getToken();
@@ -178,8 +178,14 @@ export const getRole = (): string | null => {
   return getRoleFromToken(token);
 };
 
+//fix
+export const getToken = (): string | null => {
+  return localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+};
+
 export const logout = () => {
   localStorage.removeItem("accessToken");
+  sessionStorage.removeItem("accessToken");
 };
 
 // ─── Helper ───────────────────────────────────────────────────
@@ -220,3 +226,33 @@ export const loginTechnician = (email: string, password: string) =>
 
 export const loginCompany = (email: string, password: string) =>
   post(`${API_BASE_URL}/auth/company/login`, { email, password });
+
+// ─── Technician Admin API ─────────────────────────────────────
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+
+const authFetch = (url: string, options: RequestInit = {}) => {
+  const token = getToken();
+  return fetch(url, {
+    ...options,
+    headers: {
+      ...(options.headers || {}),
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const getTechniciansByStatus = (status: "PENDING" | "ACTIVE" | "REJECTED") =>
+  authFetch(`${API_BASE}/admin/technicians/${status.toLowerCase()}`).then(r => r.json());
+
+export const getTechnicianById = (id: number) =>
+  authFetch(`${API_BASE}/admin/technicians/${id}`).then(r => r.json());
+
+export const approveTechnician = (id: number) =>
+  authFetch(`${API_BASE}/admin/technicians/${id}/approve`, { method: "POST" }).then(r => r.json());
+
+export const rejectTechnician = (id: number, reason: string) =>
+  authFetch(`${API_BASE}/admin/technicians/${id}/reject?reason=${encodeURIComponent(reason)}`, { method: "POST" }).then(r => r.json());
+
+export const deleteTechnician = (id: number) =>
+  authFetch(`${API_BASE}/admin/technicians/${id}`, { method: "DELETE" }).then(r => r.json());

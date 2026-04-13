@@ -69,7 +69,7 @@ export default function MinistryLoginCard() {
             if (data.accessToken) {
                 saveToken(data.accessToken);
                 if (rememberMe) {
-                    localStorage.setItem("accessToken", data.accessToken);
+                    localStorage.setItem("accessToken", data.accessToken); 
                     
                 } else {
                     sessionStorage.setItem("accessToken", data.accessToken);
