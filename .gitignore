@@ -1,3 +1,9 @@
+# Uploads
+rmis-BE/uploads/
+
+# Compressed logs
+*.gz
+
 # --- OS & IDE ---
 .vscode/
 .idea/
