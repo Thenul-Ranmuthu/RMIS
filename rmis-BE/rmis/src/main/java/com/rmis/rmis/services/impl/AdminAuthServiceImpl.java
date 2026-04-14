@@ -3,7 +3,6 @@ package com.rmis.rmis.services.impl;
 import com.rmis.rmis.domain.dtos.AdminRegisterDto;
 import com.rmis.rmis.domain.dtos.LoginDto;
 import com.rmis.rmis.domain.entities.Admin;
-import com.rmis.rmis.domain.entities.MinistryOfficer;
 import com.rmis.rmis.domain.entities.Role;
 import com.rmis.rmis.exceptions.RegisterUserAlreadyExistsException;
 import com.rmis.rmis.repositories.AdminRepository;

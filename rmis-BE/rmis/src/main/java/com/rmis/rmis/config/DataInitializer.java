@@ -8,8 +8,10 @@ import com.rmis.rmis.domain.entities.Role;
 import com.rmis.rmis.repositories.RoleRepository;
 
 
+
 @Configuration
 public class DataInitializer {
+
     @Bean
     CommandLineRunner initData(RoleRepository roleRepository) {
         return args -> {
