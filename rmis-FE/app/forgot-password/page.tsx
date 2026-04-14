@@ -3,7 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://rmis-backend.malaysiawest.azurecontainer.io:5050";
 
 type Status = "idle" | "loading" | "success" | "error";
 

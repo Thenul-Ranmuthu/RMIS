@@ -45,14 +45,14 @@
 //   const getLoginEndpoint = (role: string): string => {
 //     switch (role) {
 //       case "Technician":
-//         return "http://localhost:5050/auth/technician/login";
+//         return "http://rmis-backend.malaysiawest.azurecontainer.io:5050/auth/technician/login";
 //       case "Company":
-//         return "http://localhost:5050/auth/company/login";
+//         return "http://rmis-backend.malaysiawest.azurecontainer.io:5050/auth/company/login";
 //       case "Public User":
 //         // Return a placeholder - you'll need to implement this endpoint
-//         return "http://localhost:5050/auth/user/login";
+//         return "http://rmis-backend.malaysiawest.azurecontainer.io:5050/auth/user/login";
 //       default:
-//         return "http://localhost:5050/auth/technician/login";
+//         return "http://rmis-backend.malaysiawest.azurecontainer.io:5050/auth/technician/login";
 //     }
 //   };
 
@@ -104,7 +104,7 @@
 //       // Store the token
 //       if (data.accessToken) {
 //         if (rememberMe) {
-//           localStorage.setItem("accessToken", data.accessToken);  
+//           localStorage.setItem("accessToken", data.accessToken);
 //           localStorage.setItem(
 //             "user",
 //             JSON.stringify({
@@ -491,14 +491,14 @@ export default function LoginCard() {
   const getLoginEndpoint = (role: string): string => {
     switch (role) {
       case "Technician":
-        return "http://localhost:5050/auth/technician/login";
+        return "http://rmis-backend.malaysiawest.azurecontainer.io:5050/auth/technician/login";
       case "Company":
-        return "http://localhost:5050/auth/company/login";
+        return "http://rmis-backend.malaysiawest.azurecontainer.io:5050/auth/company/login";
       case "Public User":
         // Return a placeholder - you'll need to implement this endpoint
-        return "http://localhost:5050/auth/user/login";
+        return "http://rmis-backend.malaysiawest.azurecontainer.io:5050/auth/user/login";
       default:
-        return "http://localhost:5050/auth/technician/login";
+        return "http://rmis-backend.malaysiawest.azurecontainer.io:5050/auth/technician/login";
     }
   };
 
@@ -550,7 +550,7 @@ export default function LoginCard() {
       // Store the token
       if (data.accessToken) {
         if (rememberMe) {
-          localStorage.setItem("accessToken", data.accessToken);  
+          localStorage.setItem("accessToken", data.accessToken);
           localStorage.setItem(
             "user",
             JSON.stringify({

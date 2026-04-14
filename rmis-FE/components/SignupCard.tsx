@@ -223,7 +223,7 @@ export default function SignupCard() {
     try {
       setIsSendingCode(true);
       const response = await fetch(
-        `http://localhost:5050/sendMail/${formData.email}`,
+        `http://rmis-backend.malaysiawest.azurecontainer.io:5050/sendMail/${formData.email}`,
         {
           method: "GET",
         },
@@ -347,7 +347,7 @@ export default function SignupCard() {
 
       if (role === "Technician") {
         // endpoint =
-        //   "http://localhost:5050/auth/technician/register";
+        //   "http://rmis-backend.malaysiawest.azurecontainer.io:5050/auth/technician/register";
         // const formDataObj = new FormData();
         // formDataObj.append("firstName", formData.firstName);
         // formDataObj.append("lastName", formData.lastName);
@@ -382,7 +382,7 @@ export default function SignupCard() {
             phoneNumber: formData.phoneNumber,
             password: formData.password,
             address: combineAddress(),
-            district: formData.district, 
+            district: formData.district,
             specialization: formData.specialization || "",
             yearsOfExperience:
               formData.yearsOfExperience !== ""
@@ -395,24 +395,27 @@ export default function SignupCard() {
         // Store certifications separately since they contain File objects
         // which can't be serialized to sessionStorage
         // We'll keep them in a module-level variable temporarily
-        // ✅ FIX 
+        // ✅ FIX
         // Store files in module-level variable (survives router.push soft navigation)
         pendingCertifications.length = 0;
         formData.certifications.forEach((cert) => {
-         pendingCertifications.push(cert);
+          pendingCertifications.push(cert);
         });
 
         // Send verification email
-        await fetch(`http://localhost:5050/sendMail/${formData.email}`, {
-          method: "GET",
-        });
+        await fetch(
+          `http://rmis-backend.malaysiawest.azurecontainer.io:5050/sendMail/${formData.email}`,
+          {
+            method: "GET",
+          },
+        );
 
         //setIsLoading(false);
         // window.location.href = "/verify-email";
         router.push("/verify-email");
         return;
       } else if (role === "Company") {
-        // endpoint = `http://localhost:5050/auth/company/register/${verificationCode}`;
+        // endpoint = `http://rmis-backend.malaysiawest.azurecontainer.io:5050/auth/company/register/${verificationCode}`;
         // const companyData = {
         //     name: formData.companyName,
         //     email: formData.email,
@@ -434,9 +437,12 @@ export default function SignupCard() {
             role: role,
           }),
         );
-        await fetch(`http://localhost:5050/sendMail/${formData.email}`, {
-          method: "GET",
-        });
+        await fetch(
+          `http://rmis-backend.malaysiawest.azurecontainer.io:5050/sendMail/${formData.email}`,
+          {
+            method: "GET",
+          },
+        );
         setIsLoading(false);
         router.push("/verify-email");
         return;
@@ -455,9 +461,12 @@ export default function SignupCard() {
         );
 
         // Send verification email
-        await fetch(`http://localhost:5050/sendMail/${formData.email}`, {
-          method: "GET",
-        });
+        await fetch(
+          `http://rmis-backend.malaysiawest.azurecontainer.io:5050/sendMail/${formData.email}`,
+          {
+            method: "GET",
+          },
+        );
 
         setIsLoading(false);
         router.push("/verify-email");
@@ -481,7 +490,7 @@ export default function SignupCard() {
       console.log("Registration successful:", data);
 
       if (data.accessToken) {
-        localStorage.setItem("accessToken", data.accessToken);  
+        localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("user", JSON.stringify(data));
       }
 

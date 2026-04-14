@@ -28,12 +28,12 @@ export default function VerifyEmailPage() {
   const getEndpoint = (role: string, code: string): string => {
     switch (role) {
       case "Technician":
-        return `http://localhost:5050/auth/technician/register/${code}`;
+        return `http://rmis-backend.malaysiawest.azurecontainer.io:5050/auth/technician/register/${code}`;
       case "Company":
-        return `http://localhost:5050/auth/company/register/${code}`;
+        return `http://rmis-backend.malaysiawest.azurecontainer.io:5050/auth/company/register/${code}`;
       case "Public User":
       default:
-        return `http://localhost:5050/auth/user/register/${code}`;
+        return `http://rmis-backend.malaysiawest.azurecontainer.io:5050/auth/user/register/${code}`;
     }
   };
 
@@ -69,23 +69,33 @@ export default function VerifyEmailPage() {
         formDataObj.append("phoneNumber", userData.phoneNumber);
         formDataObj.append("password", userData.password);
         formDataObj.append("address", userData.address || "");
-        formDataObj.append("district", userData.district || ""); 
+        formDataObj.append("district", userData.district || "");
         formDataObj.append("specialization", userData.specialization || "");
         if (userData.yearsOfExperience != null) {
-          formDataObj.append("yearsOfExperience", userData.yearsOfExperience.toString());
+          formDataObj.append(
+            "yearsOfExperience",
+            userData.yearsOfExperience.toString(),
+          );
         }
 
-        
         // SAFETY CHECK: If files were lost from memory (due to refresh), show a clear error
         if (pendingCertifications.length === 0) {
-          setError("Your certification files were lost. Please go back and re-upload them.");
+          setError(
+            "Your certification files were lost. Please go back and re-upload them.",
+          );
           setIsLoading(false);
           return;
         }
 
         pendingCertifications.forEach((cert: any, index: number) => {
-          formDataObj.append(`certifications[${index}].certificationName`, cert.certificationName);
-          formDataObj.append(`certifications[${index}].issuingAuthority`, cert.issuingAuthority || "");
+          formDataObj.append(
+            `certifications[${index}].certificationName`,
+            cert.certificationName,
+          );
+          formDataObj.append(
+            `certifications[${index}].issuingAuthority`,
+            cert.issuingAuthority || "",
+          );
           formDataObj.append(`certifications[${index}].file`, cert.file);
         });
 
@@ -113,7 +123,7 @@ export default function VerifyEmailPage() {
       pendingCertifications.length = 0;
 
       if (data.accessToken) {
-        localStorage.setItem("accessToken", data.accessToken);  
+        localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem(
           "user",
           JSON.stringify({
@@ -127,7 +137,9 @@ export default function VerifyEmailPage() {
       if (storedRole === "Company") {
         router.push("/company/dashboard");
       } else if (storedRole === "Technician") {
-        alert("Registration successful! Your account is pending admin approval.");
+        alert(
+          "Registration successful! Your account is pending admin approval.",
+        );
         router.push("/");
       } else {
         alert("Registration successful! Please log in.");
@@ -150,9 +162,12 @@ export default function VerifyEmailPage() {
     setResendMessage("");
 
     try {
-      const response = await fetch(`http://localhost:5050/sendMail/${email}`, {
-        method: "GET",
-      });
+      const response = await fetch(
+        `http://rmis-backend.malaysiawest.azurecontainer.io:5050/sendMail/${email}`,
+        {
+          method: "GET",
+        },
+      );
 
       if (!response.ok) throw new Error("Failed to resend");
       setResendMessage("A new code has been sent to your email.");

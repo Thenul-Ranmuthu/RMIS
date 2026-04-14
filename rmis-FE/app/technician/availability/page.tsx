@@ -1,13 +1,15 @@
-'use client';
+"use client";
 
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { getToken, getRole } from '@/services/authService';
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { getToken, getRole } from "@/services/authService";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
-const PRIMARY = '#047857';
-const HERO_IMAGE = '/Gemini_Generated_Image_3kc8133kc8133kc8.png';
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://rmis-backend.malaysiawest.azurecontainer.io:5050";
+const PRIMARY = "#047857";
+const HERO_IMAGE = "/Gemini_Generated_Image_3kc8133kc8133kc8.png";
 
 interface AvailabilitySlot {
   id: number;
@@ -25,14 +27,14 @@ interface SlotForm {
   endTime: string;
 }
 
-const emptyForm: SlotForm = { date: '', startTime: '', endTime: '' };
+const emptyForm: SlotForm = { date: "", startTime: "", endTime: "" };
 
 function authFetch(url: string, options: RequestInit = {}) {
   const token = getToken();
   return fetch(url, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
@@ -41,18 +43,18 @@ function authFetch(url: string, options: RequestInit = {}) {
 
 function formatDate(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00`);
-  return d.toLocaleDateString('en-US', {
-    weekday: 'short',
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+  return d.toLocaleDateString("en-US", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 }
 
 function formatTime(timeStr: string) {
-  const [h, m] = timeStr.split(':');
+  const [h, m] = timeStr.split(":");
   const hour = Number.parseInt(h, 10);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const ampm = hour >= 12 ? "PM" : "AM";
   const h12 = hour % 12 || 12;
   return `${h12}:${m} ${ampm}`;
 }
@@ -60,7 +62,7 @@ function formatTime(timeStr: string) {
 function getTodayString() {
   const now = new Date();
   now.setDate(now.getDate() + 1); // tomorrow minimum
-  return now.toISOString().split('T')[0];
+  return now.toISOString().split("T")[0];
 }
 
 function groupByDate(slots: AvailabilitySlot[]) {
@@ -72,26 +74,38 @@ function groupByDate(slots: AvailabilitySlot[]) {
 
 function statusMeta(status: string) {
   switch (status) {
-    case 'AVAILABLE':
+    case "AVAILABLE":
       return {
-        label: 'Available',
-        badge: { background: '#ecfdf5', color: PRIMARY, border: '1px solid #a7f3d0' },
-        iconBg: '#d1fae5',
-        icon: '✓',
+        label: "Available",
+        badge: {
+          background: "#ecfdf5",
+          color: PRIMARY,
+          border: "1px solid #a7f3d0",
+        },
+        iconBg: "#d1fae5",
+        icon: "✓",
       };
-    case 'BOOKED':
+    case "BOOKED":
       return {
-        label: 'Booked',
-        badge: { background: '#fff7ed', color: '#b45309', border: '1px solid #fed7aa' },
-        iconBg: '#ffedd5',
-        icon: '🔒',
+        label: "Booked",
+        badge: {
+          background: "#fff7ed",
+          color: "#b45309",
+          border: "1px solid #fed7aa",
+        },
+        iconBg: "#ffedd5",
+        icon: "🔒",
       };
     default:
       return {
         label: status,
-        badge: { background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe' },
-        iconBg: '#dbeafe',
-        icon: '•',
+        badge: {
+          background: "#eff6ff",
+          color: "#1d4ed8",
+          border: "1px solid #bfdbfe",
+        },
+        iconBg: "#dbeafe",
+        icon: "•",
       };
   }
 }
@@ -104,23 +118,25 @@ export default function TechnicianAvailabilityPage() {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingSlot, setEditingSlot] = useState<AvailabilitySlot | null>(null);
-  const [deletingSlot, setDeletingSlot] = useState<AvailabilitySlot | null>(null);
+  const [deletingSlot, setDeletingSlot] = useState<AvailabilitySlot | null>(
+    null,
+  );
 
   const [form, setForm] = useState<SlotForm>(emptyForm);
-  const [formError, setFormError] = useState('');
+  const [formError, setFormError] = useState("");
   const [formLoading, setFormLoading] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(() => {
     const token = getToken();
     const role = getRole();
 
     if (!token) {
-      router.push('/');
+      router.push("/");
       return;
     }
 
-    if (role !== 'ROLE_TECHNICIAN' && role !== 'TECHNICIAN') {
+    if (role !== "ROLE_TECHNICIAN" && role !== "TECHNICIAN") {
       setIsUnauthorised(true);
       return;
     }
@@ -132,7 +148,7 @@ export default function TechnicianAvailabilityPage() {
     setIsLoading(true);
     try {
       const res = await authFetch(`${API_BASE}/technician/availability`);
-      if (!res.ok) throw new Error('Failed to fetch availability');
+      if (!res.ok) throw new Error("Failed to fetch availability");
       setSlots(await res.json());
     } catch {
       setSlots([]);
@@ -143,12 +159,12 @@ export default function TechnicianAvailabilityPage() {
 
   const showSuccess = (msg: string) => {
     setSuccessMsg(msg);
-    window.setTimeout(() => setSuccessMsg(''), 3000);
+    window.setTimeout(() => setSuccessMsg(""), 3000);
   };
 
   const openAdd = () => {
     setForm(emptyForm);
-    setFormError('');
+    setFormError("");
     setShowAddModal(true);
   };
 
@@ -159,24 +175,24 @@ export default function TechnicianAvailabilityPage() {
       startTime: slot.startTime.slice(0, 5),
       endTime: slot.endTime.slice(0, 5),
     });
-    setFormError('');
+    setFormError("");
   };
 
   const handleAdd = async () => {
-    setFormError('');
+    setFormError("");
     if (!form.date || !form.startTime || !form.endTime) {
-      setFormError('All fields are required.');
+      setFormError("All fields are required.");
       return;
     }
     if (form.endTime <= form.startTime) {
-      setFormError('End time must be later than start time.');
+      setFormError("End time must be later than start time.");
       return;
     }
 
     setFormLoading(true);
     try {
       const res = await authFetch(`${API_BASE}/technician/availability`, {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify({
           date: form.date,
           startTime: `${form.startTime}:00`,
@@ -185,14 +201,14 @@ export default function TechnicianAvailabilityPage() {
       });
 
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || 'Failed to add slot');
+      if (!res.ok) throw new Error(data.error || "Failed to add slot");
 
       setShowAddModal(false);
       setForm(emptyForm);
-      showSuccess('Availability slot added successfully.');
+      showSuccess("Availability slot added successfully.");
       fetchSlots();
     } catch (e: unknown) {
-      setFormError(e instanceof Error ? e.message : 'Something went wrong');
+      setFormError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
       setFormLoading(false);
     }
@@ -201,36 +217,39 @@ export default function TechnicianAvailabilityPage() {
   const handleUpdate = async () => {
     if (!editingSlot) return;
 
-    setFormError('');
+    setFormError("");
     if (!form.date || !form.startTime || !form.endTime) {
-      setFormError('All fields are required.');
+      setFormError("All fields are required.");
       return;
     }
     if (form.endTime <= form.startTime) {
-      setFormError('End time must be later than start time.');
+      setFormError("End time must be later than start time.");
       return;
     }
 
     setFormLoading(true);
     try {
-      const res = await authFetch(`${API_BASE}/technician/availability/${editingSlot.id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          date: form.date,
-          startTime: `${form.startTime}:00`,
-          endTime: `${form.endTime}:00`,
-        }),
-      });
+      const res = await authFetch(
+        `${API_BASE}/technician/availability/${editingSlot.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            date: form.date,
+            startTime: `${form.startTime}:00`,
+            endTime: `${form.endTime}:00`,
+          }),
+        },
+      );
 
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || 'Failed to update slot');
+      if (!res.ok) throw new Error(data.error || "Failed to update slot");
 
       setEditingSlot(null);
       setForm(emptyForm);
-      showSuccess('Availability slot updated successfully.');
+      showSuccess("Availability slot updated successfully.");
       fetchSlots();
     } catch (e: unknown) {
-      setFormError(e instanceof Error ? e.message : 'Something went wrong');
+      setFormError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
       setFormLoading(false);
     }
@@ -241,17 +260,20 @@ export default function TechnicianAvailabilityPage() {
 
     setFormLoading(true);
     try {
-      const res = await authFetch(`${API_BASE}/technician/availability/${deletingSlot.id}`, {
-        method: 'DELETE',
-      });
+      const res = await authFetch(
+        `${API_BASE}/technician/availability/${deletingSlot.id}`,
+        {
+          method: "DELETE",
+        },
+      );
 
-      if (!res.ok) throw new Error('Failed to delete slot');
+      if (!res.ok) throw new Error("Failed to delete slot");
 
       setDeletingSlot(null);
-      showSuccess('Slot removed successfully.');
+      showSuccess("Slot removed successfully.");
       fetchSlots();
     } catch {
-      setFormError('Failed to delete slot.');
+      setFormError("Failed to delete slot.");
     } finally {
       setFormLoading(false);
     }
@@ -265,7 +287,9 @@ export default function TechnicianAvailabilityPage() {
             🔒
           </div>
           <h2 className="text-2xl font-black text-slate-900">Access Denied</h2>
-          <p className="mt-2 text-sm text-slate-500">Only technicians can manage availability.</p>
+          <p className="mt-2 text-sm text-slate-500">
+            Only technicians can manage availability.
+          </p>
           <Link
             href="/"
             className="mt-6 inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
@@ -279,14 +303,12 @@ export default function TechnicianAvailabilityPage() {
 
   const grouped = groupByDate(slots);
   const dateKeys = Object.keys(grouped).sort();
-  const availableCount = slots.filter((s) => s.status === 'AVAILABLE').length;
-  const bookedCount = slots.filter((s) => s.status === 'BOOKED').length;
+  const availableCount = slots.filter((s) => s.status === "AVAILABLE").length;
+  const bookedCount = slots.filter((s) => s.status === "BOOKED").length;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
-      <div
-        className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(4,120,87,0.16),transparent_32%),radial-gradient(circle_at_top_right,rgba(15,23,42,0.08),transparent_28%),linear-gradient(to_bottom,#f8fafc,#f1f5f9)]"
-      />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(4,120,87,0.16),transparent_32%),radial-gradient(circle_at_top_right,rgba(15,23,42,0.08),transparent_28%),linear-gradient(to_bottom,#f8fafc,#f1f5f9)]" />
 
       <header className="sticky top-0 z-20 border-b border-white/70 bg-white/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
@@ -295,23 +317,32 @@ export default function TechnicianAvailabilityPage() {
               🛠️
             </div>
             <div>
-              <div className="text-sm font-extrabold tracking-wide text-slate-900">RMIS</div>
-              <div className="text-xs text-slate-500">Technician Availability</div>
+              <div className="text-sm font-extrabold tracking-wide text-slate-900">
+                RMIS
+              </div>
+              <div className="text-xs text-slate-500">
+                Technician Availability
+              </div>
             </div>
             <div className="hidden items-center gap-2 text-sm text-slate-400 md:flex">
               <span>•</span>
-              <Link href="/technician/dashboard" className="font-medium text-slate-500 transition hover:text-emerald-700">
+              <Link
+                href="/technician/dashboard"
+                className="font-medium text-slate-500 transition hover:text-emerald-700"
+              >
                 Dashboard
               </Link>
               <span>•</span>
-              <span className="font-semibold text-emerald-700">Availability</span>
+              <span className="font-semibold text-emerald-700">
+                Availability
+              </span>
             </div>
           </div>
 
           <button
             onClick={() => {
-              localStorage.removeItem('accessToken');
-              router.push('/');
+              localStorage.removeItem("accessToken");
+              router.push("/");
             }}
             className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600 shadow-sm transition hover:border-rose-200 hover:bg-rose-50"
           >
@@ -326,7 +357,7 @@ export default function TechnicianAvailabilityPage() {
             className="absolute inset-0 bg-cover bg-center"
             style={{
               backgroundImage: `url(${HERO_IMAGE})`,
-              filter: 'saturate(0.95) contrast(1.02)',
+              filter: "saturate(0.95) contrast(1.02)",
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/88 via-slate-950/72 to-slate-950/35" />
@@ -359,16 +390,25 @@ export default function TechnicianAvailabilityPage() {
 
             <div className="grid gap-4 rounded-[1.75rem] border border-white/10 bg-white/10 p-4 backdrop-blur-md">
               <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-white shadow-sm">
-                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">Today’s overview</div>
+                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
+                  Today’s overview
+                </div>
                 <div className="mt-2 text-3xl font-black">{slots.length}</div>
-                <div className="text-sm text-white/75">Scheduled availability slots</div>
+                <div className="text-sm text-white/75">
+                  Scheduled availability slots
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <InfoTile label="Available" value={availableCount} tone="emerald" />
+                <InfoTile
+                  label="Available"
+                  value={availableCount}
+                  tone="emerald"
+                />
                 <InfoTile label="Booked" value={bookedCount} tone="amber" />
               </div>
               <div className="rounded-2xl border border-white/10 bg-slate-950/25 p-4 text-sm text-slate-200">
-                Keep tomorrow and the rest of the week clear by setting clean time windows that clients can book instantly.
+                Keep tomorrow and the rest of the week clear by setting clean
+                time windows that clients can book instantly.
               </div>
             </div>
           </div>
@@ -381,16 +421,38 @@ export default function TechnicianAvailabilityPage() {
         )}
 
         <section className="mt-6 grid gap-4 sm:grid-cols-3">
-          <StatCard label="Total Slots" value={slots.length} icon="📅" accent={PRIMARY} bg="rgba(4,120,87,0.08)" />
-          <StatCard label="Available" value={availableCount} icon="✅" accent="#16a34a" bg="rgba(22,163,74,0.08)" />
-          <StatCard label="Booked" value={bookedCount} icon="🔒" accent="#b45309" bg="rgba(180,83,9,0.08)" />
+          <StatCard
+            label="Total Slots"
+            value={slots.length}
+            icon="📅"
+            accent={PRIMARY}
+            bg="rgba(4,120,87,0.08)"
+          />
+          <StatCard
+            label="Available"
+            value={availableCount}
+            icon="✅"
+            accent="#16a34a"
+            bg="rgba(22,163,74,0.08)"
+          />
+          <StatCard
+            label="Booked"
+            value={bookedCount}
+            icon="🔒"
+            accent="#b45309"
+            bg="rgba(180,83,9,0.08)"
+          />
         </section>
 
         <section className="mt-6 rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
           <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-xl font-black text-slate-900">My Availability</h2>
-              <p className="text-sm text-slate-500">Manage your future booking windows and keep your calendar tidy.</p>
+              <h2 className="text-xl font-black text-slate-900">
+                My Availability
+              </h2>
+              <p className="text-sm text-slate-500">
+                Manage your future booking windows and keep your calendar tidy.
+              </p>
             </div>
             <button
               onClick={openAdd}
@@ -406,7 +468,9 @@ export default function TechnicianAvailabilityPage() {
                 <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-emerald-700">
                   ⏳
                 </div>
-                <p className="text-sm font-semibold text-slate-500">Loading slots...</p>
+                <p className="text-sm font-semibold text-slate-500">
+                  Loading slots...
+                </p>
               </div>
             </div>
           ) : slots.length === 0 ? (
@@ -414,9 +478,12 @@ export default function TechnicianAvailabilityPage() {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-3xl text-emerald-700">
                 📆
               </div>
-              <h3 className="text-xl font-black text-slate-900">No availability set yet</h3>
+              <h3 className="text-xl font-black text-slate-900">
+                No availability set yet
+              </h3>
               <p className="mx-auto mt-2 max-w-lg text-sm text-slate-500">
-                Add your first availability slot so clients can start booking time with you.
+                Add your first availability slot so clients can start booking
+                time with you.
               </p>
               <button
                 onClick={openAdd}
@@ -430,15 +497,16 @@ export default function TechnicianAvailabilityPage() {
               {dateKeys.map((date) => {
                 const slotsForDate = grouped[date];
                 return (
-                  <div key={date} className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-50/80">
+                  <div
+                    key={date}
+                    className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-50/80"
+                  >
                     <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-4 sm:px-5">
                       <div>
                         <div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">
                           {formatDate(date)}
                         </div>
-                        
                       </div>
-                      
                     </div>
 
                     <div className="space-y-3 p-4 sm:p-5">
@@ -459,9 +527,12 @@ export default function TechnicianAvailabilityPage() {
                               </div>
                               <div>
                                 <div className="text-base font-extrabold text-slate-900">
-                                  {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+                                  {formatTime(slot.startTime)} –{" "}
+                                  {formatTime(slot.endTime)}
                                 </div>
-                                <div className="mt-1 text-sm text-slate-500">Slot ID #{slot.id}</div>
+                                <div className="mt-1 text-sm text-slate-500">
+                                  Slot ID #{slot.id}
+                                </div>
                               </div>
                             </div>
 
@@ -473,7 +544,7 @@ export default function TechnicianAvailabilityPage() {
                                 {meta.label}
                               </span>
 
-                              {slot.status !== 'BOOKED' && (
+                              {slot.status !== "BOOKED" && (
                                 <>
                                   <button
                                     onClick={() => openEdit(slot)}
@@ -484,7 +555,7 @@ export default function TechnicianAvailabilityPage() {
                                   <button
                                     onClick={() => {
                                       setDeletingSlot(slot);
-                                      setFormError('');
+                                      setFormError("");
                                     }}
                                     className="rounded-xl border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50"
                                   >
@@ -560,11 +631,16 @@ export default function TechnicianAvailabilityPage() {
               🗑️
             </div>
             <h3 className="text-2xl font-black text-slate-900">Remove Slot?</h3>
-            <p className="mt-2 text-sm text-slate-500">{formatDate(deletingSlot.date)}</p>
-            <p className="mt-1 text-base font-bold text-slate-700">
-              {formatTime(deletingSlot.startTime)} – {formatTime(deletingSlot.endTime)}
+            <p className="mt-2 text-sm text-slate-500">
+              {formatDate(deletingSlot.date)}
             </p>
-            <p className="mt-3 text-sm text-rose-600">This action cannot be undone.</p>
+            <p className="mt-1 text-base font-bold text-slate-700">
+              {formatTime(deletingSlot.startTime)} –{" "}
+              {formatTime(deletingSlot.endTime)}
+            </p>
+            <p className="mt-3 text-sm text-rose-600">
+              This action cannot be undone.
+            </p>
             <div className="mt-8 flex justify-center gap-3">
               <button
                 onClick={() => setDeletingSlot(null)}
@@ -577,7 +653,7 @@ export default function TechnicianAvailabilityPage() {
                 disabled={formLoading}
                 className="rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-rose-700 disabled:opacity-60"
               >
-                {formLoading ? 'Removing...' : 'Yes, Remove'}
+                {formLoading ? "Removing..." : "Yes, Remove"}
               </button>
             </div>
           </div>
@@ -594,21 +670,29 @@ function InfoTile({
 }: {
   label: string;
   value: number;
-  tone: 'emerald' | 'amber';
+  tone: "emerald" | "amber";
 }) {
   const styles =
-    tone === 'emerald'
-      ? { bg: 'rgba(4,120,87,0.18)', text: '#d1fae5' }
-      : { bg: 'rgba(180,83,9,0.18)', text: '#ffedd5' };
+    tone === "emerald"
+      ? { bg: "rgba(4,120,87,0.18)", text: "#d1fae5" }
+      : { bg: "rgba(180,83,9,0.18)", text: "#ffedd5" };
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-white shadow-sm">
-      <div className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">{label}</div>
+      <div className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
+        {label}
+      </div>
       <div className="mt-2 text-2xl font-black" style={{ color: styles.text }}>
         {value}
       </div>
       <div className="mt-2 h-2 rounded-full bg-white/10">
-        <div className="h-2 rounded-full" style={{ background: styles.text, width: tone === 'emerald' ? '72%' : '48%' }} />
+        <div
+          className="h-2 rounded-full"
+          style={{
+            background: styles.text,
+            width: tone === "emerald" ? "72%" : "48%",
+          }}
+        />
       </div>
     </div>
   );
@@ -647,7 +731,13 @@ function StatCard({
   );
 }
 
-function ModalOverlay({ children, onClose }: { children: ReactNode; onClose: () => void }) {
+function ModalOverlay({
+  children,
+  onClose,
+}: {
+  children: ReactNode;
+  onClose: () => void;
+}) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 px-4 py-6 backdrop-blur-sm"
@@ -669,7 +759,13 @@ function ModalOverlay({ children, onClose }: { children: ReactNode; onClose: () 
   );
 }
 
-function ModalHeading({ title, subtitle }: { title: string; subtitle: string }) {
+function ModalHeading({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle: string;
+}) {
   return (
     <div className="mb-6 pr-10">
       <div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">
@@ -699,25 +795,25 @@ function SlotForm({
   submitLabel: string;
 }) {
   const inputStyle: CSSProperties = {
-    width: '100%',
-    padding: '12px 14px',
+    width: "100%",
+    padding: "12px 14px",
     borderRadius: 14,
-    border: '1px solid #dbe3ea',
+    border: "1px solid #dbe3ea",
     fontSize: 14,
-    outline: 'none',
-    fontFamily: 'inherit',
-    boxSizing: 'border-box',
-    color: '#0f172a',
-    background: '#f8fafc',
+    outline: "none",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
+    color: "#0f172a",
+    background: "#f8fafc",
   };
 
   const labelStyle: CSSProperties = {
-    display: 'block',
+    display: "block",
     fontSize: 12,
     fontWeight: 800,
-    color: '#475569',
-    textTransform: 'uppercase',
-    letterSpacing: '0.08em',
+    color: "#475569",
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
     marginBottom: 8,
   };
 
@@ -773,7 +869,7 @@ function SlotForm({
           disabled={loading}
           className="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-800 disabled:opacity-60"
         >
-          {loading ? 'Saving...' : submitLabel}
+          {loading ? "Saving..." : submitLabel}
         </button>
       </div>
     </div>

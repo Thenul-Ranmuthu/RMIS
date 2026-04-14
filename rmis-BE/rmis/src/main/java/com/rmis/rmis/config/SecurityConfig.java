@@ -35,7 +35,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Value("${app.cors.allowed-origins}")//http://localhost:3000
+    @Value("${app.cors.allowed-origins}")//http://rmis-backend.malaysiawest.azurecontainer.io:3000
     private String allowedOriginsProperty;
 
     // ---- Inject both UserDetailsService implementations ----
