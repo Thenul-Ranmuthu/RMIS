@@ -55,6 +55,9 @@ public class QuotaRequest {
     @Column(name = "requested_quota", nullable = false, precision = 15, scale = 2)
     private BigDecimal requestedQuota;
 
+    @Column(name = "approved_amount")
+    private BigDecimal approvedAmount;  // null until approved
+
     @Column(name = "submission_date", nullable = false, updatable = false)
     private LocalDateTime submissionDate;
 
