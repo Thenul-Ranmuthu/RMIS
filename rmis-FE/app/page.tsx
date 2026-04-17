@@ -3,35 +3,31 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
-// Mock Announcements Data
-const announcements = [
-  {
-    id: 1,
-    title: "New Technician Registration Open",
-    date: "April 15, 2026",
-    content: "We are now accepting applications for certified environmental technicians. Join our mission today.",
-    tag: "Update"
-  },
-  {
-    id: 2,
-    title: "Upcoming Quota Allocation for Q3",
-    date: "April 10, 2026",
-    content: "The Ministry will announce the next round of quota allocations for partner companies on May 1st.",
-    tag: "Policy"
-  },
-  {
-    id: 3,
-    title: "System Maintenance Notice",
-    date: "April 05, 2026",
-    content: "The RMIS platform will undergo scheduled maintenance this Sunday from 2 AM to 4 AM UTC.",
-    tag: "Maintenance"
-  }
-];
+
 
 export default function Homepage() {
   const [scrolled, setScrolled] = useState(false);
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5055";
+        const response = await fetch(`${baseUrl}/public/announcements`);
+        if (response.ok) {
+          const data = await response.json();
+          setAnnouncements(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch announcements:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnnouncements();
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
@@ -203,25 +199,31 @@ export default function Homepage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {announcements.map((announcement) => (
-              <div key={announcement.id} className="bg-white/5 backdrop-blur-lg rounded-[2rem] p-8 border border-white/10 flex flex-col hover:bg-white/10 transition-all duration-300 group">
-                <span className="inline-block px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase tracking-widest mb-4 border border-emerald-500/20">
-                  {announcement.tag}
-                </span>
-                <h4 className="text-xl font-bold mb-3 group-hover:text-emerald-300 transition-colors">{announcement.title}</h4>
-                <p className="text-white/60 text-sm mb-6 leading-relaxed flex-1">
-                  {announcement.content}
-                </p>
-                <div className="flex items-center justify-between pt-6 border-t border-white/10">
-                  <span className="text-xs font-semibold text-white/40">{announcement.date}</span>
-                  <div className="text-emerald-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 11 7.293 7.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                    </svg>
+            {loading ? (
+              // Loading Skeleton
+              [1, 2, 3].map((i) => (
+                <div key={i} className="bg-white/5 backdrop-blur-lg rounded-[2rem] p-8 border border-white/10 h-64 animate-pulse" />
+              ))
+            ) : announcements.length > 0 ? (
+              announcements.map((announcement) => (
+                <div key={announcement.id} className="bg-white/5 backdrop-blur-lg rounded-[2rem] p-8 border border-white/10 flex flex-col hover:bg-white/10 transition-all duration-300 group">
+                  <span className="inline-block px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase tracking-widest mb-4 border border-emerald-500/20">
+                    {announcement.tag}
+                  </span>
+                  <h4 className="text-xl font-bold mb-3 text-white group-hover:text-emerald-300 transition-colors">{announcement.title}</h4>
+                  <p className="text-white/90 text-sm mb-6 leading-relaxed flex-1 line-clamp-3">
+                    {announcement.content}
+                  </p>
+                  <div className="flex items-center justify-between pt-6 border-t border-white/10">
+                    <span className="text-xs font-bold text-white/70">
+                      {new Date(announcement.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </span>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="col-span-full text-center text-white/40 font-medium">No announcements at this time.</p>
+            )}
           </div>
         </div>
       </section>
@@ -249,7 +251,7 @@ export default function Homepage() {
               <ul className="space-y-4">
                 <li><Link href="/" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">Home</Link></li>
                 <li><Link href="/public/directory" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">Technician Directory</Link></li>
-                <li><Link href="/login" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">Company Login</Link></li>
+                <li><Link href="/login" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">Login</Link></li>
                 <li><Link href="/signup" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">Registration</Link></li>
               </ul>
             </div>
