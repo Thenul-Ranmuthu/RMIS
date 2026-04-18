@@ -8,12 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * SRP: Only orchestrates the strategy call and transaction boundary.
- * DIP: Depends on QuotaAggregationStrategy abstraction.
- * Facade: Single entry point for analytics — the controller calls getDashboardData()
- *         and does not know about strategies or repositories.
- */
 @Service
 @RequiredArgsConstructor
 public class QuotaAnalyticsServiceImpl implements QuotaAnalyticsService {

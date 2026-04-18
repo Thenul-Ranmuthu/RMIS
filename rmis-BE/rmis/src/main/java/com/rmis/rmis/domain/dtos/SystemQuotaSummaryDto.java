@@ -1,13 +1,9 @@
 package com.rmis.rmis.domain.dtos;
-// SystemQuotaSummaryDTO.java  — system-wide totals
 
 import lombok.*;
 import java.math.BigDecimal;
 
-/**
- * DTO carrying system-wide aggregated quota figures.
- * Builder pattern used for clean, readable construction.
- */
+
 @Getter
 @Builder
 @NoArgsConstructor

@@ -5,10 +5,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Composite DTO returned to the frontend for the full dashboard.
- * Supports both bar chart (per-company) and pie chart (system-wide) data.
- */
+
 @Getter
 @Builder
 @NoArgsConstructor
