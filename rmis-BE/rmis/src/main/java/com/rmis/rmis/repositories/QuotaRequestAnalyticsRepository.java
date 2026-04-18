@@ -1,5 +1,4 @@
 package com.rmis.rmis.repositories;
-// QuotaRequestAnalyticsRepository.java
 
 
 import com.rmis.rmis.domain.entities.QuotaRequest;
@@ -10,17 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * ISP: Focused only on quota request queries needed by analytics.
- * Does NOT extend a generic "all quota operations" repository.
- */
 public interface QuotaRequestAnalyticsRepository
         extends JpaRepository<QuotaRequest, Long> {
 
     /**
      * SYSTEM-WIDE used quota.
      * "Used quota" = SUM of approvedAmount on all APPROVED requests.
-     * This replaces the old QuotaAllocation-based query entirely.
      */
     @Query("""
         SELECT COALESCE(SUM(qr.approvedAmount), 0)
@@ -47,8 +41,5 @@ public interface QuotaRequestAnalyticsRepository
     """)
     List<Object[]> findApprovedUsedAmountGroupedByCompany();
 
-    /**
-     * Count of approved requests — for the summary card subtitle.
-     */
     long countByStatus(QuotaRequestStatus status);
 }
