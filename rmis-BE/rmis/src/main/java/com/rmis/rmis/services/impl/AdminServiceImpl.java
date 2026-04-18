@@ -3,6 +3,8 @@ package com.rmis.rmis.services.impl;
 
 import java.math.BigDecimal;
 
+import com.rmis.rmis.domain.entities.AnnualQuotaDistribution;
+import com.rmis.rmis.repositories.AnnualQuotaDistributionRepository;
 import org.springframework.stereotype.Service;
 
 import com.rmis.rmis.domain.entities.Company;
@@ -23,6 +25,7 @@ public class AdminServiceImpl implements AdminService{
 
     private TechnicianRepository technicianRepository;
     private CompanyRepository companyRepository;
+    private AnnualQuotaDistributionRepository annualQuotaDistributionRepository;
     // private QuotaRequestHeaderRepository quotaRequestHeaderRepository;
 
     @Override
@@ -40,6 +43,7 @@ public class AdminServiceImpl implements AdminService{
 
     @Override
     public String addCompanyQouata(String email, BigDecimal quota) {
+
         if(!companyRepository.existsByEmail(email)){
             return "company not found in the repository!!";
         }
@@ -50,6 +54,15 @@ public class AdminServiceImpl implements AdminService{
         company.setStatus(CompanyStatus.ACTIVE);
         companyRepository.save(company);
         return "Company Quota set to: " + quota;
+    }
+
+    @Override
+    public String addYearlyQuota(BigDecimal quota){
+        AnnualQuotaDistribution entity = new AnnualQuotaDistribution();
+        entity.setAnnualQuota(quota);
+        annualQuotaDistributionRepository.save(entity);
+
+        return "Yearly Approved Quota Amount set to: " + quota;
     }
 
 }

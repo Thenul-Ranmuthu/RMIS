@@ -8,6 +8,8 @@ public interface AdminService {
 
     String addCompanyQouata(String email, BigDecimal quota);
 
+    String addYearlyQuota(BigDecimal quota);
+
     // List<QuotaRequestHeader> getPendingQuotas();
 
     // String changeQuotaRequestStatusApprove(Long id);

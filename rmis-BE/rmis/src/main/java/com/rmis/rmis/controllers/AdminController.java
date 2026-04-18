@@ -1,20 +1,15 @@
 package com.rmis.rmis.controllers;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.rmis.rmis.services.interfaces.AdminService;
 
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import java.math.BigDecimal;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-
 
 
 @RestController
@@ -34,4 +29,11 @@ public class AdminController {
         String response = adminService.addCompanyQouata(email, quota);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
+
+    @PutMapping("/addApprovedQuota/{quota}")
+    public ResponseEntity<String> addApprovedQuota(@PathVariable("quota")BigDecimal quota){
+        String response = adminService.addYearlyQuota(quota);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
 }
