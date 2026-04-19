@@ -1,8 +1,7 @@
 import { getToken } from "./authService";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://rmis-backend.malaysiawest.azurecontainer.io:5050";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5055";
 
 export interface ServiceTicketResponse {
   id: number;
@@ -24,6 +23,7 @@ export interface ServiceTicketResponse {
   cancellationTimestamp?: string;
   createdAt: string;
   updatedAt: string;
+  rated: boolean;
 }
 
 export interface ServiceRatingResponse {

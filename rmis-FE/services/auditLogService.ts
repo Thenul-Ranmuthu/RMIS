@@ -5,7 +5,7 @@ import { getToken } from "@/services/authService";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  "http://rmis-backend.malaysiawest.azurecontainer.io:5050";
+  "http://localhost:5055";
 
 const authHeaders = () => ({
   Authorization: `Bearer ${getToken()}`,

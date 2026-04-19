@@ -1,5 +1,7 @@
 package com.rmis.rmis.services.impl;
 
+import com.rmis.rmis.domain.dtos.ServiceRatingRequestDto;
+import com.rmis.rmis.domain.dtos.ServiceRatingResponseDto;
 import com.rmis.rmis.domain.dtos.ServiceTicketRequestDto;
 import com.rmis.rmis.domain.dtos.ServiceTicketResponseDto;
 import com.rmis.rmis.domain.entities.*;
@@ -27,6 +29,7 @@ public class ServiceTicketServiceImpl implements ServiceTicketService {
     private final AvailabilityRepository   availabilityRepository;
     private final PublicUserRepository     publicUserRepository;
     private final CompanyRepository        companyRepository;
+    private final ServiceRatingRepository  serviceRatingRepository;
     private final EmailService             emailService;
     private final TicketNumberGenerator    ticketNumberGenerator;
     private final Mapper<ServiceTicket, ServiceTicketResponseDto> serviceTicketMapper;
@@ -35,6 +38,7 @@ public class ServiceTicketServiceImpl implements ServiceTicketService {
                                     AvailabilityRepository availabilityRepository,
                                     PublicUserRepository publicUserRepository,
                                     CompanyRepository companyRepository,
+                                    ServiceRatingRepository serviceRatingRepository,
                                     @Lazy EmailService emailService,
                                     TicketNumberGenerator ticketNumberGenerator,
                                     Mapper<ServiceTicket, ServiceTicketResponseDto> serviceTicketMapper) {
@@ -42,6 +46,7 @@ public class ServiceTicketServiceImpl implements ServiceTicketService {
         this.availabilityRepository = availabilityRepository;
         this.publicUserRepository = publicUserRepository;
         this.companyRepository = companyRepository;
+        this.serviceRatingRepository = serviceRatingRepository;
         this.emailService = emailService;
         this.ticketNumberGenerator = ticketNumberGenerator;
         this.serviceTicketMapper = serviceTicketMapper;
@@ -208,8 +213,10 @@ public class ServiceTicketServiceImpl implements ServiceTicketService {
                     "This time slot is no longer available. Please choose a different slot.");
         }
 
-        // Layer 2: check no ticket already references this slot
-        if (serviceTicketRepository.existsByAvailabilityId(availabilityId)) {
+        // Layer 2: check no active ticket already references this slot
+        boolean alreadyBooked = serviceTicketRepository.existsByAvailabilityIdAndStatusNot(
+                availabilityId, ServiceTicketStatus.CANCELLED);
+        if (alreadyBooked) {
             throw new IllegalStateException(
                     "This time slot has already been booked. Please choose a different slot.");
         }
@@ -230,5 +237,88 @@ public class ServiceTicketServiceImpl implements ServiceTicketService {
         ticket.setStatus(ServiceTicketStatus.PENDING);
         ticket.setSubmissionDate(LocalDate.now());
         return ticket;
+    }
+
+    // ── Rating methods ────────────────────────────────────────────────────────
+
+    @Override
+    @Transactional
+    public ServiceRatingResponseDto submitRating(Long ticketId, String userEmail, ServiceRatingRequestDto dto) {
+        ServiceTicket ticket = serviceTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResourceNotFoundException("Service ticket not found"));
+
+        // Scenario 2: Restrict Rating — service must be completed
+        if (ticket.getStatus() != ServiceTicketStatus.COMPLETED) {
+            throw new IllegalStateException(
+                    "Cannot rate this service. Only completed services can be rated. Current status: " + ticket.getStatus());
+        }
+
+        // Verify ownership: the rating must come from the customer who raised the ticket
+        boolean isOwner = false;
+        String reviewerName = "Anonymous";
+        if (ticket.getPublicUser() != null && ticket.getPublicUser().getEmail().equals(userEmail)) {
+            isOwner = true;
+            reviewerName = ticket.getPublicUser().getFirstName() + " " + ticket.getPublicUser().getLastName();
+        } else if (ticket.getCompany() != null && ticket.getCompany().getEmail().equals(userEmail)) {
+            isOwner = true;
+            reviewerName = ticket.getCompany().getName();
+        }
+
+        if (!isOwner) {
+            throw new IllegalStateException("You are not authorized to rate this service.");
+        }
+
+        // Prevent duplicate ratings
+        if (serviceRatingRepository.existsByServiceTicketId(ticketId)) {
+            throw new IllegalStateException("You have already submitted a rating for this service.");
+        }
+
+        // Scenario 1: Store Rating
+        ServiceRating rating = new ServiceRating();
+        rating.setServiceTicket(ticket);
+        rating.setTechnician(ticket.getTechnician());
+        rating.setRating(dto.getRating());
+        rating.setFeedback(dto.getFeedback());
+
+        ServiceRating saved = serviceRatingRepository.save(rating);
+        
+        // Link the rating back to the ticket to ensure the bidirectional relationship is updated
+        ticket.setServiceRating(saved);
+        serviceTicketRepository.save(ticket);
+        
+        log.info("Rating {} submitted for ticket {} by {}", saved.getRating(), ticket.getTicketNumber(), userEmail);
+
+        return ServiceRatingResponseDto.builder()
+                .id(saved.getId())
+                .serviceTicketId(ticket.getId())
+                .rating(saved.getRating())
+                .feedback(saved.getFeedback())
+                .createdAt(saved.getCreatedAt())
+                .reviewerName(reviewerName)
+                .build();
+    }
+
+    @Override
+    public List<ServiceRatingResponseDto> getTechnicianFeedbacks(Long technicianId) {
+        return serviceRatingRepository.findByTechnicianIdOrderByCreatedAtDesc(technicianId)
+                .stream()
+                .map(r -> {
+                    String reviewerName = "Anonymous";
+                    ServiceTicket ticket = r.getServiceTicket();
+                    if (ticket.getPublicUser() != null) {
+                        reviewerName = ticket.getPublicUser().getFirstName() + " " + ticket.getPublicUser().getLastName();
+                    } else if (ticket.getCompany() != null) {
+                        reviewerName = ticket.getCompany().getName();
+                    }
+                    return ServiceRatingResponseDto.builder()
+                            .id(r.getId())
+                            .serviceTicketId(ticket.getId())
+                            .rating(r.getRating())
+                            .feedback(r.getFeedback())
+                            .createdAt(r.getCreatedAt())
+                            .reviewerName(reviewerName)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }

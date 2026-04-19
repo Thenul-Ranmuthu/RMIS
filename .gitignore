@@ -3,6 +3,9 @@ rmis-BE/uploads/
 
 # Compressed logs
 *.gz
+*.tar
+*.zip
+*.7z
 
 # --- OS & IDE ---
 .vscode/
@@ -57,6 +60,9 @@ rmis-FE/next-env.d.ts
 .vercel/
 .turbo/
 dist/
+rmis-FE/mnt/
+rmis-FE/*.html
+rmis-FE/tsconfig.tsbuildinfo
 
 # --- General ---
 /tmp/
@@ -74,3 +80,7 @@ scratch/
 
 # Local dev seeders
 rmis-BE/rmis/src/main/java/com/rmis/rmis/config/UserSeeder.java
+
+# Maven wrapper files (optional to ignore, usually kept but some prefer not to)
+.mvn/
+rmis-BE/rmis/.mvn/

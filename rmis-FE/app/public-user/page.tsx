@@ -158,7 +158,6 @@ export default function PublicUserDashboard() {
                             tickets={tickets} 
                             loading={loading} 
                             onViewDirectory={() => router.push('/public/directory')}
-                            onViewDetails={(num) => alert(`Ticket ${num} is being processed.`)}
                             onCancel={handleCancel}
                         />
                     )}
@@ -166,4 +165,4 @@ export default function PublicUserDashboard() {
             </section>
         </main>
     );
-}
+}

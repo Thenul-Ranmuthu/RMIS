@@ -24,6 +24,7 @@ public interface ServiceTicketRepository extends JpaRepository<ServiceTicket, Lo
     List<ServiceTicket> findByStatusOrderByCreatedAtDesc(ServiceTicketStatus status);
 
     boolean existsByAvailabilityId(Long availabilityId);
+    boolean existsByAvailabilityIdAndStatusNot(Long availabilityId, ServiceTicketStatus status);
 
     boolean existsByTechnicianIdAndStatusIn(Long technicianId, List<ServiceTicketStatus> statuses);//fix
 

@@ -1,6 +1,6 @@
 // // RMIS/files/services/authService.ts
 
-// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://rmis-backend.malaysiawest.azurecontainer.io:5050";
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5055";
 
 // // ─── Interfaces ───────────────────────────────────────────────
 
@@ -120,7 +120,7 @@
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  "http://rmis-backend.malaysiawest.azurecontainer.io:5050";
+  "http://localhost:5055";
 
 // ─── Interfaces ───────────────────────────────────────────────
 
@@ -235,7 +235,7 @@ export const loginCompany = (email: string, password: string) =>
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
-  "http://rmis-backend.malaysiawest.azurecontainer.io:5050";
+  "http://localhost:5055";
 
 const authFetch = (url: string, options: RequestInit = {}) => {
   const token = getToken();

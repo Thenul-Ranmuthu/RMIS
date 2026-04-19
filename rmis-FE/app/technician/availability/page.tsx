@@ -7,7 +7,7 @@ import { getToken, getRole } from "@/services/authService";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
-  "http://rmis-backend.malaysiawest.azurecontainer.io:5050";
+  "http://localhost:5055";
 const PRIMARY = "#047857";
 const HERO_IMAGE = "/Gemini_Generated_Image_3kc8133kc8133kc8.png";
 

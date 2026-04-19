@@ -7,10 +7,17 @@ import com.rmis.rmis.domain.entities.PublicUser;
 import com.rmis.rmis.domain.entities.ServiceTicket;
 import com.rmis.rmis.domain.entities.Technician;
 import com.rmis.rmis.mappers.Mapper;
+import com.rmis.rmis.repositories.ServiceRatingRepository;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ServiceTicketMapperImpl implements Mapper<ServiceTicket, ServiceTicketResponseDto> {
+
+    private final ServiceRatingRepository serviceRatingRepository;
+
+    public ServiceTicketMapperImpl(ServiceRatingRepository serviceRatingRepository) {
+        this.serviceRatingRepository = serviceRatingRepository;
+    }
 
     @Override
     public ServiceTicketResponseDto mapTo(ServiceTicket t) {
@@ -23,7 +30,8 @@ public class ServiceTicketMapperImpl implements Mapper<ServiceTicket, ServiceTic
                 .cancellationReason(t.getCancellationReason())
                 .cancellationTimestamp(t.getCancellationTimestamp())
                 .createdAt(t.getCreatedAt())
-                .updatedAt(t.getUpdatedAt());
+                .updatedAt(t.getUpdatedAt())
+                .rated(t.getServiceRating() != null || serviceRatingRepository.existsByServiceTicketId(t.getId()));
 
         // CUSTOMER MAPPING
         if (t.getPublicUser() != null) {
