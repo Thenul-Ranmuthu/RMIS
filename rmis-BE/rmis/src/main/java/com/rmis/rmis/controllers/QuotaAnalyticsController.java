@@ -28,13 +28,9 @@ public class QuotaAnalyticsController {
      *
      * Returns system-wide totals AND per-company breakdown in one response.
      * The frontend uses this to render both the summary cards and the bar/pie charts.
-     *
-     * Scenario 1: returns totalApprovedQuota, totalUsedQuota, totalRemainingQuota
-     * Scenario 2: companyBreakdowns list drives the chart data series
-     * Scenario 3: @PreAuthorize + SecurityConfig reject non-admin callers with 403
      */
     @GetMapping("/dashboard")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MINISTRY_OFFICER')")
     public ResponseEntity<AnalyticsDashboardDto> getDashboard() {
         AnalyticsDashboardDto dashboard = analyticsService.getDashboardData();
         return ResponseEntity.ok(dashboard);
