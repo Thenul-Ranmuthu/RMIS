@@ -382,7 +382,7 @@ export default function SignupCard() {
             phoneNumber: formData.phoneNumber,
             password: formData.password,
             address: combineAddress(),
-            district: formData.district, 
+            district: formData.district,
             specialization: formData.specialization || "",
             yearsOfExperience:
               formData.yearsOfExperience !== ""
@@ -399,7 +399,7 @@ export default function SignupCard() {
         // Store files in module-level variable (survives router.push soft navigation)
         pendingCertifications.length = 0;
         formData.certifications.forEach((cert) => {
-         pendingCertifications.push(cert);
+          pendingCertifications.push(cert);
         });
 
         // Send verification email
@@ -481,7 +481,7 @@ export default function SignupCard() {
       console.log("Registration successful:", data);
 
       if (data.accessToken) {
-        localStorage.setItem("accessToken", data.accessToken);  
+        localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("user", JSON.stringify(data));
       }
 
@@ -1337,11 +1337,10 @@ export default function SignupCard() {
               setVerificationCode("");
               setCodeSent(false);
             }}
-            className={`flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-              role === item
+            className={`flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${role === item
                 ? "bg-white shadow text-gray-900"
                 : "text-gray-500 hover:text-gray-700"
-            }`}
+              }`}
           >
             {item}
           </button>
@@ -1510,11 +1509,10 @@ export default function SignupCard() {
             <button
               type="button"
               onClick={() => setAgreeTerms(!agreeTerms)}
-              className={`h-5 w-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 mt-0.5 ${
-                agreeTerms
+              className={`h-5 w-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 mt-0.5 ${agreeTerms
                   ? "bg-emerald-600 border-emerald-600"
                   : "border-gray-300 bg-white"
-              }`}
+                }`}
             >
               {agreeTerms && (
                 <svg

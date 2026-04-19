@@ -65,20 +65,14 @@ export default function MinistryLoginCard() {
                 throw new Error(data.error || data.message || "Login failed");
             }
 
-            // Save token
-            if (data.accessToken) {
-                saveToken(data.accessToken);
-                if (rememberMe) {
-                    localStorage.setItem("accessToken", data.accessToken); 
-                    
-                } else {
-                    sessionStorage.setItem("accessToken", data.accessToken);
-                }
-                // After saving to localStorage/sessionStorage, also set a cookie
-                document.cookie = `accessToken=${data.accessToken}; path=/; max-age=${rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24}`;
+            // Handle multiple possible token field names from backend for resilience
+            const token = data.token || data.accessToken;
+            if (token) {
+                saveToken(token, rememberMe);
+                router.push("/ministry/quota-requests");
+            } else {
+                throw new Error("Invalid response from server: No authentication token found");
             }
-
-            router.push("/ministry/quota-requests");
 
         } catch (err) {
             setError(

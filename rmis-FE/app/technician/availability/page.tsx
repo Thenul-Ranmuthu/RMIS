@@ -436,9 +436,9 @@ export default function TechnicianAvailabilityPage() {
                         <div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">
                           {formatDate(date)}
                         </div>
-                        
+
                       </div>
-                      
+
                     </div>
 
                     <div className="space-y-3 p-4 sm:p-5">

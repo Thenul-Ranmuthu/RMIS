@@ -69,13 +69,13 @@ export default function VerifyEmailPage() {
         formDataObj.append("phoneNumber", userData.phoneNumber);
         formDataObj.append("password", userData.password);
         formDataObj.append("address", userData.address || "");
-        formDataObj.append("district", userData.district || ""); 
+        formDataObj.append("district", userData.district || "");
         formDataObj.append("specialization", userData.specialization || "");
         if (userData.yearsOfExperience != null) {
           formDataObj.append("yearsOfExperience", userData.yearsOfExperience.toString());
         }
 
-        
+
         // SAFETY CHECK: If files were lost from memory (due to refresh), show a clear error
         if (pendingCertifications.length === 0) {
           setError("Your certification files were lost. Please go back and re-upload them.");
@@ -113,7 +113,7 @@ export default function VerifyEmailPage() {
       pendingCertifications.length = 0;
 
       if (data.accessToken) {
-        localStorage.setItem("accessToken", data.accessToken);  
+        localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem(
           "user",
           JSON.stringify({

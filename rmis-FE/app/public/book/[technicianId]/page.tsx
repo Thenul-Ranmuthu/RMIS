@@ -183,7 +183,7 @@ export default function BookTechnicianPage() {
       <main className="min-h-screen bg-[#0f172a] flex items-center justify-center p-6 font-['Public_Sans']">
         <div className="bg-[#111827] p-10 rounded-[40px] shadow-2xl border border-emerald-500/20 max-w-xl w-full text-center relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-2 bg-emerald-600 shadow-[0_0_20px_rgba(5,150,105,0.4)]" />
-          
+
           <div className="mb-8 flex justify-center">
             <div className="bg-emerald-500/10 rounded-full p-6 relative">
               <span className="material-symbols-outlined text-6xl text-emerald-400 animate-bounce">task_alt</span>
@@ -198,7 +198,7 @@ export default function BookTechnicianPage() {
           </p>
 
           <div className="bg-slate-800/40 rounded-3xl p-6 mb-10 text-left border border-white/5 backdrop-blur-sm">
-             <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-[10px] font-black text-emerald-500/50 uppercase tracking-widest mb-1">Service</p>
                 <p className="font-bold text-slate-100">{serviceType}</p>
@@ -214,7 +214,7 @@ export default function BookTechnicianPage() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <button 
+            <button
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300 shadow-lg shadow-emerald-900/40 active:scale-[0.98] flex items-center justify-center gap-3"
               onClick={() => router.push(dashPath)}
             >
@@ -265,12 +265,12 @@ export default function BookTechnicianPage() {
   return (
     <div className="book-page">
       <div className="bg-texture" />
-      
+
       <div className="book-layout">
         <div className="layout-header">
           <button className="back-btn" onClick={() => router.back()}>
-             <span className="material-symbols-outlined text-sm">arrow_back</span>
-             Back
+            <span className="material-symbols-outlined text-sm">arrow_back</span>
+            Back
           </button>
         </div>
         {/* ── Left: Technician profile ────────────────────── */}
