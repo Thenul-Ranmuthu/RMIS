@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rmis.rmis.domain.dtos.QuotaRequestAddQuotaDto;
 import com.rmis.rmis.services.interfaces.QuotaRequestService;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 
@@ -26,8 +27,8 @@ public class QuotaRequestController {
 
     @PreAuthorize("hasRole('COMPANY')")
     @PostMapping(path = "/addQuota")
-    public ResponseEntity<String> addQuotaRequest(@RequestBody QuotaRequestAddQuotaDto quotaRequestAddQuotaDto) {
-        String response = quotaRequestService.addQuotaRequest(quotaRequestAddQuotaDto); // duplicate check runs first
+    public ResponseEntity<String> addQuotaRequest(@Valid @RequestBody QuotaRequestAddQuotaDto quotaRequestAddQuotaDto) {
+        String response = quotaRequestService.addQuotaRequest(quotaRequestAddQuotaDto); 
         if (response.toLowerCase().startsWith("error:")) {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }

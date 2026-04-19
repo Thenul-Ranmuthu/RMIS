@@ -18,12 +18,12 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/ministry/quota-requests")
+@PreAuthorize("hasRole('MINISTRY_OFFICER')")
 @RequiredArgsConstructor
 public class QuotaRequestsController {
     private final QuotaRequestService quotaRequestService;
 
     @GetMapping
-    @PreAuthorize("hasRole('MINISTRY_OFFICER')")
     public ResponseEntity<List<QuotaRequestResponseDto>> getAllRequests() {
         if (quotaRequestService.getAllRequests().isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -33,7 +33,6 @@ public class QuotaRequestsController {
     }
 
     @GetMapping("/paginated")
-    @PreAuthorize("hasRole('MINISTRY_OFFICER')")
     public ResponseEntity<PagedResponseDto<QuotaRequestResponseDto>> getQuotaRequestsPaginated(
             @RequestParam(defaultValue = "1")  int page,    // defaults to page 1
             @RequestParam(defaultValue = "5")  int limit    // defaults to 5 per page
@@ -44,7 +43,6 @@ public class QuotaRequestsController {
     }
 
     @GetMapping("/filter")
-    @PreAuthorize("hasRole('MINISTRY_OFFICER')")
     public ResponseEntity<PagedResponseDto<QuotaRequestResponseDto>> getQuotaRequestsFiltered(
             @RequestParam(required = false)
             QuotaRequestStatus status,
@@ -71,7 +69,6 @@ public class QuotaRequestsController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('MINISTRY_OFFICER')")
     public ResponseEntity<QuotaRequestDetailDto> getRequestById(
             @PathVariable UUID id
     ) {

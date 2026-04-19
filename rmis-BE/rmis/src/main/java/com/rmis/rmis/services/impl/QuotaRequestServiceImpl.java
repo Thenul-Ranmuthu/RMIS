@@ -1,131 +1,107 @@
 package com.rmis.rmis.services.impl;
 
 import com.rmis.rmis.domain.dtos.PagedResponseDto;
-import com.rmis.rmis.domain.dtos.QuotaRequestDetailDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestAddQuotaDto;
+import com.rmis.rmis.domain.dtos.QuotaRequestDetailDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestResponseDto;
 import com.rmis.rmis.domain.entities.Company;
 import com.rmis.rmis.domain.entities.QuotaRequest;
 import com.rmis.rmis.enums.QuotaRequestStatus;
+import com.rmis.rmis.mappers.Mapper;
 import com.rmis.rmis.repositories.CompanyRepository;
-import com.rmis.rmis.repositories.MinistryOfficerRepository;
-import com.rmis.rmis.exceptions.QuotaRequestNotFoundException;
 import com.rmis.rmis.repositories.QuotaRequestRepository;
-import com.rmis.rmis.services.QuotaRequestsSpecification;
 import com.rmis.rmis.services.interfaces.EmailService;
 import com.rmis.rmis.services.interfaces.QuotaRequestService;
-import org.springframework.transaction.annotation.Transactional;
-
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import org.springframework.data.domain.Pageable;
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
+@Slf4j
 public class QuotaRequestServiceImpl implements QuotaRequestService {
+
     private final QuotaRequestRepository quotaRequestRepository;
     private final CompanyRepository companyRepository;
+    private final Mapper<QuotaRequest, QuotaRequestResponseDto> quotaRequestResponseMapper;
+    private final Mapper<QuotaRequest, QuotaRequestDetailDto> quotaRequestDetailMapper;
     private final EmailService emailService;
 
-    public QuotaRequestServiceImpl(QuotaRequestRepository quotaRequestRepository, 
-                                   CompanyRepository companyRepository, 
-                                   EmailService emailService) {
-        this.quotaRequestRepository = quotaRequestRepository;
-        this.companyRepository = companyRepository;
-        this.emailService = emailService;
+    @Override
+    public List<QuotaRequestResponseDto> getAllRequests() {
+        List<QuotaRequest> entities = (List<QuotaRequest>) quotaRequestRepository.findAll();
+        return entities.stream()
+                .map(quotaRequestResponseMapper::mapTo)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<QuotaRequestResponseDto> getAllRequests(){
-        return quotaRequestRepository.findAll()
-                .stream()
-                .map(this::toDto)
+    public PagedResponseDto<QuotaRequestResponseDto> getQuotaRequestsPaginated(int page, int limit) {
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Page<QuotaRequest> quotaRequestPage = quotaRequestRepository.findAll(pageable);
+
+        List<QuotaRequestResponseDto> content = quotaRequestPage.getContent().stream()
+                .map(quotaRequestResponseMapper::mapTo)
                 .collect(Collectors.toList());
+
+        return new PagedResponseDto<>(
+                content,
+                quotaRequestPage.getNumber() + 1,
+                quotaRequestPage.getSize(),
+                quotaRequestPage.getTotalElements(),
+                quotaRequestPage.getTotalPages(),
+                quotaRequestPage.isLast()
+        );
     }
 
-    public PagedResponseDto<QuotaRequestResponseDto> getQuotaRequestsPaginated(
+    @Override
+    public PagedResponseDto<QuotaRequestResponseDto> getFilteredRequests(
+            QuotaRequestStatus status,
+            String companyName,
+            LocalDate submissionDate,
             int page,
             int limit
     ) {
-        Pageable pageable = PageRequest.of(
-                page - 1,
-                limit,
-                Sort.by(Sort.Direction.DESC, "submissionDate")     
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Page<QuotaRequest> quotaRequestPage = quotaRequestRepository.findFilteredRequests(
+                status,
+                companyName,
+                submissionDate,
+                pageable
         );
 
-        // Execute paginated query — no filters, just page + sort
-        Page<QuotaRequest> resultPage = quotaRequestRepository.findAll(pageable);
-
-        // Map each entity to DTO
-        List<QuotaRequestResponseDto> data = resultPage.getContent()
-                .stream()
-                .map(this::toDto)
+        List<QuotaRequestResponseDto> content = quotaRequestPage.getContent().stream()
+                .map(quotaRequestResponseMapper::mapTo)
                 .collect(Collectors.toList());
 
-        // Wrap in paginated response with metadata
-        return PagedResponseDto.<QuotaRequestResponseDto>builder()
-                .data(data)
-                .totalRecords(resultPage.getTotalElements())
-                .totalPages(resultPage.getTotalPages())
-                .currentPage(page)                                  // return 1-based page to client
-                .build();
-    }
-
-    public PagedResponseDto<QuotaRequestResponseDto> getFilteredRequests(QuotaRequestStatus status,
-                                                                         String companyName,
-                                                                         LocalDate submissionDate,
-                                                                         int page, int limit) {
-        Pageable pageable = PageRequest.of(
-                page - 1,
-                limit,
-                Sort.by(Sort.Direction.DESC, "submissionDate")
+        return new PagedResponseDto<>(
+                content,
+                quotaRequestPage.getNumber() + 1,
+                quotaRequestPage.getSize(),
+                quotaRequestPage.getTotalElements(),
+                quotaRequestPage.getTotalPages(),
+                quotaRequestPage.isLast()
         );
-
-        Specification<QuotaRequest> spec = QuotaRequestsSpecification.withFilters(status, companyName, submissionDate);
-
-        Page<QuotaRequest> resultPage = quotaRequestRepository.findAll(spec, pageable);
-
-        // Map each entity to DTO
-        List<QuotaRequestResponseDto> data = resultPage.getContent()
-                .stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-
-        // Wrap in paginated response
-        return PagedResponseDto.<QuotaRequestResponseDto>builder()
-                .data(data)
-                .totalRecords(resultPage.getTotalElements())
-                .totalPages(resultPage.getTotalPages())
-                .currentPage(page)                                  // return 1-based page to client
-                .build();
     }
 
-
-    private QuotaRequestResponseDto toDto(QuotaRequest entity) {
-        return QuotaRequestResponseDto.builder()
-                .id(entity.getRequestId())
-                .requestId(formatRequestId(entity.getRequestNumber()))
-                .companyName(entity.getCompanyName())
-                .requestedQuota(entity.getRequestedQuota())
-                .submissionDate(entity.getSubmissionDate())
-                .status(entity.getStatus())
-                .build();
+    @Override
+    public QuotaRequestDetailDto getRequestById(UUID id) {
+        QuotaRequest entity = quotaRequestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Quota Request not found with ID: " + id));
+        return quotaRequestDetailMapper.mapTo(entity);
     }
-
-     private String formatRequestId(Long requestNumber) {
-         return String.format("REQ-%04d", requestNumber);
-     }
 
     @Override
     @Transactional
@@ -136,8 +112,10 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
         Company company = companyRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Company not found with email: " + email));
 
-        if(quotaRequestHeaderDto.getRequestedQuota().compareTo(company.getQuota()) > 0){
-            return "Error: Insuffitient quota balance!!";
+        // Logic Check: Prevent negative or zero quota requests
+        if (quotaRequestHeaderDto.getRequestedQuota() == null || 
+            quotaRequestHeaderDto.getRequestedQuota().compareTo(BigDecimal.ZERO) <= 0) {
+            return "Error: Requested quota must be greater than zero!!";
         }
 
         boolean hasPending = quotaRequestRepository.existsByCompanyAndStatus(
@@ -147,48 +125,25 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
         }
 
         QuotaRequest entity = new QuotaRequest();
-
-        entity.setCompany(company);
-        entity.setRequestedQuota(quotaRequestHeaderDto.getRequestedQuota());
         entity.setCompanyName(company.getName());
-        entity.setUpdatedAt(LocalDateTime.now());
+        entity.setCompanyEmail(company.getEmail());
+        entity.setRequestedQuota(quotaRequestHeaderDto.getRequestedQuota());
+        entity.setStatus(QuotaRequestStatus.PENDING);
+        entity.setSubmissionDate(LocalDate.now());
+        entity.setCompany(company);
 
+        // Generate request number (simple count-based for now)
         long nextNumber = quotaRequestRepository.count() + 1;
-        entity.setRequestNumber(nextNumber);
-        
+        entity.setRequestNumber("QR-" + String.format("%05d", nextNumber));
 
         quotaRequestRepository.save(entity);
-        
-        // Ensure the notification uses the authenticated company's email
+
+        // Safety: ensure DTO has the correct email for notification
         quotaRequestHeaderDto.setCompanyEmail(company.getEmail());
         
-        // Notify officers ONLY after successful save
+        // Notify Ministry Officers
         emailService.sendNotificationNewRequestSubmission(quotaRequestHeaderDto);
-        
-        return "Quota saved succefully!!";
-    }
 
-    public QuotaRequestDetailDto getRequestById(UUID requestId) {
-        QuotaRequest entity = quotaRequestRepository.findById(requestId)
-                .orElseThrow(() -> new QuotaRequestNotFoundException("Quota request not found: " + requestId));
-
-        return toDetailDto(entity);
-    }
-
-    private QuotaRequestDetailDto toDetailDto(QuotaRequest entity) {
-        return QuotaRequestDetailDto.builder()
-                .id(entity.getRequestId())
-                .requestId(formatRequestId(entity.getRequestNumber()))
-                .companyName(entity.getCompanyName())
-                .companyEmail(entity.getCompany().getEmail())
-                .companyIdentifier(entity.getCompany().getCompanyid())
-                .requestedQuota(entity.getRequestedQuota())
-                .submissionDate(entity.getSubmissionDate())
-                .status(entity.getStatus())
-                .reviewedBy(entity.getReviewedBy() != null
-                        ? entity.getReviewedBy().getName()
-                        : null)
-                .reviewedAt(entity.getReviewedAt())
-                .build();
+        return "Quota request submitted successfully. Request Number: " + entity.getRequestNumber();
     }
 }

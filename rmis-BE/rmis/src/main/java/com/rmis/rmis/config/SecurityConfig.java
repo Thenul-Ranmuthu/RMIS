@@ -28,17 +28,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Collectors;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-// ...existing code...
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Value("${app.cors.allowed-origins}")//http://rmis-backend.malaysiawest.azurecontainer.io:3000
+    @Value("${app.cors.allowed-origins}")
     private String allowedOriginsProperty;
-
-    // ---- Inject both UserDetailsService implementations ----
 
     private final UserDetailsService companyDetailsService;
     private final UserDetailsService publicUserDetailsService;
@@ -59,8 +56,6 @@ public class SecurityConfig {
         this.ministryOfficerDetailsService = ministryOfficerDetailsService;
         this.adminDetailsService = adminDetailsService;
     }
-
-    // ---- Authentication Providers ----
 
     @Bean
     public AuthenticationProvider companyAuthenticationProvider() {
@@ -97,14 +92,13 @@ public class SecurityConfig {
         return provider;
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JwtAuthenticationFilter jwtAuthenticationFilter,
                                                    JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> {}) // enables CORS support using corsConfigurationSource bean
+            .cors(cors -> {}) 
             .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/company/**").permitAll()
@@ -112,22 +106,24 @@ public class SecurityConfig {
                 .requestMatchers("/auth/technician/**").permitAll()
                 .requestMatchers("/sendMail/**").permitAll()
                 .requestMatchers("/admin/auth/**").permitAll()
-                .requestMatchers("/admin/**").authenticated() 
-                    .requestMatchers("/ministry/auth/**").permitAll()
+                .requestMatchers("/ministry/auth/**").permitAll()
                 .requestMatchers("/api/password-reset/**").permitAll()
-                    .requestMatchers("/public/**").permitAll()
-                    .requestMatchers("/uploads/**").permitAll()
-                    .requestMatchers("/ministry/quota-requests/**").hasRole("MINISTRY_OFFICER")
-                    .requestMatchers("/technician/availability/**").hasRole("TECHNICIAN")
-                    .requestMatchers("/api/service-tickets/**").authenticated()
-                    .requestMatchers("/technician/bookings/**").hasRole("TECHNICIAN")
-                    .anyRequest().authenticated()
+                .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
+                
+                // Fixed path matching for protected areas (covering both base paths and wildcards)
+                .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
+                .requestMatchers("/ministry/quota-requests", "/ministry/quota-requests/**").hasRole("MINISTRY_OFFICER")
+                .requestMatchers("/quotaHeader", "/quotaHeader/**").hasRole("COMPANY")
+                .requestMatchers("/technician/availability", "/technician/availability/**").hasRole("TECHNICIAN")
+                .requestMatchers("/api/service-tickets", "/api/service-tickets/**").authenticated()
+                .requestMatchers("/technician/bookings", "/technician/bookings/**").hasRole("TECHNICIAN")
+                .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             );
 
-        // Register our JWT filter before the UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -136,7 +132,6 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // allow multiple origins via comma-separated property
         configuration.setAllowedOrigins(
             Arrays.stream(allowedOriginsProperty.split(","))
                   .map(String::trim)
@@ -145,7 +140,6 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
-
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
