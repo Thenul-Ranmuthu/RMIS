@@ -12,7 +12,9 @@ import com.rmis.rmis.repositories.MinistryOfficerRepository;
 import com.rmis.rmis.exceptions.QuotaRequestNotFoundException;
 import com.rmis.rmis.repositories.QuotaRequestRepository;
 import com.rmis.rmis.services.QuotaRequestsSpecification;
+import com.rmis.rmis.services.interfaces.EmailService;
 import com.rmis.rmis.services.interfaces.QuotaRequestService;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,15 +36,14 @@ import java.util.stream.Collectors;
 public class QuotaRequestServiceImpl implements QuotaRequestService {
     private final QuotaRequestRepository quotaRequestRepository;
     private final CompanyRepository companyRepository;
-//     private final MinistryOfficerRepository ministryOfficerRepository;
-    
-//     @Value("${app.mail.resend.api}")
-//     private String resendApiKey;
+    private final EmailService emailService;
 
-    public QuotaRequestServiceImpl(QuotaRequestRepository quotaRequestRepository, CompanyRepository companyRepository, MinistryOfficerRepository ministryOfficerRepository) {
+    public QuotaRequestServiceImpl(QuotaRequestRepository quotaRequestRepository, 
+                                   CompanyRepository companyRepository, 
+                                   EmailService emailService) {
         this.quotaRequestRepository = quotaRequestRepository;
         this.companyRepository = companyRepository;
-        // this.ministryOfficerRepository = ministryOfficerRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -127,6 +128,7 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
      }
 
     @Override
+    @Transactional
     public String addQuotaRequest(QuotaRequestAddQuotaDto quotaRequestHeaderDto) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
@@ -156,6 +158,13 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
         
 
         quotaRequestRepository.save(entity);
+        
+        // Ensure the notification uses the authenticated company's email
+        quotaRequestHeaderDto.setCompanyEmail(company.getEmail());
+        
+        // Notify officers ONLY after successful save
+        emailService.sendNotificationNewRequestSubmission(quotaRequestHeaderDto);
+        
         return "Quota saved succefully!!";
     }
 
