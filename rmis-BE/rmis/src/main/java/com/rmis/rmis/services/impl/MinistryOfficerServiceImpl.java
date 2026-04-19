@@ -33,17 +33,17 @@ public class MinistryOfficerServiceImpl implements MinistryOfficerService{
         QuotaRequest quotaRequest = quotaRequestRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("No Quota request!!"));
 
+        Company company = companyRepository.findByEmail(quotaRequest.getCompany().getEmail())
+                .orElseThrow(() -> new RuntimeException("No Company found!!"));
+
         quotaRequest.setStatus(QuotaRequestStatus.APPROVED);
         quotaRequest.setReviewedBy(officer);
         quotaRequest.setReviewedAt(LocalDateTime.now());
-        
         quotaRequestRepository.save(quotaRequest);
         auditLogService.logApproval(officer, quotaRequest);
+        quotaRequest.setApprovedAmount(quotaRequest.getRequestedQuota());
 
-        Company company = companyRepository.findByEmail(quotaRequest.getCompany().getEmail())
-            .orElseThrow(() -> new RuntimeException("No Company found!!"));
-
-        company.setQuota(company.getQuota().subtract(quotaRequest.getRequestedQuota()));
+        company.setRemainingQuota(company.getQuota().subtract(quotaRequest.getRequestedQuota()));
 
         companyRepository.save(company);
 
