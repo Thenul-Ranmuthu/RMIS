@@ -26,6 +26,15 @@ export interface ServiceTicketResponse {
   updatedAt: string;
 }
 
+export interface ServiceRatingResponse {
+  id: number;
+  serviceTicketId: number;
+  rating: number;
+  feedback: string;
+  createdAt: string;
+  reviewerName: string;
+}
+
 const authFetch = async (url: string, options: RequestInit = {}) => {
   const token = getToken();
   const response = await fetch(url, {
@@ -90,4 +99,21 @@ export const cancelCompanyTicket = (
   authFetch(`${API_BASE_URL}/api/service-tickets/${id}/cancel`, {
     method: "PUT",
     body: JSON.stringify({ reason }),
+  });
+
+export const submitRating = (
+  ticketId: number,
+  rating: number,
+  feedback: string,
+): Promise<ServiceRatingResponse> =>
+  authFetch(`${API_BASE_URL}/api/service-tickets/${ticketId}/rating`, {
+    method: "POST",
+    body: JSON.stringify({ rating, feedback }),
+  });
+
+export const getTechnicianFeedbacks = (
+  technicianId: number,
+): Promise<ServiceRatingResponse[]> =>
+  authFetch(`${API_BASE_URL}/public/technicians/${technicianId}/feedbacks`, {
+    method: "GET",
   });

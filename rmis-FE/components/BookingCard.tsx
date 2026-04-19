@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { ServiceTicketResponse } from "@/services/serviceTicketService";
+import { SubmitRatingModal } from "./SubmitRatingModal";
 
 const STATUS_STYLES: Record<string, string> = {
     PENDING: "bg-amber-100 text-amber-700 border-amber-200",
@@ -18,8 +20,11 @@ interface BookingCardProps {
  * OCP: The status styles are defined in a map, making it easy to add new statuses.
  */
 export function BookingCard({ ticket, onViewDetails, onCancel }: BookingCardProps) {
+    const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+    
     const statusStyle = STATUS_STYLES[ticket.status.toUpperCase()] || "bg-gray-100 text-gray-700 border-gray-200";
     const isCancelable = ticket.status.toUpperCase() === "PENDING";
+    const isCompleted = ticket.status.toUpperCase() === "COMPLETED";
 
     return (
         <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
@@ -99,8 +104,29 @@ export function BookingCard({ ticket, onViewDetails, onCancel }: BookingCardProp
                             Cancel Booking
                         </button>
                     )}
+                    {isCompleted && (
+                        <button 
+                            className="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-600 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition border border-emerald-100 flex items-center justify-center gap-2"
+                            onClick={() => setIsRatingModalOpen(true)}
+                        >
+                            <span className="material-symbols-outlined text-sm">star_rate</span>
+                            Rate Technician
+                        </button>
+                    )}
                 </div>
             </div>
+
+            {isRatingModalOpen && (
+                <SubmitRatingModal 
+                    ticketId={ticket.id}
+                    technicianName={ticket.technicianName}
+                    onClose={() => setIsRatingModalOpen(false)}
+                    onSuccess={() => {
+                        setIsRatingModalOpen(false);
+                        alert("Thank you for your feedback!");
+                    }}
+                />
+            )}
         </div>
     );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ReviewsModal } from "./ReviewsModal";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -39,6 +40,8 @@ interface Technician {
   registrationDate?: string;
   approvalDate?: string;
   certifications?: Certification[];
+  averageRating?: number;
+  ratingCount?: number;
 }
 
 const sriLankanDistricts = [
@@ -102,6 +105,7 @@ export default function PublicDirectory() {
   const [selectedSkill, setSelectedSkill] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [slotsPopover, setSlotsPopover] = useState<number | null>(null);
+  const [reviewsModalTech, setReviewsModalTech] = useState<Technician | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
   // Lazy slots state
@@ -110,6 +114,9 @@ export default function PublicDirectory() {
   );
   const [loadingSlots, setLoadingSlots] = useState<number | null>(null);
   const [slotsError, setSlotsError] = useState<number | null>(null);
+
+  // Ratings cache: stores {avg, count} per technician, fetched lazily
+  const [ratingsCache, setRatingsCache] = useState<Record<number, { avg: number; count: number }>>({});
 
   const PER_PAGE = 6;
 
@@ -137,7 +144,37 @@ export default function PublicDirectory() {
       }
     };
     fetchTechnicians();
+    // Also clear ratings cache on refresh
+    setRatingsCache({});
   }, [selectedDate, selectedSkill, reloadKey]);
+
+  // Fetch ratings for visible technicians on the current page
+  useEffect(() => {
+    if (currentItems.length === 0) return;
+    const toFetch = currentItems.filter((t) => ratingsCache[t.id] === undefined);
+    if (toFetch.length === 0) return;
+
+    toFetch.forEach(async (tech) => {
+      try {
+        const res = await fetch(
+          `${API_BASE}/public/technicians/${tech.id}/feedbacks`,
+        );
+        if (!res.ok) throw new Error("Failed");
+        const data = await res.json();
+        const reviews = Array.isArray(data) ? data : [];
+        const count = reviews.length;
+        const avg =
+          count > 0
+            ? reviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0) / count
+            : 0;
+        setRatingsCache((prev) => ({ ...prev, [tech.id]: { avg, count } }));
+      } catch {
+        // If endpoint doesn't exist yet, show 0 reviews gracefully
+        setRatingsCache((prev) => ({ ...prev, [tech.id]: { avg: 0, count: 0 } }));
+      }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, technicians]);
 
   const handleSlotsClick = async (techId: number) => {
     // Toggle close
@@ -559,6 +596,40 @@ export default function PublicDirectory() {
                   </div>
 
                   <div className="card-body">
+                    {/* Rating display */}
+                    {(() => {
+                      const ratingData = ratingsCache[tech.id];
+                      return (
+                        <div className="rating-row">
+                          <div className="rating-stars">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <span
+                                key={star}
+                                className={`rating-star ${ratingData && ratingData.avg >= star ? "filled" : ratingData && ratingData.avg >= star - 0.5 ? "half" : ""}`}
+                              >
+                                ★
+                              </span>
+                            ))}
+                          </div>
+                          <span className="rating-text">
+                            {!ratingData
+                              ? "Loading…"
+                              : ratingData.count > 0
+                                ? `${ratingData.avg.toFixed(1)} (${ratingData.count} review${ratingData.count !== 1 ? "s" : ""})`
+                                : "No reviews yet"}
+                          </span>
+                          {ratingData && ratingData.count > 0 && (
+                            <button
+                              className="reviews-link"
+                              onClick={() => setReviewsModalTech(tech)}
+                            >
+                              View
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })()}
+
                     <InfoRow
                       icon={<ClockIcon />}
                       label="Experience"
@@ -652,6 +723,14 @@ export default function PublicDirectory() {
           </div>
         )}
       </main>
+
+      {reviewsModalTech && (
+        <ReviewsModal 
+          technicianId={reviewsModalTech.id}
+          technicianName={`${reviewsModalTech.firstName} ${reviewsModalTech.lastName}`}
+          onClose={() => setReviewsModalTech(null)}
+        />
+      )}
 
       {totalPages > 1 && (
         <div className="pagination">
@@ -928,6 +1007,27 @@ const globalStyles = `
   .cert-more { color: #34d399; border-color: rgba(52, 211, 153, 0.2); background: rgba(52, 211, 153, 0.08); }
 
   .card-actions { display: flex; gap: 8px; align-items: center; }
+
+  /* Rating row */
+  .rating-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 14px; padding: 8px 10px;
+    background: rgba(251, 191, 36, 0.06);
+    border: 1px solid rgba(251, 191, 36, 0.12);
+    border-radius: 8px;
+  }
+  .rating-stars { display: flex; gap: 2px; }
+  .rating-star { font-size: 14px; color: #334155; transition: color 0.15s; }
+  .rating-star.filled { color: #fbbf24; }
+  .rating-star.half { color: #fbbf24; opacity: 0.6; }
+  .rating-text { font-size: 11px; color: #94a3b8; flex: 1; }
+  .reviews-link {
+    background: none; border: 1px solid rgba(251, 191, 36, 0.25); color: #fbbf24;
+    font-size: 10px; font-weight: 600; border-radius: 6px; padding: 3px 10px;
+    cursor: pointer; text-transform: uppercase; letter-spacing: 0.08em;
+    transition: all 0.15s ease;
+  }
+  .reviews-link:hover { background: rgba(251, 191, 36, 0.12); }
 
   .btn-outline, .btn-primary, .page-btn { transition: all 0.15s ease; }
 

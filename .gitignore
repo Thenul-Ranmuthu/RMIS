@@ -69,6 +69,8 @@ rmis-BE/uploads/
 rmis-FE/replace.js
 rmis-FE/backup/
 rmis-FE/public-*-example.html
+scratch/
+*.tsbuildinfo
 
 # Local dev seeders
 rmis-BE/rmis/src/main/java/com/rmis/rmis/config/UserSeeder.java
