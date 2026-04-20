@@ -27,6 +27,7 @@ import CompanyBreakdownTable from "@/components/analytics/CompanyBreakdownTable"
 import AccessDeniedState from "@/components/analytics/AccessDeniedState";
 import ErrorState from "@/components/analytics/ErrorState";
 import EmptyState from "@/components/analytics/EmptyState";
+import { useExport } from "@/hooks/useExport";
 
 interface DashboardClientProps {
   /** Pre-fetched by the Server Component; null means server already failed */
@@ -39,6 +40,8 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
   const [error, setError] = useState<string | null>(null);
   const [isAccessDenied, setIsAccessDenied] = useState(false);
   const [hasFetchedInitialData, setHasFetchedInitialData] = useState(false);
+
+  const { isExporting, exportingFormat, exportError, lastExported, triggerExport, clearError } = useExport();
 
   // Client-side refresh (user clicks "↻ Refresh")
   const handleRefresh = useCallback(async () => {
@@ -96,29 +99,68 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
               <span className="text-green-900/20 text-xs">›</span>
               <span className="text-[10px] text-green-700 tracking-wide font-arial font-bold uppercase">Analytics</span>
             </nav>
-            <h2 style={{ margin: 0 }}>Gas Quota Analytics</h2>
-            <p style={{ margin: 0 }}>System-wide distribution monitoring & regulatory oversight</p>
+            <h2 className="text-[#1a4a38] font-bold text-2xl" style={{ margin: 0 }}>Gas Quota Analytics</h2>
+            <p className="text-[#1a4a38]/70 text-sm" style={{ margin: 0 }}>System-wide distribution monitoring & regulatory oversight</p>
           </div>
 
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* Live badge */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1a4a38]/10 border border-[#1a4a38]/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1a4a38] animate-pulse inline-block" />
-              <span className="font-sans text-[11px] font-bold text-[#1a4a38]/70">
-                Updated {formatGeneratedAt(data.generatedAt)}
-              </span>
+          <div className="flex flex-col items-end gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* Live badge */}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1a4a38]/10 border border-[#1a4a38]/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#1a4a38] animate-pulse inline-block" />
+                <span className="font-sans text-[11px] font-bold text-[#1a4a38]/70">
+                  Updated {formatGeneratedAt(data.generatedAt)}
+                </span>
+              </div>
+
+              {/* Refresh button */}
+              <button
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="px-4 py-1.5 bg-[#1a4a38] text-white rounded-lg
+                           text-xs font-bold tracking-wide
+                           hover:bg-[#123528] transition-colors disabled:opacity-40"
+              >
+                {isRefreshing ? "Loading…" : "↻ Refresh"}
+              </button>
             </div>
 
-            {/* Refresh button */}
-            <button
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="px-4 py-1.5 bg-[#1a4a38] text-white rounded-lg
-                         text-xs font-bold tracking-wide
-                         hover:bg-[#123528] transition-colors disabled:opacity-40"
-            >
-              {isRefreshing ? "Loading…" : "↻ Refresh"}
-            </button>
+            {/* Export Buttons */}
+            <div className="flex flex-col items-end gap-2 mt-1">
+                <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => triggerExport("CSV")}
+                      disabled={isExporting}
+                      className={`px-3 py-1.5 border border-[#1a4a38]/30 rounded-lg
+                                 text-[11px] font-bold tracking-wide flex items-center gap-1.5
+                                 hover:bg-[#1a4a38]/5 transition-colors disabled:opacity-40
+                                 ${lastExported === "CSV" ? "bg-green-100 text-[#3D8B6E] border-[#3D8B6E]" : "text-[#1a4a38]"}`}
+                    >
+                      {isExporting && exportingFormat === "CSV" ? "..." : lastExported === "CSV" ? "✓" : "⊞"} 
+                      {lastExported === "CSV" ? "CSV Downloaded" : "Export as CSV"}
+                    </button>
+                    <button
+                      onClick={() => triggerExport("PDF")}
+                      disabled={isExporting}
+                      className={`px-3 py-1.5 border border-[#1a4a38]/30 rounded-lg
+                                 text-[11px] font-bold tracking-wide flex items-center gap-1.5
+                                 hover:bg-[#1a4a38]/5 transition-colors disabled:opacity-40
+                                 ${lastExported === "PDF" ? "bg-green-100 text-[#3D8B6E] border-[#3D8B6E]" : "text-[#1a4a38]"}`}
+                    >
+                      {isExporting && exportingFormat === "PDF" ? "..." : lastExported === "PDF" ? "✓" : "⊟"} 
+                      {lastExported === "PDF" ? "PDF Downloaded" : "Export as PDF"}
+                    </button>
+                </div>
+                
+                {exportError && (
+                    <div className="flex items-center gap-2 px-3 py-1 rounded bg-red-50 border border-red-100 mt-1">
+                        <span className="text-[10px] text-red-600 font-medium">{exportError}</span>
+                        <button onClick={clearError} className="text-red-400 hover:text-red-600">
+                           <span className="text-[12px]">✕</span>
+                        </button>
+                    </div>
+                )}
+            </div>
           </div>
         </div>
       </div>
