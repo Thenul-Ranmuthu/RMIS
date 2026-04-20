@@ -36,22 +36,22 @@ public class CsvExportService extends AbstractExportService {
                      new OutputStreamWriter(baos, StandardCharsets.UTF_8))) {
 
             // Report header
-            writer.println("# " + REPORT_TITLE);
-            writer.println("# " + MINISTRY_NAME);
-            writer.println("# Generated: " + report.getGeneratedAt().format(DISPLAY_DATETIME_FMT));
-            writer.println("#");
+            writer.println(REPORT_TITLE);
+            writer.println(MINISTRY_NAME);
+            writer.println("Generated: " + report.getGeneratedAt().format(DISPLAY_DATETIME_FMT));
+            writer.println();
 
             // System summary block
-            writer.println("# SYSTEM SUMMARY");
-            writer.println("# Total Annual Budget," +
+            writer.println("SYSTEM SUMMARY");
+            writer.println("Total Annual Budget," +
                     formatQuota(report.getSystemSummary().getTotalApprovedQuota()) + " ton");
-            writer.println("# Total Used," +
+            writer.println("Total Used," +
                     formatQuota(report.getSystemSummary().getTotalUsedQuota()) + " ton");
-            writer.println("# Total Remaining," +
+            writer.println("Total Remaining," +
                     formatQuota(report.getSystemSummary().getTotalRemainingQuota()) + " ton");
-            writer.println("# Active Companies," +
+            writer.println("Active Companies," +
                     report.getSystemSummary().getTotalCompanies());
-            writer.println("#");
+            writer.println();
 
             // Column headers
             writer.println(String.join(",", CSV_HEADERS));

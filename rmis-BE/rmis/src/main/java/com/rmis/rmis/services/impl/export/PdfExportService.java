@@ -36,7 +36,7 @@ public class PdfExportService extends AbstractExportService {
     private static final DeviceRgb TEAL         = new DeviceRgb(74,  124, 142);
     private static final DeviceRgb LIGHT_TEXT   = new DeviceRgb(220, 220, 220);
     private static final DeviceRgb DIM_TEXT     = new DeviceRgb(140, 140, 140);
-    private static final DeviceRgb ROW_ALT      = new DeviceRgb(22,  26,  35);
+    private static final DeviceRgb WHITE      = new DeviceRgb(255,  255,  255);
     private static final DeviceRgb HEADER_BG    = new DeviceRgb(18,  22,  30);
 
     @Override
@@ -197,7 +197,7 @@ public class PdfExportService extends AbstractExportService {
                             .setPadding(6f)
                             .add(new Paragraph(header.toUpperCase())
                                     .setFont(bold).setFontSize(6f)
-                                    .setFontColor(DIM_TEXT)
+                                    .setFontColor(WHITE)
                                     .setCharacterSpacing(1f))
             );
         }
@@ -212,10 +212,10 @@ public class PdfExportService extends AbstractExportService {
             DeviceRgb usageColor = pct > 85 ? RED_QUOTA : pct > 60 ? GOLD : GREEN_QUOTA;
 
             addDataCell(table, row.getCompanyName(), rowBg, bold,    new DeviceRgb(40,40,40), 8f);
-            addDataCell(table, row.getRegistrationNumber(), rowBg, mono, new DeviceRgb(90,90,90), 7.5f);
-            addDataCell(table, formatQuota(row.getAllocatedQuota()) + " ton", rowBg, mono, GOLD, 7.5f);
-            addDataCell(table, formatQuota(row.getUsedQuota()) + " ton",      rowBg, mono, RED_QUOTA, 7.5f);
-            addDataCell(table, formatQuota(row.getRemainingQuota()) + " ton", rowBg, mono, GREEN_QUOTA, 7.5f);
+            addDataCell(table, row.getRegistrationNumber(), rowBg, mono, new DeviceRgb(40,40,40), 7.5f);
+            addDataCell(table, formatQuota(row.getAllocatedQuota()) + " ton", rowBg, mono, new DeviceRgb(40,40,40), 7.5f);
+            addDataCell(table, formatQuota(row.getUsedQuota()) + " ton",      rowBg, mono, new DeviceRgb(40,40,40), 7.5f);
+            addDataCell(table, formatQuota(row.getRemainingQuota()) + " ton", rowBg, mono, new DeviceRgb(40,40,40),  7.5f);
             addDataCell(table, formatPercentage(pct) + "%",                  rowBg, bold, usageColor, 8f);
         }
 
