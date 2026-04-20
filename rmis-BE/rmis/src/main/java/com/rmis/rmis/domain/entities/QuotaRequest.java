@@ -55,9 +55,6 @@ public class QuotaRequest {
     @Column(name = "requested_quota", nullable = false, precision = 15, scale = 2)
     private BigDecimal requestedQuota;
 
-    @Column(name = "request_reason", nullable = false, length = 255)
-    private String requestReason;
-
     @Column(name = "approved_amount")
     private BigDecimal approvedAmount;  // null until approved
 

@@ -51,7 +51,6 @@ public class AdminServiceImpl implements AdminService{
             .orElseThrow(() -> new RuntimeException("Company not found by email: " + email));
 
         company.setQuota(quota);
-        company.setRemainingQuota(quota);
         company.setStatus(CompanyStatus.ACTIVE);
         companyRepository.save(company);
         return "Company Quota set to: " + quota;

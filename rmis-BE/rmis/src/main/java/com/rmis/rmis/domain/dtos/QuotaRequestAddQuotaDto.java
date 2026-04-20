@@ -13,6 +13,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class QuotaRequestAddQuotaDto {
     private BigDecimal requestedQuota;
-    private String requestReason;
     private String companyEmail;
 }
