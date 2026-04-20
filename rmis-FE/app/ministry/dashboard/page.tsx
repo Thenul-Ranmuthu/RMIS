@@ -48,7 +48,7 @@ function MinistryDashboardContent() {
         <div className="admin-theme" style={{
             display: 'flex',
             minHeight: '100vh',
-            backgroundImage: "url('/ministry_dashboard_bg_deer_1776617937111.png')",
+            backgroundImage: `url('/bg.png')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundAttachment: 'fixed'
