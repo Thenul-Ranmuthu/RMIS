@@ -135,7 +135,7 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
         Company company = companyRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Company not found with email: " + email));
 
-        if(quotaRequestHeaderDto.getRequestedQuota().compareTo(company.getQuota()) > 0){
+        if(quotaRequestHeaderDto.getRequestedQuota().compareTo(company.getRemainingQuota()) > 0){
             return "Error: Insuffitient quota balance!!";
         }
 
