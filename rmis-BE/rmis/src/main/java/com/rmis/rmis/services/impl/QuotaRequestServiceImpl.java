@@ -136,7 +136,7 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
             .orElseThrow(() -> new RuntimeException("Company not found with email: " + email));
 
         if(quotaRequestHeaderDto.getRequestedQuota().compareTo(company.getRemainingQuota()) > 0){
-            return "Error: Insuffitient quota balance!!";
+            return "Error: Insufficient quota balance!!";
         }
 
         boolean hasPending = quotaRequestRepository.existsByCompanyAndStatus(
@@ -157,7 +157,7 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
         
 
         quotaRequestRepository.save(entity);
-        return "Quota saved succefully!!";
+        return "Quota saved successfully!!";
     }
 
     public QuotaRequestDetailDto getRequestById(UUID requestId) {
