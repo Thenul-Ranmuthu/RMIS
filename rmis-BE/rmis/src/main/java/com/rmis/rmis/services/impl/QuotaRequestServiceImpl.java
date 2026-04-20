@@ -128,14 +128,14 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
      }
 
     @Override
-    public String addQuotaRequest(QuotaRequestAddQuotaDto quotaRequestHeaderDto) {
+    public String addQuotaRequest(QuotaRequestAddQuotaDto quotaRequestAddQuotaDto) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
 
         Company company = companyRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Company not found with email: " + email));
 
-        if(quotaRequestHeaderDto.getRequestedQuota().compareTo(company.getRemainingQuota()) > 0){
+        if(quotaRequestAddQuotaDto.getRequestedQuota().compareTo(company.getRemainingQuota()) > 0){
             return "Error: Insuffitient quota balance!!";
         }
 
@@ -148,9 +148,10 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
         QuotaRequest entity = new QuotaRequest();
 
         entity.setCompany(company);
-        entity.setRequestedQuota(quotaRequestHeaderDto.getRequestedQuota());
+        entity.setRequestedQuota(quotaRequestAddQuotaDto.getRequestedQuota());
         entity.setCompanyName(company.getName());
         entity.setUpdatedAt(LocalDateTime.now());
+        entity.setRequestReason(quotaRequestAddQuotaDto.getRequestReason());
 
         long nextNumber = quotaRequestRepository.count() + 1;
         entity.setRequestNumber(nextNumber);
