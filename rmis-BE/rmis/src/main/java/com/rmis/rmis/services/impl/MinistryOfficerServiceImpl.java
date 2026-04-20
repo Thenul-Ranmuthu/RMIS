@@ -43,7 +43,7 @@ public class MinistryOfficerServiceImpl implements MinistryOfficerService{
         auditLogService.logApproval(officer, quotaRequest);
         quotaRequest.setApprovedAmount(quotaRequest.getRequestedQuota());
 
-        company.setRemainingQuota(company.getQuota().subtract(quotaRequest.getRequestedQuota()));
+        company.setRemainingQuota(company.getRemainingQuota().subtract(quotaRequest.getRequestedQuota()));
 
         companyRepository.save(company);
 
