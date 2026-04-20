@@ -63,3 +63,11 @@ dist/
 # --- Temp/debug scripts ---
 rmis-FE/replace.js
 rmis-FE/backup/
+
+
+rmis-BE/rmis/src/main/java/com/rmis/rmis/uploads
+
+
+rmis-FE/.env
+
+rmis-FE/node_modules

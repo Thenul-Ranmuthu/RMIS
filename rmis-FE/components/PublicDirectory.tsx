@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://rmis-backend.malaysiawest.azurecontainer.io:5050";
+  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
 
 interface Certification {
   id?: number;
@@ -1058,11 +1057,15 @@ const globalStyles = `
 
   @media (max-width: 768px) {
     .hero, .filters-bar, .filter-meta, .grid-wrap, .pagination, .footer { padding-left: 16px; padding-right: 16px; }
-    .hero { padding-top: 40px; }
+    .hero { padding-top: 32px; padding-bottom: 28px; }
     .grid { grid-template-columns: 1fr; }
     .filter-date, .small, .search { width: 100%; }
     .clear-btn { width: 100%; }
     .card-actions { flex-direction: column; align-items: stretch; }
     .btn-outline { width: 100%; }
+    .navbar { padding-left: 16px; padding-right: 16px; }
+    .filters-bar { flex-direction: column; gap: 10px; }
+    .pagination { padding-left: 16px; padding-right: 16px; }
+    .hero h1 { font-size: clamp(26px, 7vw, 40px); }
   }
 `;

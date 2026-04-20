@@ -6,8 +6,7 @@ import Link from "next/link";
 import { getToken, getRole } from "@/services/authService";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://rmis-backend.malaysiawest.azurecontainer.io:5050";
+  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
 
 interface BookingDetail {
   id: number;
@@ -589,10 +588,12 @@ const s: Record<string, CSSProperties> = {
   headerInner: {
     maxWidth: 1100,
     margin: "0 auto",
-    padding: "14px 32px",
+    padding: "12px 16px",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
+    flexWrap: "wrap" as const,
+    gap: 8,
   },
   headerLeft: { display: "flex", alignItems: "center", gap: 16 },
   logoBox: {
@@ -632,7 +633,7 @@ const s: Record<string, CSSProperties> = {
     cursor: "pointer",
   },
 
-  main: { maxWidth: 1100, margin: "0 auto", padding: "28px 32px 60px" },
+  main: { maxWidth: 1100, margin: "0 auto", padding: "20px 16px 60px" },
   backBtn: {
     background: "transparent",
     border: "1px solid #e2e8f0",
@@ -654,12 +655,13 @@ const s: Record<string, CSSProperties> = {
     overflow: "hidden",
     background:
       "linear-gradient(135deg, #064e3b 0%, #065f46 55%, #047857 100%)",
-    padding: "36px 40px",
+    padding: "20px 20px",
     marginBottom: 20,
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "space-between",
-    gap: 24,
+    gap: 16,
+    flexWrap: "wrap" as const,
   },
   heroOverlay: {
     position: "absolute",
@@ -749,9 +751,10 @@ const s: Record<string, CSSProperties> = {
     padding: "20px 24px",
     marginBottom: 20,
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "space-between",
-    gap: 16,
+    gap: 12,
+    flexWrap: "wrap" as const,
     boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
   },
   actionBarTitle: {
@@ -761,7 +764,7 @@ const s: Record<string, CSSProperties> = {
     marginBottom: 3,
   },
   actionBarSub: { fontSize: 12, color: "#94a3b8" },
-  actionBtns: { display: "flex", gap: 10, flexShrink: 0 },
+  actionBtns: { display: "flex", gap: 10, flexWrap: "wrap" as const },
   actionBtnPrimary: {
     background: "#047857",
     border: "none",
@@ -798,7 +801,11 @@ const s: Record<string, CSSProperties> = {
   },
   cancelledBannerReason: { fontSize: 13, color: "#7f1d1d" },
 
-  detailGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 },
+  detailGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: 16,
+  },
   detailCard: {
     background: "#fff",
     border: "1px solid #e2e8f0",
@@ -895,7 +902,7 @@ const s: Record<string, CSSProperties> = {
   modal: {
     background: "#fff",
     borderRadius: 20,
-    padding: "36px 32px",
+    padding: "20px 16px",
     maxWidth: 440,
     width: "100%",
     textAlign: "center" as const,
@@ -991,7 +998,7 @@ const s: Record<string, CSSProperties> = {
     background: "#fff",
     border: "1px solid #e2e8f0",
     borderRadius: 20,
-    padding: "36px 32px",
+    padding: "20px 16px",
     textAlign: "center" as const,
     maxWidth: 380,
     width: "100%",
@@ -1027,7 +1034,7 @@ const s: Record<string, CSSProperties> = {
 
   footer: {
     textAlign: "center" as const,
-    padding: "24px 32px",
+    padding: "16px 16px",
     borderTop: "1px solid #f1f5f9",
     fontSize: 12,
     color: "#cbd5e1",
