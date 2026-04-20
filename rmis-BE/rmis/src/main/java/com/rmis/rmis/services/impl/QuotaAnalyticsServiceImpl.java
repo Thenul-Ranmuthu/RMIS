@@ -1,7 +1,7 @@
 package com.rmis.rmis.services.impl;
 
 
-import com.rmis.rmis.analytics.stratergy.QuotaAggregationStrategy;
+import com.rmis.rmis.analytics.strategy.QuotaAggregationStrategy;
 import com.rmis.rmis.domain.dtos.AnalyticsDashboardDto;
 import com.rmis.rmis.services.interfaces.QuotaAnalyticsService;
 import lombok.RequiredArgsConstructor;

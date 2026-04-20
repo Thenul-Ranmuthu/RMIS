@@ -1,4 +1,4 @@
-package com.rmis.rmis.analytics.stratergy;
+package com.rmis.rmis.analytics.strategy;
 
 // FullDashboardAggregationStrategy.java  — Concrete strategy: all companies, all time
 
@@ -7,7 +7,6 @@ package com.rmis.rmis.analytics.stratergy;
 import com.rmis.rmis.domain.dtos.AnalyticsDashboardDto;
 import com.rmis.rmis.domain.dtos.CompanyQuotaBreakdownDto;
 import com.rmis.rmis.domain.dtos.SystemQuotaSummaryDto;
-import com.rmis.rmis.domain.entities.Company;
 import com.rmis.rmis.enums.CompanyStatus;
 import com.rmis.rmis.enums.QuotaRequestStatus;
 import com.rmis.rmis.repositories.AnnualQuotaDistributionRepository;
@@ -21,7 +20,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
