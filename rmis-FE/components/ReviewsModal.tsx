@@ -31,10 +31,10 @@ export function ReviewsModal({ technicianId, technicianName, onClose }: ReviewsM
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[80vh]">
-                <div className="bg-gray-50 px-8 py-6 border-b border-gray-100 flex justify-between items-center shrink-0">
+            <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] sm:max-h-[80vh]">
+                <div className="bg-gray-50 px-5 sm:px-8 py-4 sm:py-6 border-b border-gray-100 flex justify-between items-center shrink-0">
                     <div>
-                        <h2 className="text-2xl font-black text-gray-900 tracking-tight">Client Reviews</h2>
+                        <h2 className="text-lg sm:text-2xl font-black text-gray-900 tracking-tight">Client Reviews</h2>
                         <p className="text-gray-500 text-sm font-medium mt-1">for {technicianName}</p>
                     </div>
                     <button 
@@ -45,7 +45,7 @@ export function ReviewsModal({ technicianId, technicianName, onClose }: ReviewsM
                     </button>
                 </div>
 
-                <div className="p-8 overflow-y-auto flex-1">
+                <div className="p-4 sm:p-8 overflow-y-auto flex-1">
                     {loading ? (
                         <div className="flex justify-center items-center py-12">
                             <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>

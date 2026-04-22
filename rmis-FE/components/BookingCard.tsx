@@ -27,7 +27,7 @@ export function BookingCard({ ticket, onCancel, onRatingSuccess }: BookingCardPr
     const isCompleted = ticket.status.toUpperCase() === "COMPLETED";
 
     return (
-        <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group">
             {/* Top Badge Row */}
             <div className="flex flex-wrap items-center gap-3 mb-4">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100/50">
@@ -40,7 +40,7 @@ export function BookingCard({ ticket, onCancel, onRatingSuccess }: BookingCardPr
 
             {/* Title & Description */}
             <div className="mb-6">
-                <h3 className="text-2xl font-black text-slate-800 tracking-tight">{ticket.serviceType}</h3>
+                <h3 className="text-lg sm:text-2xl font-black text-slate-800 tracking-tight">{ticket.serviceType}</h3>
                 <p className="text-slate-500 mt-2 italic font-medium">
                     {ticket.description ? `"${ticket.description}"` : '"No notes provided"'}
                 </p>
@@ -53,7 +53,7 @@ export function BookingCard({ ticket, onCancel, onRatingSuccess }: BookingCardPr
             </div>
 
             {/* Middle Section: 3-Column Info Bar */}
-            <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-4 mb-6 grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+            <div className="bg-slate-50/50 border border-slate-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-4 sm:mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 relative">
                 {/* Technician */}
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 border-2 border-white shadow-sm overflow-hidden">
@@ -66,7 +66,7 @@ export function BookingCard({ ticket, onCancel, onRatingSuccess }: BookingCardPr
                 </div>
 
                 {/* Date */}
-                <div className="flex items-center gap-4 md:border-l md:border-slate-200 md:pl-6">
+                <div className="flex items-center gap-4 sm:border-l sm:border-slate-200 sm:pl-6">
                     <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-500 border-2 border-white shadow-sm">
                         <span className="material-symbols-outlined text-2xl">calendar_today</span>
                     </div>
@@ -81,7 +81,7 @@ export function BookingCard({ ticket, onCancel, onRatingSuccess }: BookingCardPr
                 </div>
 
                 {/* Time */}
-                <div className="flex items-center gap-4 md:border-l md:border-slate-200 md:pl-6">
+                <div className="flex items-center gap-4 sm:border-l sm:border-slate-200 sm:pl-6">
                     <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 border-2 border-white shadow-sm">
                         <span className="material-symbols-outlined text-2xl">schedule</span>
                     </div>
@@ -98,9 +98,9 @@ export function BookingCard({ ticket, onCancel, onRatingSuccess }: BookingCardPr
             </div>
 
             {/* Bottom Section */}
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
                 {isCompleted ? (
-                    <div className="flex-1 bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between shadow-sm group/rating">
+                    <div className="flex-1 bg-white border border-slate-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm group/rating">
                         <div className="flex flex-col gap-1">
                             <div className="flex gap-1 text-emerald-400">
                                 {[1, 2, 3, 4, 5].map((s) => (
