@@ -96,7 +96,7 @@ export default function BookTechnicianPage() {
     id: number;
   } | null>(null);
 
-  // â”€â”€ Auth check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Auth check ────────────────────────────────────────────────
   useEffect(() => {
     const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
     const token =
@@ -128,7 +128,7 @@ export default function BookTechnicianPage() {
     setAuthChecked(true);
   }, [router]);
 
-  // â”€â”€ Fetch technician + available slots â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Fetch technician + available slots ────────────────────────
   useEffect(() => {
     if (!authChecked || !technicianId) return;
 
@@ -164,7 +164,7 @@ export default function BookTechnicianPage() {
     fetchData();
   }, [authChecked, technicianId]);
 
-  // â”€â”€ Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Submit ────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSlot) {
@@ -196,7 +196,7 @@ export default function BookTechnicianPage() {
   const groupedSlots = groupByDate(slots);
   const dateKeys = Object.keys(groupedSlots).sort();
 
-  // â”€â”€ Success screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Success screen ────────────────────────────────────────────
   const dashPath = role === "COMPANY" ? "/company/dashboard" : "/public-user";
 
   useEffect(() => {
@@ -273,13 +273,13 @@ export default function BookTechnicianPage() {
     );
   }
 
-  // â”€â”€ Loading / Error â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Loading / Error ──────────────────────────────────────────
   if (!authChecked || loadingSlots) {
     return (
       <div className="book-page">
         <div className="center-wrap">
           <div className="spinner" />
-          <p className="loading-txt">Loading availabilityâ€¦</p>
+          <p className="loading-txt">Loading availability...</p>
         </div>
         <style jsx global>
           {pageStyles}
@@ -296,7 +296,7 @@ export default function BookTechnicianPage() {
             <p className="err-title">Could not load data</p>
             <p className="err-msg">{slotsError}</p>
             <button className="btn-back" onClick={() => router.back()}>
-              â† Go Back
+              ← Go Back
             </button>
           </div>
         </div>
@@ -323,7 +323,7 @@ export default function BookTechnicianPage() {
           </button>
         </div>
 
-        {/* â”€â”€ Left: Technician profile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* ── Left: Technician profile ────────────────────── */}
         <aside className="tech-pane">
           <div className="tech-avatar">{initials}</div>
           <h2 className="tech-name">
@@ -336,7 +336,7 @@ export default function BookTechnicianPage() {
           <div className="tech-meta-list">
             {technician?.skillLevel && (
               <div className="tech-meta-row">
-                <span className="meta-icon">â­</span>
+                <span className="meta-icon">⭐</span>
                 <span className="meta-label">Skill Level</span>
                 <span className="meta-val">
                   {technician.skillLevel.charAt(0) +
@@ -346,7 +346,7 @@ export default function BookTechnicianPage() {
             )}
             {technician?.yearsOfExperience !== undefined && (
               <div className="tech-meta-row">
-                <span className="meta-icon">ðŸ•</span>
+                <span className="meta-icon">⌛</span>
                 <span className="meta-label">Experience</span>
                 <span className="meta-val">
                   {technician.yearsOfExperience} yrs
@@ -355,14 +355,14 @@ export default function BookTechnicianPage() {
             )}
             {technician?.district && (
               <div className="tech-meta-row">
-                <span className="meta-icon">ðŸ“</span>
+                <span className="meta-icon">📍</span>
                 <span className="meta-label">District</span>
                 <span className="meta-val">{technician.district}</span>
               </div>
             )}
             {technician?.phoneNumber && (
               <div className="tech-meta-row">
-                <span className="meta-icon">ðŸ“ž</span>
+                <span className="meta-icon">📞</span>
                 <span className="meta-label">Contact</span>
                 <span className="meta-val">{technician.phoneNumber}</span>
               </div>
@@ -376,7 +376,7 @@ export default function BookTechnicianPage() {
           )}
         </aside>
 
-        {/* â”€â”€ Right: Booking form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* ── Right: Booking form ────────────────────────── */}
         <div className="form-pane">
           <div className="form-header">
             <h1>Book a Service Appointment</h1>
@@ -386,17 +386,17 @@ export default function BookTechnicianPage() {
             </p>
             <div className="step-breadcrumb">
               <span className="crumb-active">Step 1 of 3</span>
-              <span className="crumb-sep"> Â· </span>
+              <span className="crumb-sep"> · </span>
               <span className="crumb-active">Time</span>
-              <span className="crumb-sep"> â†’ </span>
+              <span className="crumb-sep"> → </span>
               <span className="crumb-dim">Service</span>
-              <span className="crumb-sep"> â†’ </span>
+              <span className="crumb-sep"> → </span>
               <span className="crumb-dim">Confirm</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} noValidate>
-            {/* â”€â”€ Step 1: Pick a slot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/* ── Step 1: Pick a slot ────────────────── */}
             <div className="form-section">
               <div className="section-label">
                 <span className="step-num">1</span>
@@ -437,8 +437,7 @@ export default function BookTechnicianPage() {
                             className={`slot-chip${selectedSlot?.id === slot.id ? " slot-chip-selected" : ""}`}
                             onClick={() => setSelectedSlot(slot)}
                           >
-                            {formatTime(slot.startTime)} â€“{" "}
-                            {formatTime(slot.endTime)}
+                            {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
                           </button>
                         ))}
                       </div>
@@ -449,21 +448,20 @@ export default function BookTechnicianPage() {
 
               {selectedSlot && (
                 <div className="selected-slot-badge">
-                  âœ“ Selected: {formatDate(selectedSlot.date)} Â·{" "}
-                  {formatTime(selectedSlot.startTime)} â€“{" "}
-                  {formatTime(selectedSlot.endTime)}
+                  ✓ Selected: {formatDate(selectedSlot.date)} ·{" "}
+                  {formatTime(selectedSlot.startTime)} – {formatTime(selectedSlot.endTime)}
                 </div>
               )}
             </div>
 
-            {/* â”€â”€ Step 2: Service type â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/* ── Step 2: Service type ────────────────── */}
             <div className="form-section">
               <div className="section-label">
                 <span className="step-num">2</span>
                 Service Type <span className="required">*</span>
               </div>
               <div className="form-select-wrap">
-                <span className="form-select-icon">ðŸ”§</span>
+                <span className="form-select-icon">🔧</span>
                 <select
                   id="serviceType"
                   value={serviceType}
@@ -481,7 +479,7 @@ export default function BookTechnicianPage() {
               </div>
             </div>
 
-            {/* â”€â”€ Step 3: Description â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/* ── Step 3: Description ──────────────────── */}
             <div className="form-section">
               <div className="section-label">
                 <span className="step-num">3</span>
@@ -493,13 +491,13 @@ export default function BookTechnicianPage() {
                 onChange={(e) => setDescription(e.target.value)}
                 maxLength={500}
                 rows={4}
-                placeholder="Describe the issue or what service you needâ€¦"
+                placeholder="Describe the issue or what service you need..."
                 className="form-textarea"
               />
               <div className="char-count">{description.length}/500</div>
             </div>
 
-            {/* â”€â”€ Error â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/* ── Error ───────────────────────────────── */}
             {submitError && (
               <div className="submit-error">
                 <svg
@@ -516,11 +514,24 @@ export default function BookTechnicianPage() {
                     d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                {submitError}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span>{submitError}</span>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                        localStorage.clear();
+                        sessionStorage.clear();
+                        window.location.href = '/login';
+                    }}
+                    style={{ background: 'none', border: 'none', padding: 0, color: '#f87171', textDecoration: 'underline', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold', textAlign: 'left' }}
+                  >
+                    Session Expired? Click here to Log In Again
+                  </button>
+                </div>
               </div>
             )}
 
-            {/* â”€â”€ Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/* ── Submit ──────────────────────────────── */}
             <button
               type="submit"
               disabled={submitting || slots.length === 0 || !selectedSlot}
@@ -530,11 +541,11 @@ export default function BookTechnicianPage() {
               {submitting ? (
                 <>
                   <span className="btn-spinner" />
-                  Creating Bookingâ€¦
+                  Creating Booking...
                 </>
               ) : (
                 <>
-                  Confirm &amp; Book Appointment
+                  Confirm & Book Appointment
                   <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                   </svg>

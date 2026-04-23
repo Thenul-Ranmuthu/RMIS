@@ -28,7 +28,6 @@ public class ServiceTicketController {
 
 
     @PostMapping("/user")
-    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<?> raiseTicketAsUser(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody ServiceTicketRequestDto requestDto) {
@@ -51,7 +50,6 @@ public class ServiceTicketController {
     }
 
     @GetMapping("/user/my")
-    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<List<ServiceTicketResponseDto>> getMyTicketsAsUser(
             @AuthenticationPrincipal UserDetails userDetails) {
 

@@ -46,12 +46,16 @@ const authFetch = async (url: string, options: RequestInit = {}) => {
     },
   });
 
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : {};
+
   if (!response.ok) {
-    const error = await response.json();
-    throw error;
+    console.error(`[authFetch] Error Body:`, data);
+    const errorMsg = data && Object.keys(data).length > 0 ? data : { message: `Request failed with status ${response.status}` };
+    throw errorMsg;
   }
 
-  return response.json();
+  return data;
 };
 
 export const raiseTicketAsUser = (

@@ -64,11 +64,16 @@ public class JwtTokenProvider {
 
     // validate JWT token
     public boolean validateToken(String token){
+        try {
             Jwts.parser()
                     .verifyWith((SecretKey) key())
                     .build()
                     .parse(token);
-        return true;
+            return true;
+        } catch (Exception e) {
+            System.err.println("JWT Validation Error: " + e.getMessage());
+            return false;
+        }
     }
 
         public String getUserType(String token) {

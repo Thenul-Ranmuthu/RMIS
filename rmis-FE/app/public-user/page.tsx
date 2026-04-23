@@ -20,7 +20,8 @@ export default function PublicUserDashboard() {
             setTickets(data);
         } catch (err: any) {
             console.error("Error fetching tickets:", err);
-            setError("Failed to load your booking history.");
+            const msg = err.message || (typeof err === 'string' ? err : "Failed to load your booking history.");
+            setError(msg);
         } finally {
             setLoading(false);
         }
@@ -137,7 +138,20 @@ export default function PublicUserDashboard() {
                         <span className="material-symbols-outlined text-red-500 text-3xl">report</span>
                         <div>
                             <p className="text-sm font-black uppercase tracking-widest mb-1">Error Occurred</p>
-                            <p className="text-sm font-medium opacity-80">{error}</p>
+                            <p className="text-sm font-medium opacity-80">
+                                {error}
+                                {error.includes("status") ? "" : " (Check console for details)"}
+                            </p>
+                            <button 
+                                onClick={() => {
+                                    localStorage.clear();
+                                    sessionStorage.clear();
+                                    window.location.href = '/login';
+                                }}
+                                className="mt-2 text-xs font-bold text-red-600 underline hover:text-red-800"
+                            >
+                                Force Clear Session & Log In Again
+                            </button>
                         </div>
                     </div>
                 )}
