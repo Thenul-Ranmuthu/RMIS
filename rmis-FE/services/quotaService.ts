@@ -42,8 +42,9 @@ export interface QuotaListResponse {
 }
 
 export interface AddQuotaPayload {
-  companyEmail: string;
-  requestedQuota: number;
+    companyEmail: string;
+    requestedQuota: number;
+    requestReason: string;
 }
 
 // ─── Company-side response parser ─────────────────────────────────────────

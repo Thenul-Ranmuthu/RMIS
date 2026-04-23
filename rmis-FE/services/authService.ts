@@ -165,8 +165,14 @@ export const getRoleFromToken = (token: string): string | null => {
   }
 };
 
-export const saveToken = (token: string) => {
-  localStorage.setItem("accessToken", token);
+export const saveToken = (token: string, rememberMe: boolean = false) => {
+  if (rememberMe) {
+    localStorage.setItem("accessToken", token);
+  } else {
+    sessionStorage.setItem("accessToken", token);
+  }
+  // Also set cookie for middleware/SSR if needed
+  document.cookie = `accessToken=${token}; path=/; max-age=${rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24}`;
 };
 
 //export const getToken = (): string | null => {
@@ -181,8 +187,10 @@ export const getRole = (): string | null => {
 
 //fix
 export const getToken = (): string | null => {
+  if (typeof window === "undefined") return null;
   return (
-    localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")
+    localStorage.getItem("accessToken") || 
+    sessionStorage.getItem("accessToken")
   );
 };
 

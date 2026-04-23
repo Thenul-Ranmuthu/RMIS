@@ -317,9 +317,7 @@ export default function BookTechnicianPage() {
       <div className="book-layout">
         <div className="layout-header">
           <button className="back-btn" onClick={() => router.back()}>
-            <span className="material-symbols-outlined text-sm">
-              arrow_back
-            </span>
+            <span className="material-symbols-outlined text-sm">arrow_back</span>
             Back
           </button>
         </div>

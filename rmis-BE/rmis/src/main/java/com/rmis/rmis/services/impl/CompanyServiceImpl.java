@@ -61,8 +61,8 @@ public class CompanyServiceImpl implements CompanyService{
         }
 
         QuotaDetailsResponseDto dto = new QuotaDetailsResponseDto();
-        dto.setRemainingQuota(available);
-        dto.setQuota(available.add(used));
+        dto.setQuota(company.getQuota());
+        dto.setRemainingQuota(company.getRemainingQuota());
         return dto;
     }
 
