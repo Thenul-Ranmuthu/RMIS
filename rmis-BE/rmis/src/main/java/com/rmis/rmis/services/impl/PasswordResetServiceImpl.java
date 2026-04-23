@@ -77,7 +77,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         tokenRepo.save(resetToken);
 
         // Send email
-        String resetLink = "http://localhost:3000/reset-password?token=" + token;
+        String resetLink = "http://rmis-backend.malaysiawest.azurecontainer.io:3000/reset-password?token=" + token;
         emailService.sendPasswordResetEmail(email, resetLink);
     }
 

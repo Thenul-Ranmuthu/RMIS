@@ -1,6 +1,7 @@
 import { getToken } from "./authService";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
 
 export interface ServiceTicketResponse {
   id: number;
@@ -46,7 +47,7 @@ const authFetch = async (url: string, options: RequestInit = {}) => {
 export const raiseTicketAsUser = (
   availabilityId: number,
   serviceType: string,
-  description: string
+  description: string,
 ): Promise<ServiceTicketResponse> =>
   authFetch(`${API_BASE_URL}/api/service-tickets/user`, {
     method: "POST",
@@ -56,7 +57,7 @@ export const raiseTicketAsUser = (
 export const raiseTicketAsCompany = (
   availabilityId: number,
   serviceType: string,
-  description: string
+  description: string,
 ): Promise<ServiceTicketResponse> =>
   authFetch(`${API_BASE_URL}/api/service-tickets/company`, {
     method: "POST",
@@ -72,13 +73,19 @@ export const getMyCompanyTickets = (): Promise<ServiceTicketResponse[]> =>
 export const getTicketById = (id: number): Promise<ServiceTicketResponse> =>
   authFetch(`${API_BASE_URL}/api/service-tickets/${id}`);
 
-export const cancelTicket = (id: number, reason: string): Promise<ServiceTicketResponse> =>
+export const cancelTicket = (
+  id: number,
+  reason: string,
+): Promise<ServiceTicketResponse> =>
   authFetch(`${API_BASE_URL}/api/service-tickets/${id}/cancel`, {
     method: "PUT",
     body: JSON.stringify({ reason }),
   });
 
-export const cancelCompanyTicket = (id: number, reason: string): Promise<ServiceTicketResponse> =>
+export const cancelCompanyTicket = (
+  id: number,
+  reason: string,
+): Promise<ServiceTicketResponse> =>
   authFetch(`${API_BASE_URL}/api/service-tickets/${id}/cancel`, {
     method: "PUT",
     body: JSON.stringify({ reason }),

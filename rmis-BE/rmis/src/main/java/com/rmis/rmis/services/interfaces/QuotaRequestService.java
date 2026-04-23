@@ -1,7 +1,6 @@
 package com.rmis.rmis.services.interfaces;
 
 import com.rmis.rmis.domain.dtos.PagedResponseDto;
-import com.rmis.rmis.domain.dtos.QuotaRequestHeaderDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestDetailDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestAddQuotaDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestResponseDto;

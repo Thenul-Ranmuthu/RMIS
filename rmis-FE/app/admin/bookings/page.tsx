@@ -1,16 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { getToken } from '@/services/authService';
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { getToken, getRole } from "@/services/authService";
+import UnauthorisedMessage from "@/components/audit-log/UnauthorisedMessage";
+import Link from "next/link";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
 
 interface ServiceTicket {
   id: number;
   ticketNumber: string;
   customerName: string;
   customerEmail: string;
-  customerType: 'PUBLIC_USER' | 'COMPANY';
+  customerType: "PUBLIC_USER" | "COMPANY";
   technicianId: number;
   technicianName: string;
   technicianSpecialization: string;
@@ -56,18 +60,16 @@ export default function AdminBookingDashboardPage() {
     setIsLoading(true);
     try {
       const token = getToken();
-      const url = statusFilter === 'ALL'
-        ? `${API_BASE}/api/service-tickets/admin/all`
-        : `${API_BASE}/api/service-tickets/admin/all?status=${statusFilter}`;
-
+      const url =
+        statusFilter === "ALL"
+          ? `${API_BASE}/api/service-tickets/admin/all`
+          : `${API_BASE}/api/service-tickets/admin/all?status=${statusFilter}`;
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (!res.ok) throw new Error('Failed to fetch bookings');
+      if (!res.ok) throw new Error("Failed");
       setTickets(await res.json());
-    } catch (err) {
-      console.error(err);
+    } catch {
       setTickets([]);
     } finally {
       setIsLoading(false);

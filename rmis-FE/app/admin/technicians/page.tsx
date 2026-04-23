@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from 'react';
 import { getToken } from '@/services/authService';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
 
 interface Certification {
   id: number;
@@ -12,7 +13,6 @@ interface Certification {
   fileUrl: string;
   originalFileName: string;
 }
-
 interface Technician {
   id: number;
   firstName: string;
@@ -57,8 +57,7 @@ export default function AdminTechnicianPage() {
       });
       if (!res.ok) throw new Error('Failed to fetch');
       setTechnicians(await res.json());
-    } catch (err) {
-      console.error(err);
+    } catch {
       setTechnicians([]);
     } finally {
       setIsLoading(false);
@@ -72,7 +71,7 @@ export default function AdminTechnicianPage() {
 
   const handleApprove = async (id: number) => {
     if (!selectedSkillLevel) {
-      alert('Please select a skill level before approving');
+      alert("Please select a skill level before approving");
       return;
     }
     setActionLoading(true);
@@ -83,7 +82,7 @@ export default function AdminTechnicianPage() {
         `${API_BASE}/admin/${endpoint}/${id}/approve?skillLevel=${selectedSkillLevel}`,
         { method: 'POST', headers: { Authorization: `Bearer ${token}` } }
       );
-      if (!res.ok) throw new Error('Approval failed');
+      if (!res.ok) throw new Error("Failed");
       setSelectedTechnician(null);
       setSelectedSkillLevel('');
       fetchData();
@@ -96,8 +95,7 @@ export default function AdminTechnicianPage() {
   };
 
   const handleRejectSubmit = async () => {
-    if (!rejectReason.trim()) { alert('Please enter a rejection reason'); return; }
-    if (rejectingId == null) return;
+    if (!rejectReason.trim() || rejectingId == null) return;
     setActionLoading(true);
     try {
       const token = getToken();
@@ -106,9 +104,9 @@ export default function AdminTechnicianPage() {
         `${API_BASE}/admin/${endpoint}/${rejectingId}/reject?reason=${encodeURIComponent(rejectReason)}`,
         { method: 'POST', headers: { Authorization: `Bearer ${token}` } }
       );
-      if (!res.ok) throw new Error('Rejection failed');
+      if (!res.ok) throw new Error("Failed");
       setShowRejectModal(false);
-      setRejectReason('');
+      setRejectReason("");
       setRejectingId(null);
       setSelectedTechnician(null);
       fetchData();

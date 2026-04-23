@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { raiseTicketAsUser, raiseTicketAsCompany } from "@/services/serviceTicketService";
+import {
+  raiseTicketAsUser,
+  raiseTicketAsCompany,
+} from "@/services/serviceTicketService";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
 
 interface AvailabilitySlot {
   id: number;
@@ -40,7 +44,9 @@ const SERVICE_TYPES = [
   "Other",
 ];
 
-function groupByDate(slots: AvailabilitySlot[]): Record<string, AvailabilitySlot[]> {
+function groupByDate(
+  slots: AvailabilitySlot[],
+): Record<string, AvailabilitySlot[]> {
   return slots.reduce<Record<string, AvailabilitySlot[]>>((acc, s) => {
     (acc[s.date] ||= []).push(s);
     return acc;
@@ -75,20 +81,28 @@ export default function BookTechnicianPage() {
   const [slotsError, setSlotsError] = useState("");
 
   // Form state
-  const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(
+    null,
+  );
   const [serviceType, setServiceType] = useState("");
   const [description, setDescription] = useState("");
 
   // UI state
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const [successTicket, setSuccessTicket] = useState<{ ticketNumber: string; id: number } | null>(null);
+  const [successTicket, setSuccessTicket] = useState<{
+    ticketNumber: string;
+    id: number;
+  } | null>(null);
 
   // ── Auth check ────────────────────────────────────────────────
   useEffect(() => {
     const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token")
-      || localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+    const token =
+      localStorage.getItem("token") ||
+      sessionStorage.getItem("token") ||
+      localStorage.getItem("accessToken") ||
+      sessionStorage.getItem("accessToken");
 
     if (!raw || !token) {
       router.push("/");
@@ -131,7 +145,13 @@ export default function BookTechnicianPage() {
 
         if (slotsRes.ok) {
           const slotsData = await slotsRes.json();
-          setSlots(Array.isArray(slotsData) ? slotsData.filter((s: AvailabilitySlot) => s.status === "AVAILABLE") : []);
+          setSlots(
+            Array.isArray(slotsData)
+              ? slotsData.filter(
+                  (s: AvailabilitySlot) => s.status === "AVAILABLE",
+                )
+              : [],
+          );
         }
       } catch (e: unknown) {
         setSlotsError((e as Error).message || "Failed to load availability.");
@@ -146,8 +166,14 @@ export default function BookTechnicianPage() {
   // ── Submit ────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedSlot) { setSubmitError("Please select a time slot."); return; }
-    if (!serviceType) { setSubmitError("Please select a service type."); return; }
+    if (!selectedSlot) {
+      setSubmitError("Please select a time slot.");
+      return;
+    }
+    if (!serviceType) {
+      setSubmitError("Please select a service type.");
+      return;
+    }
 
     setSubmitting(true);
     setSubmitError("");
@@ -157,7 +183,10 @@ export default function BookTechnicianPage() {
       setSuccessTicket({ ticketNumber: ticket.ticketNumber, id: ticket.id });
     } catch (err: unknown) {
       const errObj = err as Record<string, string>;
-      setSubmitError(errObj?.error || "Failed to create booking. The slot may already be taken.");
+      setSubmitError(
+        errObj?.error ||
+          "Failed to create booking. The slot may already be taken.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -181,30 +210,41 @@ export default function BookTechnicianPage() {
   if (successTicket) {
     return (
       <main className="min-h-screen bg-[#0f172a] flex items-center justify-center p-6 font-['Public_Sans']">
-        <div className="bg-[#111827] p-10 rounded-[40px] shadow-2xl border border-emerald-500/20 max-w-xl w-full text-center relative overflow-hidden group">
+        <div className="bg-[#111827] p-6 sm:p-10 rounded-[40px] shadow-2xl border border-emerald-500/20 max-w-xl w-full text-center relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-2 bg-emerald-600 shadow-[0_0_20px_rgba(5,150,105,0.4)]" />
 
           <div className="mb-8 flex justify-center">
             <div className="bg-emerald-500/10 rounded-full p-6 relative">
-              <span className="material-symbols-outlined text-6xl text-emerald-400 animate-bounce">task_alt</span>
+              <span className="material-symbols-outlined text-6xl text-emerald-400 animate-bounce">
+                task_alt
+              </span>
               <div className="absolute inset-0 rounded-full border-4 border-emerald-500/20 animate-ping opacity-20" />
             </div>
           </div>
 
-          <h2 className="text-4xl font-black text-slate-50 tracking-tight mb-4">Booking Successful!</h2>
+          <h2 className="text-4xl font-black text-slate-50 tracking-tight mb-4">
+            Booking Successful!
+          </h2>
           <p className="text-slate-400 font-medium mb-8 leading-relaxed max-w-sm mx-auto">
-            Your ticket <span className="text-emerald-400 font-black tracking-widest italic">#{successTicket.ticketNumber}</span> has been confirmed.
-            The technician has been notified via email.
+            Your ticket{" "}
+            <span className="text-emerald-400 font-black tracking-widest italic">
+              #{successTicket.ticketNumber}
+            </span>{" "}
+            has been confirmed. The technician has been notified via email.
           </p>
 
           <div className="bg-slate-800/40 rounded-3xl p-6 mb-10 text-left border border-white/5 backdrop-blur-sm">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-[10px] font-black text-emerald-500/50 uppercase tracking-widest mb-1">Service</p>
+                <p className="text-[10px] font-black text-emerald-500/50 uppercase tracking-widest mb-1">
+                  Service
+                </p>
                 <p className="font-bold text-slate-100">{serviceType}</p>
               </div>
               <div>
-                <p className="text-[10px] font-black text-emerald-500/50 uppercase tracking-widest mb-1">Status</p>
+                <p className="text-[10px] font-black text-emerald-500/50 uppercase tracking-widest mb-1">
+                  Status
+                </p>
                 <p className="font-bold text-amber-400 flex items-center gap-1.5 uppercase text-[11px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                   Pending Review
@@ -225,7 +265,9 @@ export default function BookTechnicianPage() {
             </p>
           </div>
         </div>
-        <style jsx global>{pageStyles}</style>
+        <style jsx global>
+          {pageStyles}
+        </style>
       </main>
     );
   }
@@ -238,7 +280,9 @@ export default function BookTechnicianPage() {
           <div className="spinner" />
           <p className="loading-txt">Loading availability…</p>
         </div>
-        <style jsx global>{pageStyles}</style>
+        <style jsx global>
+          {pageStyles}
+        </style>
       </div>
     );
   }
@@ -250,10 +294,14 @@ export default function BookTechnicianPage() {
           <div className="err-card">
             <p className="err-title">Could not load data</p>
             <p className="err-msg">{slotsError}</p>
-            <button className="btn-back" onClick={() => router.back()}>← Go Back</button>
+            <button className="btn-back" onClick={() => router.back()}>
+              ← Go Back
+            </button>
           </div>
         </div>
-        <style jsx global>{pageStyles}</style>
+        <style jsx global>
+          {pageStyles}
+        </style>
       </div>
     );
   }
@@ -276,22 +324,31 @@ export default function BookTechnicianPage() {
         {/* ── Left: Technician profile ────────────────────── */}
         <aside className="tech-pane">
           <div className="tech-avatar">{initials}</div>
-          <h2 className="tech-name">{technician?.firstName} {technician?.lastName}</h2>
-          <p className="tech-spec">{technician?.specialization || "General Technician"}</p>
+          <h2 className="tech-name">
+            {technician?.firstName} {technician?.lastName}
+          </h2>
+          <p className="tech-spec">
+            {technician?.specialization || "General Technician"}
+          </p>
 
           <div className="tech-meta-list">
             {technician?.skillLevel && (
               <div className="tech-meta-row">
                 <span className="meta-icon">⭐</span>
                 <span className="meta-label">Skill Level</span>
-                <span className="meta-val">{technician.skillLevel.charAt(0) + technician.skillLevel.slice(1).toLowerCase()}</span>
+                <span className="meta-val">
+                  {technician.skillLevel.charAt(0) +
+                    technician.skillLevel.slice(1).toLowerCase()}
+                </span>
               </div>
             )}
             {technician?.yearsOfExperience !== undefined && (
               <div className="tech-meta-row">
                 <span className="meta-icon">🕐</span>
                 <span className="meta-label">Experience</span>
-                <span className="meta-val">{technician.yearsOfExperience} yrs</span>
+                <span className="meta-val">
+                  {technician.yearsOfExperience} yrs
+                </span>
               </div>
             )}
             {technician?.district && (
@@ -321,11 +378,13 @@ export default function BookTechnicianPage() {
         <div className="form-pane">
           <div className="form-header">
             <h1>Book a Service Appointment</h1>
-            <p>Select an available time slot, choose your service type, and confirm your booking.</p>
+            <p>
+              Select an available time slot, choose your service type, and
+              confirm your booking.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} noValidate>
-
             {/* ── Step 1: Pick a slot ─────────────────── */}
             <div className="form-section">
               <div className="section-label">
@@ -335,11 +394,24 @@ export default function BookTechnicianPage() {
 
               {slots.length === 0 ? (
                 <div className="no-slots">
-                  <svg width="28" height="28" fill="none" stroke="#64748b" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <svg
+                    width="28"
+                    height="28"
+                    fill="none"
+                    stroke="#64748b"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
                   </svg>
-                  <p>No available slots for this technician right now. Please check back later.</p>
+                  <p>
+                    No available slots for this technician right now. Please
+                    check back later.
+                  </p>
                 </div>
               ) : (
                 <div className="slots-container">
@@ -354,7 +426,8 @@ export default function BookTechnicianPage() {
                             className={`slot-chip${selectedSlot?.id === slot.id ? " slot-chip-selected" : ""}`}
                             onClick={() => setSelectedSlot(slot)}
                           >
-                            {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+                            {formatTime(slot.startTime)} –{" "}
+                            {formatTime(slot.endTime)}
                           </button>
                         ))}
                       </div>
@@ -365,7 +438,9 @@ export default function BookTechnicianPage() {
 
               {selectedSlot && (
                 <div className="selected-slot-badge">
-                  ✓ Selected: {formatDate(selectedSlot.date)} · {formatTime(selectedSlot.startTime)} – {formatTime(selectedSlot.endTime)}
+                  ✓ Selected: {formatDate(selectedSlot.date)} ·{" "}
+                  {formatTime(selectedSlot.startTime)} –{" "}
+                  {formatTime(selectedSlot.endTime)}
                 </div>
               )}
             </div>
@@ -385,7 +460,9 @@ export default function BookTechnicianPage() {
               >
                 <option value="">— Select service type —</option>
                 {SERVICE_TYPES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
                 ))}
               </select>
             </div>
@@ -411,9 +488,19 @@ export default function BookTechnicianPage() {
             {/* ── Error ─────────────────────────────────── */}
             {submitError && (
               <div className="submit-error">
-                <svg width="16" height="16" fill="none" stroke="#f87171" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="#f87171"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 {submitError}
               </div>
@@ -433,9 +520,19 @@ export default function BookTechnicianPage() {
                 </>
               ) : (
                 <>
-                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   Confirm Booking
                 </>
@@ -445,7 +542,9 @@ export default function BookTechnicianPage() {
         </div>
       </div>
 
-      <style jsx global>{pageStyles}</style>
+      <style jsx global>
+        {pageStyles}
+      </style>
     </div>
   );
 }
@@ -481,7 +580,7 @@ const pageStyles = `
     gap: 32px;
     max-width: 1100px;
     margin: 40px auto;
-    padding: 0 32px 80px;
+    padding: 0 16px 60px;
     position: relative;
     z-index: 10;
   }
@@ -517,7 +616,7 @@ const pageStyles = `
   }
 
   .tech-pane {
-    padding: 40px 24px;
+    padding: 24px 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -673,13 +772,13 @@ const pageStyles = `
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 32px 20px;
+    padding: 20px 16px;
   }
   .success-card {
     background: #111827;
     border: 1px solid rgba(52, 211, 153, 0.25);
     border-radius: 20px;
-    padding: 44px 40px;
+    padding: 24px 20px;
     text-align: center;
     max-width: 440px;
     width: 100%;
@@ -760,7 +859,7 @@ const pageStyles = `
     background: #111827;
     border: 1px solid rgba(248, 113, 113, 0.2);
     border-radius: 16px;
-    padding: 32px 28px;
+    padding: 20px 16px;
     text-align: center;
     max-width: 360px;
   }
@@ -786,8 +885,11 @@ const pageStyles = `
       padding: 0 16px 40px;
       margin-top: 20px;
     }
-    .tech-pane { position: static; }
-    .form-pane { padding: 24px 20px; }
+    .tech-pane { position: static; padding: 24px 16px; }
+    .form-pane { padding: 20px 16px; }
     .book-topbar { padding: 12px 16px; }
+    .tech-hero { padding: 28px 16px; }
+    .slots-panel { padding: 20px 16px; }
+    .confirm-box { padding: 24px 16px; }
   }
 `;

@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
 
 interface Certification {
   id?: number;
@@ -40,11 +41,31 @@ interface Technician {
 }
 
 const sriLankanDistricts = [
-  "Ampara","Anuradhapura","Badulla","Batticaloa","Colombo",
-  "Galle","Gampaha","Hambantota","Jaffna","Kalutara",
-  "Kandy","Kegalle","Kilinochchi","Kurunegala","Mannar",
-  "Matale","Matara","Monaragala","Mullaitivu","Nuwara Eliya",
-  "Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya",
+  "Ampara",
+  "Anuradhapura",
+  "Badulla",
+  "Batticaloa",
+  "Colombo",
+  "Galle",
+  "Gampaha",
+  "Hambantota",
+  "Jaffna",
+  "Kalutara",
+  "Kandy",
+  "Kegalle",
+  "Kilinochchi",
+  "Kurunegala",
+  "Mannar",
+  "Matale",
+  "Matara",
+  "Monaragala",
+  "Mullaitivu",
+  "Nuwara Eliya",
+  "Polonnaruwa",
+  "Puttalam",
+  "Ratnapura",
+  "Trincomalee",
+  "Vavuniya",
 ];
 
 function formatSlotDate(dateStr?: string) {
@@ -57,7 +78,9 @@ function formatSlotDate(dateStr?: string) {
   });
 }
 
-function groupSlotsByDate(slots: Availability[]): Record<string, Availability[]> {
+function groupSlotsByDate(
+  slots: Availability[],
+): Record<string, Availability[]> {
   return slots.reduce<Record<string, Availability[]>>((acc, slot) => {
     const key = slot.date || "unknown";
     (acc[key] ||= []).push(slot);
@@ -81,7 +104,9 @@ export default function PublicDirectory() {
   const [reloadKey, setReloadKey] = useState(0);
 
   // Lazy slots state
-  const [slotsCache, setSlotsCache] = useState<Record<number, Availability[]>>({});
+  const [slotsCache, setSlotsCache] = useState<Record<number, Availability[]>>(
+    {},
+  );
   const [loadingSlots, setLoadingSlots] = useState<number | null>(null);
   const [slotsError, setSlotsError] = useState<number | null>(null);
 
@@ -133,10 +158,15 @@ export default function PublicDirectory() {
     setLoadingSlots(techId);
     try {
       const params = selectedDate ? `?date=${selectedDate}` : "";
-      const res = await fetch(`${API_BASE}/public/technicians/${techId}/availability${params}`);
+      const res = await fetch(
+        `${API_BASE}/public/technicians/${techId}/availability${params}`,
+      );
       if (!res.ok) throw new Error("Failed to fetch slots");
       const data = await res.json();
-      setSlotsCache((prev) => ({ ...prev, [techId]: Array.isArray(data) ? data : [] }));
+      setSlotsCache((prev) => ({
+        ...prev,
+        [techId]: Array.isArray(data) ? data : [],
+      }));
       setSlotsPopover(techId);
     } catch {
       setSlotsError(techId);
@@ -146,8 +176,15 @@ export default function PublicDirectory() {
   };
 
   const specs = useMemo(
-    () => Array.from(new Set(technicians.map((t) => (t.specialization || "").trim()).filter(Boolean))).sort(),
-    [technicians]
+    () =>
+      Array.from(
+        new Set(
+          technicians
+            .map((t) => (t.specialization || "").trim())
+            .filter(Boolean),
+        ),
+      ).sort(),
+    [technicians],
   );
 
   const filtered = useMemo(() => {
@@ -161,7 +198,8 @@ export default function PublicDirectory() {
         return first.startsWith(q) || last.startsWith(q);
       });
     }
-    if (selectedSpec) list = list.filter((t) => t.specialization === selectedSpec);
+    if (selectedSpec)
+      list = list.filter((t) => t.specialization === selectedSpec);
     if (selectedDist) list = list.filter((t) => t.district === selectedDist);
     return list;
   }, [technicians, searchTerm, selectedSpec, selectedDist]);
@@ -172,14 +210,21 @@ export default function PublicDirectory() {
   }, [searchTerm, selectedSpec, selectedDist, selectedDate, selectedSkill]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-  const currentItems = filtered.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
+  const currentItems = filtered.slice(
+    (currentPage - 1) * PER_PAGE,
+    currentPage * PER_PAGE,
+  );
 
   const clearFilters = () => {
-    setSearchTerm(""); setSelectedSpec("");
-    setSelectedDist(""); setSelectedSkill(""); setSelectedDate("");
+    setSearchTerm("");
+    setSelectedSpec("");
+    setSelectedDist("");
+    setSelectedSkill("");
+    setSelectedDate("");
   };
 
-  const initials = (f: string, l: string) => `${f?.[0] || ""}${l?.[0] || ""}`.toUpperCase() || "T";
+  const initials = (f: string, l: string) =>
+    `${f?.[0] || ""}${l?.[0] || ""}`.toUpperCase() || "T";
 
   const skillPillClass = (level?: string) => {
     if (level === "SENIOR") return "pill pill-amber";
@@ -199,7 +244,9 @@ export default function PublicDirectory() {
           <div className="spinner" />
           <p>Loading technicians…</p>
         </div>
-        <style jsx global>{globalStyles}</style>
+        <style jsx global>
+          {globalStyles}
+        </style>
       </div>
     );
   }
@@ -212,24 +259,52 @@ export default function PublicDirectory() {
           <div className="hero-image" />
           <div className="hero-overlay" />
           <div className="hero-content">
-            <div className="badge"><span className="badge-dot" /><span>Public Directory</span></div>
-            <h1>Find Certified<br /><em>Technicians</em></h1>
-            <p>Browse verified environmental compliance technicians across Sri Lanka.</p>
+            <div className="badge">
+              <span className="badge-dot" />
+              <span>Public Directory</span>
+            </div>
+            <h1>
+              Find Certified
+              <br />
+              <em>Technicians</em>
+            </h1>
+            <p>
+              Browse verified environmental compliance technicians across Sri
+              Lanka.
+            </p>
           </div>
         </section>
         <div className="error-wrap">
           <div className="error-card">
             <div className="error-icon">
-              <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#f87171">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                width="28"
+                height="28"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="#f87171"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <h2>Something went wrong</h2>
             <p>{error}</p>
-            <button className="btn-primary full" onClick={() => setReloadKey((v) => v + 1)}>Try Again</button>
+            <button
+              className="btn-primary full"
+              onClick={() => setReloadKey((v) => v + 1)}
+            >
+              Try Again
+            </button>
           </div>
         </div>
-        <style jsx global>{globalStyles}</style>
+        <style jsx global>
+          {globalStyles}
+        </style>
       </div>
     );
   }
@@ -241,9 +316,19 @@ export default function PublicDirectory() {
         <div className="hero-image" />
         <div className="hero-overlay" />
         <div className="hero-content">
-          <div className="badge"><span className="badge-dot" /><span>Public Directory</span></div>
-          <h1>Find Certified<br /><em>Technicians</em></h1>
-          <p>Browse verified environmental compliance technicians across Sri Lanka. Filter by date, skill level, specialization, and district.</p>
+          <div className="badge">
+            <span className="badge-dot" />
+            <span>Public Directory</span>
+          </div>
+          <h1>
+            Find Certified
+            <br />
+            <em>Technicians</em>
+          </h1>
+          <p>
+            Browse verified environmental compliance technicians across Sri
+            Lanka. Filter by date, skill level, specialization, and district.
+          </p>
           <div className="hero-stats">
             <div className="stat">
               <div className="stat-val">{technicians.length}</div>
@@ -266,11 +351,19 @@ export default function PublicDirectory() {
       <section className="filters-bar">
         <div className="filter-group filter-date">
           <label>Date</label>
-          <input type="date" value={selectedDate} min={new Date().toISOString().split("T")[0]} onChange={(e) => setSelectedDate(e.target.value)} />
+          <input
+            type="date"
+            value={selectedDate}
+            min={new Date().toISOString().split("T")[0]}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
         </div>
         <div className="filter-group small">
           <label>Skill Level</label>
-          <select value={selectedSkill} onChange={(e) => setSelectedSkill(e.target.value)}>
+          <select
+            value={selectedSkill}
+            onChange={(e) => setSelectedSkill(e.target.value)}
+          >
             <option value="">All levels</option>
             <option value="JUNIOR">Junior</option>
             <option value="INTERMEDIATE">Intermediate</option>
@@ -279,36 +372,77 @@ export default function PublicDirectory() {
         </div>
         <div className="filter-group small">
           <label>Specialization</label>
-          <select value={selectedSpec} onChange={(e) => setSelectedSpec(e.target.value)}>
+          <select
+            value={selectedSpec}
+            onChange={(e) => setSelectedSpec(e.target.value)}
+          >
             <option value="">All</option>
-            {specs.map((s) => <option key={s} value={s}>{s}</option>)}
+            {specs.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
           </select>
         </div>
         <div className="filter-group small">
           <label>District</label>
-          <select value={selectedDist} onChange={(e) => setSelectedDist(e.target.value)}>
+          <select
+            value={selectedDist}
+            onChange={(e) => setSelectedDist(e.target.value)}
+          >
             <option value="">All districts</option>
-            {sriLankanDistricts.map((d) => <option key={d} value={d}>{d}</option>)}
+            {sriLankanDistricts.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
           </select>
         </div>
         <div className="filter-group search">
           <label>Search</label>
           <div className="search-wrap">
-            <svg width="14" height="14" fill="none" stroke="#64748b" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              width="14"
+              height="14"
+              fill="none"
+              stroke="#64748b"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
-            <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by name…" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by name…"
+            />
           </div>
         </div>
-        {(searchTerm || selectedSpec || selectedDist || selectedSkill || selectedDate) && (
-          <button className="clear-btn" onClick={clearFilters}>Clear</button>
+        {(searchTerm ||
+          selectedSpec ||
+          selectedDist ||
+          selectedSkill ||
+          selectedDate) && (
+          <button className="clear-btn" onClick={clearFilters}>
+            Clear
+          </button>
         )}
       </section>
 
       <div className="filter-meta">
         <span>
           Showing <strong>{filtered.length}</strong> technicians
-          {selectedDate ? <> on <strong>{selectedDate}</strong></> : null}
+          {selectedDate ? (
+            <>
+              {" "}
+              on <strong>{selectedDate}</strong>
+            </>
+          ) : null}
         </span>
       </div>
 
@@ -324,18 +458,29 @@ export default function PublicDirectory() {
               const hasSlots = isCached && slotCount > 0;
               const isOpen = slotsPopover === tech.id;
               const slotsByDate = hasSlots ? groupSlotsByDate(techSlots) : {};
-              const dateKeys = Object.keys(slotsByDate).filter((k) => k !== "unknown").sort();
+              const dateKeys = Object.keys(slotsByDate)
+                .filter((k) => k !== "unknown")
+                .sort();
               const unknownSlots = slotsByDate["unknown"] || [];
 
               return (
                 <article key={tech.id} className="card">
                   {isOpen && (
                     <>
-                      <div className="backdrop" onClick={() => setSlotsPopover(null)} />
+                      <div
+                        className="backdrop"
+                        onClick={() => setSlotsPopover(null)}
+                      />
                       <div className="slots-panel">
                         <div className="slots-title">
                           <span>Available slots</span>
-                          <button type="button" className="slots-close" onClick={() => setSlotsPopover(null)}>✕</button>
+                          <button
+                            type="button"
+                            className="slots-close"
+                            onClick={() => setSlotsPopover(null)}
+                          >
+                            ✕
+                          </button>
                         </div>
                         <div className="slots-scroll">
                           {hasSlots ? (
@@ -348,8 +493,15 @@ export default function PublicDirectory() {
                                   </div>
                                   {slotsByDate[date].map((a, idx) => (
                                     <div key={idx} className="slot-row">
-                                      <span className="slot-time">{a.startTime.slice(0, 5)} – {a.endTime.slice(0, 5)}</span>
-                                      <span className={`slot-status-pill slot-status-${a.status.toLowerCase()}`}>{a.status}</span>
+                                      <span className="slot-time">
+                                        {a.startTime.slice(0, 5)} –{" "}
+                                        {a.endTime.slice(0, 5)}
+                                      </span>
+                                      <span
+                                        className={`slot-status-pill slot-status-${a.status.toLowerCase()}`}
+                                      >
+                                        {a.status}
+                                      </span>
                                     </div>
                                   ))}
                                 </div>
@@ -358,15 +510,25 @@ export default function PublicDirectory() {
                                 <div className="slots-date-group">
                                   {unknownSlots.map((a, idx) => (
                                     <div key={idx} className="slot-row">
-                                      <span className="slot-time">{a.startTime.slice(0, 5)} – {a.endTime.slice(0, 5)}</span>
-                                      <span className={`slot-status-pill slot-status-${a.status.toLowerCase()}`}>{a.status}</span>
+                                      <span className="slot-time">
+                                        {a.startTime.slice(0, 5)} –{" "}
+                                        {a.endTime.slice(0, 5)}
+                                      </span>
+                                      <span
+                                        className={`slot-status-pill slot-status-${a.status.toLowerCase()}`}
+                                      >
+                                        {a.status}
+                                      </span>
                                     </div>
                                   ))}
                                 </div>
                               )}
                             </>
                           ) : (
-                            <div className="slots-empty">No available slots{selectedDate ? ` on ${selectedDate}` : ""}.</div>
+                            <div className="slots-empty">
+                              No available slots
+                              {selectedDate ? ` on ${selectedDate}` : ""}.
+                            </div>
                           )}
                         </div>
                       </div>
@@ -374,31 +536,59 @@ export default function PublicDirectory() {
                   )}
 
                   <div className="card-header">
-                    <div className="avatar">{initials(tech.firstName, tech.lastName)}</div>
+                    <div className="avatar">
+                      {initials(tech.firstName, tech.lastName)}
+                    </div>
                     <div className="card-header-main">
-                      <div className="card-name">{tech.firstName} {tech.lastName}</div>
-                      <div className="card-spec">{tech.specialization || "General Technician"}</div>
+                      <div className="card-name">
+                        {tech.firstName} {tech.lastName}
+                      </div>
+                      <div className="card-spec">
+                        {tech.specialization || "General Technician"}
+                      </div>
                       <div className="card-badges">
                         <span className="pill pill-green">Active</span>
-                        {tech.skillLevel && <span className={skillPillClass(tech.skillLevel)}>{skillLabel(tech.skillLevel)}</span>}
+                        {tech.skillLevel && (
+                          <span className={skillPillClass(tech.skillLevel)}>
+                            {skillLabel(tech.skillLevel)}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   <div className="card-body">
-                    <InfoRow icon={<ClockIcon />} label="Experience" value={`${tech.yearsOfExperience || 0} years`} />
-                    {tech.district ? <InfoRow icon={<PinIcon />} label="District" value={tech.district} /> : null}
-                    <InfoRow icon={<PhoneIcon />} label="Contact" value={tech.phoneNumber || "Not available"} />
+                    <InfoRow
+                      icon={<ClockIcon />}
+                      label="Experience"
+                      value={`${tech.yearsOfExperience || 0} years`}
+                    />
+                    {tech.district ? (
+                      <InfoRow
+                        icon={<PinIcon />}
+                        label="District"
+                        value={tech.district}
+                      />
+                    ) : null}
+                    <InfoRow
+                      icon={<PhoneIcon />}
+                      label="Contact"
+                      value={tech.phoneNumber || "Not available"}
+                    />
 
                     {tech.certifications && tech.certifications.length > 0 && (
                       <div className="certs">
                         <div className="cert-label">Certifications</div>
                         <div className="cert-tags">
                           {tech.certifications.slice(0, 2).map((c, idx) => (
-                            <span key={idx} className="cert-tag">{c.certificationName}</span>
+                            <span key={idx} className="cert-tag">
+                              {c.certificationName}
+                            </span>
                           ))}
                           {tech.certifications.length > 2 && (
-                            <span className="cert-tag cert-more">+{tech.certifications.length - 2}</span>
+                            <span className="cert-tag cert-more">
+                              +{tech.certifications.length - 2}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -413,14 +603,18 @@ export default function PublicDirectory() {
                         {isFetching
                           ? "Loading…"
                           : hasFetchError
-                          ? "⚠ Retry"
-                          : isCached
-                          ? `🕐 ${slotCount} Slot${slotCount !== 1 ? "s" : ""}`
-                          : "🕐 View Slots"}
+                            ? "⚠ Retry"
+                            : isCached
+                              ? `🕐 ${slotCount} Slot${slotCount !== 1 ? "s" : ""}`
+                              : "🕐 View Slots"}
                       </button>
                       <button
                         className="btn-primary"
-                        style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
                         onClick={() => router.push(`/public/book/${tech.id}`)}
                       >
                         Book Me →
@@ -434,35 +628,78 @@ export default function PublicDirectory() {
         ) : (
           <div className="empty">
             <div className="empty-icon">
-              <svg width="24" height="24" fill="none" stroke="#34d399" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                width="24"
+                height="24"
+                fill="none"
+                stroke="#34d399"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <h3>No technicians found</h3>
             <p>Try adjusting your filters or search term.</p>
-            <button className="btn-primary full" onClick={clearFilters}>Clear Filters</button>
+            <button className="btn-primary full" onClick={clearFilters}>
+              Clear Filters
+            </button>
           </div>
         )}
       </main>
 
       {totalPages > 1 && (
         <div className="pagination">
-          <button className="page-btn" onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))} disabled={currentPage === 1}>← Prev</button>
+          <button
+            className="page-btn"
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            ← Prev
+          </button>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button key={page} className={`page-btn ${page === currentPage ? "active" : ""}`} onClick={() => setCurrentPage(page)}>{page}</button>
+            <button
+              key={page}
+              className={`page-btn ${page === currentPage ? "active" : ""}`}
+              onClick={() => setCurrentPage(page)}
+            >
+              {page}
+            </button>
           ))}
-          <button className="page-btn" onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}>Next →</button>
+          <button
+            className="page-btn"
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next →
+          </button>
         </div>
       )}
 
-      <footer className="footer">© {new Date().getFullYear()} RMIS · Ministry of Environment</footer>
+      <footer className="footer">
+        © {new Date().getFullYear()} RMIS · Ministry of Environment
+      </footer>
 
-      <style jsx global>{globalStyles}</style>
+      <style jsx global>
+        {globalStyles}
+      </style>
     </div>
   );
 }
 
-function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function InfoRow({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="info-row">
       <div className="info-icon">{icon}</div>
@@ -475,13 +712,64 @@ function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string;
 }
 
 function ClockIcon() {
-  return <svg width="13" height="13" fill="none" stroke="#34d399" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+  return (
+    <svg
+      width="13"
+      height="13"
+      fill="none"
+      stroke="#34d399"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+  );
 }
 function PinIcon() {
-  return <svg width="13" height="13" fill="none" stroke="#34d399" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
+  return (
+    <svg
+      width="13"
+      height="13"
+      fill="none"
+      stroke="#34d399"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+      />
+    </svg>
+  );
 }
 function PhoneIcon() {
-  return <svg width="13" height="13" fill="none" stroke="#34d399" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>;
+  return (
+    <svg
+      width="13"
+      height="13"
+      fill="none"
+      stroke="#34d399"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+      />
+    </svg>
+  );
 }
 
 const globalStyles = `
@@ -769,11 +1057,15 @@ const globalStyles = `
 
   @media (max-width: 768px) {
     .hero, .filters-bar, .filter-meta, .grid-wrap, .pagination, .footer { padding-left: 16px; padding-right: 16px; }
-    .hero { padding-top: 40px; }
+    .hero { padding-top: 32px; padding-bottom: 28px; }
     .grid { grid-template-columns: 1fr; }
     .filter-date, .small, .search { width: 100%; }
     .clear-btn { width: 100%; }
     .card-actions { flex-direction: column; align-items: stretch; }
     .btn-outline { width: 100%; }
+    .navbar { padding-left: 16px; padding-right: 16px; }
+    .filters-bar { flex-direction: column; gap: 10px; }
+    .pagination { padding-left: 16px; padding-right: 16px; }
+    .hero h1 { font-size: clamp(26px, 7vw, 40px); }
   }
 `;
