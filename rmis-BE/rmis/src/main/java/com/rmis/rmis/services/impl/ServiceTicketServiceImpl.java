@@ -14,6 +14,7 @@ import com.rmis.rmis.services.interfaces.ServiceTicketService;
 import com.rmis.rmis.utils.TicketNumberGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -243,6 +244,7 @@ public class ServiceTicketServiceImpl implements ServiceTicketService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasAnyRole('CUSTOMER','COMPANY')")
     public ServiceRatingResponseDto submitRating(Long ticketId, String userEmail, ServiceRatingRequestDto dto) {
         ServiceTicket ticket = serviceTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Service ticket not found"));
