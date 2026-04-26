@@ -106,7 +106,7 @@ function ResetPasswordForm() {
 
       setSubmitStatus("success");
       // Auto-redirect after 3s
-      setTimeout(() => router.push("/"), 3000);
+      setTimeout(() => router.push("/login"), 3000);
     } catch (err) {
       setSubmitStatus("error");
       setErrorMsg(
@@ -187,7 +187,7 @@ function ResetPasswordForm() {
         </Link>
         <p className="text-sm text-gray-400">
           <Link
-            href="/"
+            href="/login"
             className="text-emerald-600 hover:text-emerald-700 font-medium transition"
           >
             ← Back to Sign In
@@ -250,7 +250,7 @@ function ResetPasswordForm() {
           Redirecting to sign in…
         </div>
         <Link
-          href="/"
+          href="/login"
           className="w-full inline-block bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl text-sm font-bold text-center shadow-lg shadow-emerald-200 transition-all duration-200"
         >
           Sign In Now
@@ -614,7 +614,7 @@ function ResetPasswordForm() {
 
         <p className="text-center text-sm text-gray-500 mt-5">
           <Link
-            href="/"
+            href="/login"
             className="text-emerald-600 font-semibold hover:text-emerald-700 transition"
           >
             ← Back to Sign In
