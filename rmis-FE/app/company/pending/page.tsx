@@ -11,7 +11,7 @@ export default function CompanyPendingPage() {
   useEffect(() => {
     const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
     if (!raw) {
-      router.push("/");
+      router.push("/login");
       return;
     }
     try {
@@ -24,7 +24,7 @@ export default function CompanyPendingPage() {
       setStatus(parsed.status ?? "PENDING");
       setEmail(parsed.email ?? "");
     } catch {
-      router.push("/");
+      router.push("/login");
     }
   }, [router]);
 
@@ -33,7 +33,7 @@ export default function CompanyPendingPage() {
       localStorage.removeItem(key);
       sessionStorage.removeItem(key);
     });
-    router.push("/");
+    router.push("/login");
   };
 
   const isPending = status.toUpperCase() === "PENDING";
