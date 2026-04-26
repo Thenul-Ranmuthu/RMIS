@@ -105,7 +105,7 @@ export default function BookTechnicianPage() {
       sessionStorage.getItem("accessToken");
 
     if (!raw || !token) {
-      router.push("/");
+      router.push("/login");
       return;
     }
     try {
@@ -121,7 +121,7 @@ export default function BookTechnicianPage() {
         return;
       }
     } catch {
-      router.push("/");
+      router.push("/login");
       return;
     }
     setAuthChecked(true);
