@@ -98,7 +98,7 @@ export default function BookingDetailPage() {
   useEffect(() => {
     const token = getToken();
     const role = getRole();
-    if (!token) { router.push('/'); return; }
+    if (!token) { router.push('/login'); return; }
     if (role !== 'ROLE_TECHNICIAN' && role !== 'TECHNICIAN') {
       setError('Access denied.'); setIsLoading(false); return;
     }
@@ -249,7 +249,7 @@ export default function BookingDetailPage() {
             style={s.signOutBtn}
             onClick={() => {
               localStorage.removeItem("accessToken");
-              router.push("/");
+              router.push("/login");
             }}
           >
             Sign Out
