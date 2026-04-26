@@ -1591,7 +1591,7 @@ export default function SignupCard() {
           <p className="text-center text-sm text-gray-500 pb-2">
             Already have an account?{" "}
             <Link
-              href="/"
+              href="/login"
               className="text-emerald-500 font-bold hover:text-emerald-600 transition inline-flex items-center gap-1"
             >
               Sign In →

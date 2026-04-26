@@ -46,4 +46,5 @@ public class ServiceTicketResponseDto {
     private LocalDateTime cancellationTimestamp;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean rated;
 }

@@ -20,7 +20,8 @@ export default function PublicUserDashboard() {
             setTickets(data);
         } catch (err: any) {
             console.error("Error fetching tickets:", err);
-            setError("Failed to load your booking history.");
+            const msg = err.message || (typeof err === 'string' ? err : "Failed to load your booking history.");
+            setError(msg);
         } finally {
             setLoading(false);
         }
@@ -29,7 +30,7 @@ export default function PublicUserDashboard() {
     useEffect(() => {
         const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
         if (!userData) {
-            router.push('/');
+            router.push('/login');
             return;
         }
         setUser(JSON.parse(userData));
@@ -41,7 +42,7 @@ export default function PublicUserDashboard() {
         localStorage.removeItem('user');
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('user');
-        router.push('/');
+        router.push('/login');
     };
 
     const handleCancel = async (id: number) => {
@@ -59,13 +60,13 @@ export default function PublicUserDashboard() {
     };
 
     return (
-        <main className="min-h-screen bg-slate-100 font-['Public_Sans'] relative flex flex-col md:flex-row">
+        <main className="min-h-screen bg-slate-100 font-['Public_Sans'] relative overflow-hidden flex flex-col lg:flex-row">
             {/* Background Texture */}
             <div className="absolute inset-0 z-0 opacity-40 pointer-events-none" 
                  style={{ backgroundImage: 'url("/bg.png")', backgroundSize: 'cover', backgroundAttachment: 'fixed' }} />
 
             {/* Sidebar - Glass Design */}
-            <aside className="w-full md:w-80 backdrop-blur-3xl bg-[#0a2814]/60 border-b md:border-b-0 md:border-r border-white/10 flex flex-col p-6 md:p-8 shrink-0 z-10 text-white shadow-2xl relative">
+            <aside className="w-full lg:w-80 backdrop-blur-3xl bg-[#0a2814]/60 border-r border-white/10 flex flex-col p-5 sm:p-8 shrink-0 z-10 text-white shadow-2xl relative">
                 <div className="flex-1">
                     <div className="flex justify-center mb-8">
                         <div className="bg-emerald-500/20 rounded-[32px] p-6 border border-white/10 shadow-inner backdrop-blur-md">
@@ -110,14 +111,14 @@ export default function PublicUserDashboard() {
             </aside>
 
             {/* Main Content - Minimalist Grid */}
-            <section className="flex-1 p-5 md:p-12 max-w-6xl z-10 relative overflow-y-auto">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 md:mb-12">
+            <section className="flex-1 p-4 sm:p-6 lg:p-12 max-w-6xl z-10 relative overflow-y-auto lg:h-screen scrollbar-hide">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
                              <span className="h-1 w-12 bg-emerald-600 rounded-full" />
                              <span className="text-[10px] font-black text-emerald-700 uppercase tracking-[0.4em]">Activity Monitor</span>
                         </div>
-                        <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">Your Service History</h2>
+                        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">Your Service History</h2>
                         <p className="text-slate-500 mt-2 font-medium tracking-wide">Manage and track your active environment service tickets</p>
                     </div>
                     {tickets.length > 0 && (
@@ -137,7 +138,20 @@ export default function PublicUserDashboard() {
                         <span className="material-symbols-outlined text-red-500 text-3xl">report</span>
                         <div>
                             <p className="text-sm font-black uppercase tracking-widest mb-1">Error Occurred</p>
-                            <p className="text-sm font-medium opacity-80">{error}</p>
+                            <p className="text-sm font-medium opacity-80">
+                                {error}
+                                {error.includes("status") ? "" : " (Check console for details)"}
+                            </p>
+                            <button 
+                                onClick={() => {
+                                    localStorage.clear();
+                                    sessionStorage.clear();
+                                    window.location.href = '/login';
+                                }}
+                                className="mt-2 text-xs font-bold text-red-600 underline hover:text-red-800"
+                            >
+                                Force Clear Session & Log In Again
+                            </button>
                         </div>
                     </div>
                 )}
@@ -158,7 +172,6 @@ export default function PublicUserDashboard() {
                             tickets={tickets} 
                             loading={loading} 
                             onViewDirectory={() => router.push('/public/directory')}
-                            onViewDetails={(num) => alert(`Ticket ${num} is being processed.`)}
                             onCancel={handleCancel}
                         />
                     )}
@@ -166,4 +179,4 @@ export default function PublicUserDashboard() {
             </section>
         </main>
     );
-}
+}

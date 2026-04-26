@@ -3,18 +3,14 @@ package com.rmis.rmis.utils.impl;
 import com.rmis.rmis.utils.TicketNumberGenerator;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.concurrent.atomic.AtomicLong;
-
 @Component
 public class TicketNumberGeneratorImpl implements TicketNumberGenerator {
     
-    private final AtomicLong SEQUENCE = new AtomicLong(1);
 
     @Override
     public String generate() {
-        String date = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
-        return String.format("ST-%s-%04d", date, SEQUENCE.getAndIncrement());
+        String date = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        String random = java.util.UUID.randomUUID().toString().substring(0, 4).toUpperCase();
+        return String.format("ST-%s-%s", date, random);
     }
 }

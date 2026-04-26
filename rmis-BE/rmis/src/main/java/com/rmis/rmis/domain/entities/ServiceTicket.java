@@ -41,6 +41,9 @@ public class ServiceTicket {
     @JoinColumn(name = "availability_id", nullable = true, unique = true)
     private Availability availability;
 
+    @OneToOne(mappedBy = "serviceTicket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private ServiceRating serviceRating;
+
 
     @Column(nullable = false, length = 100)
     private String serviceType;

@@ -240,7 +240,7 @@ export default function MinistryLoginCard() {
 
                 <p className="text-center text-sm text-gray-500 mt-3">
                     Not a ministry officer?{" "}
-                    <Link href="/" className="text-gray-400 font-medium hover:text-gray-600 transition">
+                    <Link href="/login" className="text-gray-400 font-medium hover:text-gray-600 transition">
                         Back to main login
                     </Link>
                 </p>

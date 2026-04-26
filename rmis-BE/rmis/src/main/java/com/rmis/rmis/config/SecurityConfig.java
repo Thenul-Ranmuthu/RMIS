@@ -121,7 +121,7 @@ public class SecurityConfig {
                     .requestMatchers("/technician/availability/**").hasRole("TECHNICIAN")
                     .requestMatchers("/api/service-tickets/**").authenticated()
                     .requestMatchers("/technician/bookings/**").hasRole("TECHNICIAN")
-                .anyRequest().authenticated()
+                    .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

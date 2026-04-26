@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServiceTicketMapperImpl implements Mapper<ServiceTicket, ServiceTicketResponseDto> {
 
+    public ServiceTicketMapperImpl() {
+    }
+
     @Override
     public ServiceTicketResponseDto mapTo(ServiceTicket t) {
         ServiceTicketResponseDto.ServiceTicketResponseDtoBuilder builder = ServiceTicketResponseDto.builder()
@@ -23,7 +26,8 @@ public class ServiceTicketMapperImpl implements Mapper<ServiceTicket, ServiceTic
                 .cancellationReason(t.getCancellationReason())
                 .cancellationTimestamp(t.getCancellationTimestamp())
                 .createdAt(t.getCreatedAt())
-                .updatedAt(t.getUpdatedAt());
+                .updatedAt(t.getUpdatedAt())
+                .rated(t.getServiceRating() != null);
 
         // CUSTOMER MAPPING
         if (t.getPublicUser() != null) {

@@ -121,7 +121,7 @@ export default function ForgotPasswordPage() {
               Check your spam folder if you don't see the email.
             </p>
             <Link
-              href="/"
+              href="/login"
               className="w-full inline-block bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl text-sm font-bold text-center shadow-lg shadow-emerald-200 transition-all duration-200"
             >
               Back to Sign In
@@ -251,7 +251,7 @@ export default function ForgotPasswordPage() {
               <p className="text-center text-sm text-gray-500 mt-6">
                 Remember your password?{" "}
                 <Link
-                  href="/"
+                  href="/login"
                   className="text-emerald-600 font-semibold hover:text-emerald-700 transition"
                 >
                   Back to Sign In
