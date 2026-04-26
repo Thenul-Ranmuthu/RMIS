@@ -131,7 +131,7 @@ export default function TechnicianAvailabilityPage() {
     const role = getRole();
 
     if (!token) {
-      router.push("/");
+      router.push("/login");
       return;
     }
 
@@ -341,7 +341,7 @@ export default function TechnicianAvailabilityPage() {
           <button
             onClick={() => {
               localStorage.removeItem("accessToken");
-              router.push("/");
+              router.push("/login");
             }}
             className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600 shadow-sm transition hover:border-rose-200 hover:bg-rose-50"
           >
