@@ -100,7 +100,7 @@ export default function TechnicianBookingsPage() {
     const token = getToken();
     const role = getRole();
     if (!token) {
-      router.push("/");
+      router.push("/login");
       return;
     }
     if (role !== "ROLE_TECHNICIAN" && role !== "TECHNICIAN") {
@@ -161,7 +161,7 @@ export default function TechnicianBookingsPage() {
             </div>
             <h2 style={s.resultTitle}>Access Denied</h2>
             <p style={s.resultSub}>Only technicians can view this page.</p>
-            <button style={s.btnPrimary} onClick={() => router.push("/")}>
+            <button style={s.btnPrimary} onClick={() => router.push("/login")}>
               ← Go Home
             </button>
           </div>
@@ -203,7 +203,7 @@ export default function TechnicianBookingsPage() {
             style={s.signOutBtn}
             onClick={() => {
               localStorage.removeItem("accessToken");
-              router.push("/");
+              router.push("/login");
             }}
           >
             Sign Out
