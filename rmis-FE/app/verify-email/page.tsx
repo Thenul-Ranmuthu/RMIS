@@ -140,10 +140,10 @@ export default function VerifyEmailPage() {
         alert(
           "Registration successful! Your account is pending admin approval.",
         );
-        router.push("/");
+        router.push("/login");
       } else {
         alert("Registration successful! Please log in.");
-        router.push("/");
+        router.push("/login");
       }
     } catch (err) {
       setError(
