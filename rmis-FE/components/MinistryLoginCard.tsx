@@ -65,20 +65,14 @@ export default function MinistryLoginCard() {
                 throw new Error(data.error || data.message || "Login failed");
             }
 
-            // Save token
-            if (data.accessToken) {
-                saveToken(data.accessToken);
-                if (rememberMe) {
-                    localStorage.setItem("accessToken", data.accessToken); 
-                    
-                } else {
-                    sessionStorage.setItem("accessToken", data.accessToken);
-                }
-                // After saving to localStorage/sessionStorage, also set a cookie
-                document.cookie = `accessToken=${data.accessToken}; path=/; max-age=${rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24}`;
+            // Handle multiple possible token field names from backend for resilience
+            const token = data.token || data.accessToken;
+            if (token) {
+                saveToken(token, rememberMe);
+                router.push("/ministry/quota-requests");
+            } else {
+                throw new Error("Invalid response from server: No authentication token found");
             }
-
-            router.push("/ministry/quota-requests");
 
         } catch (err) {
             setError(
@@ -92,7 +86,7 @@ export default function MinistryLoginCard() {
     };
 
     return (
-        <div className="bg-white rounded-3xl shadow-2xl w-[460px] p-10">
+        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[460px] p-6 sm:p-10">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
                 <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-emerald-50">

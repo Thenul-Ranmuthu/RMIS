@@ -84,3 +84,11 @@ rmis-BE/rmis/src/main/java/com/rmis/rmis/config/UserSeeder.java
 # Maven wrapper files (optional to ignore, usually kept but some prefer not to)
 .mvn/
 rmis-BE/rmis/.mvn/
+
+
+rmis-BE/rmis/src/main/java/com/rmis/rmis/uploads
+
+
+rmis-FE/.env
+
+rmis-FE/node_modules

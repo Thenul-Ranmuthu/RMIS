@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { ReviewsModal } from "./ReviewsModal";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:5055";
+  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
 
 interface Certification {
   id?: number;

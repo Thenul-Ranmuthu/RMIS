@@ -1,9 +1,13 @@
 package com.rmis.rmis.services.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.rmis.rmis.domain.entities.AnnualQuotaDistribution;
 import com.rmis.rmis.domain.entities.MinistryOfficer;
+import com.rmis.rmis.repositories.AnnualQuotaDistributionRepository;
+import com.rmis.rmis.repositories.QuotaRequestAnalyticsRepository;
 import com.rmis.rmis.services.interfaces.AuditLogService;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +27,8 @@ public class MinistryOfficerServiceImpl implements MinistryOfficerService{
     private QuotaRequestRepository quotaRequestRepository;
     private CompanyRepository companyRepository;
     private final AuditLogService auditLogService;
+    private final AnnualQuotaDistributionRepository annualQuotaRepo;
+    private final QuotaRequestAnalyticsRepository requestRepo;
 
     @Override
     public String changeQuotaRequestStatusApprove(UUID id, MinistryOfficer officer) {
@@ -33,17 +39,31 @@ public class MinistryOfficerServiceImpl implements MinistryOfficerService{
         QuotaRequest quotaRequest = quotaRequestRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("No Quota request!!"));
 
+        Company company = companyRepository.findByEmail(quotaRequest.getCompany().getEmail())
+                .orElseThrow(() -> new RuntimeException("No Company found!!"));
+
+
+        // "Total approved quota" = ministry's annual budget from AnnualQuotaDistribution
+        BigDecimal totalApproved  = annualQuotaRepo.sumAnnualQuota();
+
+        // "Total used quota" = sum of approvedAmount on APPROVED QuotaRequests
+        BigDecimal totalUsed      = requestRepo.sumApprovedUsedAmount();
+
+        // "Total remaining" = ministry budget minus what companies have consumed
+        BigDecimal totalRemaining = totalApproved.subtract(totalUsed);
+
+        if(quotaRequest.getRequestedQuota().compareTo(totalRemaining) > 0 ) {
+            return "Insufficient quota remaining. Failed to approve quota.";
+        }
+
         quotaRequest.setStatus(QuotaRequestStatus.APPROVED);
         quotaRequest.setReviewedBy(officer);
         quotaRequest.setReviewedAt(LocalDateTime.now());
-        
         quotaRequestRepository.save(quotaRequest);
         auditLogService.logApproval(officer, quotaRequest);
+        quotaRequest.setApprovedAmount(quotaRequest.getRequestedQuota());
 
-        Company company = companyRepository.findByEmail(quotaRequest.getCompany().getEmail())
-            .orElseThrow(() -> new RuntimeException("No Company found!!"));
-
-        company.setQuota(company.getQuota().subtract(quotaRequest.getRequestedQuota()));
+        company.setRemainingQuota(company.getRemainingQuota().subtract(quotaRequest.getRequestedQuota()));
 
         companyRepository.save(company);
 

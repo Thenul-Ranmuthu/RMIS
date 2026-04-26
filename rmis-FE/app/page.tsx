@@ -13,7 +13,7 @@ export default function Homepage() {
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5055";
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
         const response = await fetch(`${baseUrl}/public/announcements`);
         if (response.ok) {
           const data = await response.json();

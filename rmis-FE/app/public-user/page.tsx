@@ -30,7 +30,7 @@ export default function PublicUserDashboard() {
     useEffect(() => {
         const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
         if (!userData) {
-            router.push('/');
+            router.push('/login');
             return;
         }
         setUser(JSON.parse(userData));
@@ -42,7 +42,7 @@ export default function PublicUserDashboard() {
         localStorage.removeItem('user');
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('user');
-        router.push('/');
+        router.push('/login');
     };
 
     const handleCancel = async (id: number) => {

@@ -53,6 +53,9 @@ public class Company implements LockableAccount {
     @Column(nullable = true)
     private BigDecimal quota;
 
+    @Column(nullable = true)
+    private BigDecimal remainingQuota;
+
     @Enumerated(EnumType.STRING)
     private CompanyStatus status;
 

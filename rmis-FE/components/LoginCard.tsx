@@ -492,13 +492,14 @@ export default function LoginCard() {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5055";
     switch (role) {
       case "Technician":
-        return `${baseUrl}/auth/technician/login`;
+        return "https://www.rmis.space/api/auth/technician/login";
       case "Company":
-        return `${baseUrl}/auth/company/login`;
+        return "https://www.rmis.space/api/auth/company/login";
       case "Public User":
-        return `${baseUrl}/auth/user/login`;
+        // Return a placeholder - you'll need to implement this endpoint
+        return "https://www.rmis.space/api/auth/user/login";
       default:
-        return `${baseUrl}/auth/technician/login`;
+        return "https://www.rmis.space/api/auth/technician/login";
     }
   };
 
@@ -609,11 +610,11 @@ export default function LoginCard() {
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-2xl w-[460px] p-10">
-      <h2 className="text-3xl font-black text-gray-900 leading-tight">
+    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[460px] p-6 sm:p-10">
+      <h2 className="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">
         Sign In to Your Account
       </h2>
-      <p className="text-gray-500 mt-2 mb-7 text-sm">
+      <p className="text-gray-500 mt-2 mb-5 sm:mb-7 text-sm">
         Please select your role and enter your credentials.
       </p>
 
@@ -627,11 +628,10 @@ export default function LoginCard() {
               setRole(item);
               setError(""); // Clear error when switching roles
             }}
-            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-              role === item
-                ? "bg-white shadow text-gray-900"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
+            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${role === item
+              ? "bg-white shadow text-gray-900"
+              : "text-gray-500 hover:text-gray-700"
+              }`}
           >
             {item}
           </button>
@@ -777,11 +777,10 @@ export default function LoginCard() {
           <button
             type="button"
             onClick={() => !isLoading && setRememberMe(!rememberMe)}
-            className={`h-4.5 w-4.5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
-              rememberMe
-                ? "bg-emerald-600 border-emerald-600"
-                : "border-gray-300 bg-white"
-            } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`h-4.5 w-4.5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${rememberMe
+              ? "bg-emerald-600 border-emerald-600"
+              : "border-gray-300 bg-white"
+              } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
             style={{ height: "18px", width: "18px" }}
             disabled={isLoading}
           >
