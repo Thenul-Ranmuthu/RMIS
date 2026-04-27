@@ -1,7 +1,6 @@
 import { getToken } from "./authService";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 export interface ServiceTicketResponse {
   id: number;
@@ -51,7 +50,10 @@ const authFetch = async (url: string, options: RequestInit = {}) => {
 
   if (!response.ok) {
     console.error(`[authFetch] Error Body:`, data);
-    const errorMsg = data && Object.keys(data).length > 0 ? data : { message: `Request failed with status ${response.status}` };
+    const errorMsg =
+      data && Object.keys(data).length > 0
+        ? data
+        : { message: `Request failed with status ${response.status}` };
     throw errorMsg;
   }
 

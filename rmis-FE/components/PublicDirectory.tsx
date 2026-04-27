@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ReviewsModal } from "./ReviewsModal";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 interface Certification {
   id?: number;
@@ -104,7 +103,9 @@ export default function PublicDirectory() {
   const [selectedSkill, setSelectedSkill] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [slotsPopover, setSlotsPopover] = useState<number | null>(null);
-  const [reviewsModalTech, setReviewsModalTech] = useState<Technician | null>(null);
+  const [reviewsModalTech, setReviewsModalTech] = useState<Technician | null>(
+    null,
+  );
   const [reloadKey, setReloadKey] = useState(0);
 
   // Lazy slots state
@@ -115,7 +116,9 @@ export default function PublicDirectory() {
   const [slotsError, setSlotsError] = useState<number | null>(null);
 
   // Ratings cache: stores {avg, count} per technician, fetched lazily
-  const [ratingsCache, setRatingsCache] = useState<Record<number, { avg: number; count: number }>>({});
+  const [ratingsCache, setRatingsCache] = useState<
+    Record<number, { avg: number; count: number }>
+  >({});
 
   const PER_PAGE = 6;
 
@@ -150,7 +153,9 @@ export default function PublicDirectory() {
   // Fetch ratings for visible technicians on the current page
   useEffect(() => {
     if (currentItems.length === 0) return;
-    const toFetch = currentItems.filter((t) => ratingsCache[t.id] === undefined);
+    const toFetch = currentItems.filter(
+      (t) => ratingsCache[t.id] === undefined,
+    );
     if (toFetch.length === 0) return;
 
     toFetch.forEach(async (tech) => {
@@ -164,15 +169,21 @@ export default function PublicDirectory() {
         const count = reviews.length;
         const avg =
           count > 0
-            ? reviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0) / count
+            ? reviews.reduce(
+                (sum: number, r: any) => sum + (r.rating || 0),
+                0,
+              ) / count
             : 0;
         setRatingsCache((prev) => ({ ...prev, [tech.id]: { avg, count } }));
       } catch {
         // If endpoint doesn't exist yet, show 0 reviews gracefully
-        setRatingsCache((prev) => ({ ...prev, [tech.id]: { avg: 0, count: 0 } }));
+        setRatingsCache((prev) => ({
+          ...prev,
+          [tech.id]: { avg: 0, count: 0 },
+        }));
       }
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, technicians]);
 
   const handleSlotsClick = async (techId: number) => {
@@ -355,8 +366,15 @@ export default function PublicDirectory() {
             <span className="badge-dot"></span>
             <span>Public Directory</span>
           </div>
-          <h1>Find Certified<br/><em>Technicians</em></h1>
-          <p>Browse verified environmental compliance technicians across Sri Lanka. Filter by date, skill level, specialization, and district.</p>
+          <h1>
+            Find Certified
+            <br />
+            <em>Technicians</em>
+          </h1>
+          <p>
+            Browse verified environmental compliance technicians across Sri
+            Lanka. Filter by date, skill level, specialization, and district.
+          </p>
           <div className="hero-stats">
             <div className="stat">
               <div className="stat-val">{technicians.length}</div>
@@ -380,8 +398,8 @@ export default function PublicDirectory() {
         <div className="filters-bar">
           <div className="fg">
             <label>Date</label>
-            <input 
-              type="date" 
+            <input
+              type="date"
               value={selectedDate}
               min={new Date().toISOString().split("T")[0]}
               onChange={(e) => setSelectedDate(e.target.value)}
@@ -389,7 +407,7 @@ export default function PublicDirectory() {
           </div>
           <div className="fg">
             <label>Skill Level</label>
-            <select 
+            <select
               value={selectedSkill}
               onChange={(e) => setSelectedSkill(e.target.value)}
             >
@@ -401,45 +419,64 @@ export default function PublicDirectory() {
           </div>
           <div className="fg">
             <label>Specialization</label>
-            <select 
+            <select
               value={selectedSpec}
               onChange={(e) => setSelectedSpec(e.target.value)}
             >
               <option value="">All</option>
               {specs.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s}>
+                  {s}
+                </option>
               ))}
             </select>
           </div>
           <div className="fg">
             <label>District</label>
-            <select 
+            <select
               value={selectedDist}
               onChange={(e) => setSelectedDist(e.target.value)}
             >
               <option value="">All districts</option>
               {sriLankanDistricts.map((d) => (
-                <option key={d} value={d}>{d}</option>
+                <option key={d} value={d}>
+                  {d}
+                </option>
               ))}
             </select>
           </div>
           <div className="fg">
             <label>Search</label>
             <div className="sw">
-              <svg width="14" height="14" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="7"/>
-                <path d="m21 21-4.35-4.35"/>
+              <svg
+                width="14"
+                height="14"
+                fill="none"
+                stroke="#6B7280"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                viewBox="0 0 24 24"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="m21 21-4.35-4.35" />
               </svg>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Search by name…"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
-          {(searchTerm || selectedSpec || selectedDist || selectedSkill || selectedDate) && (
-            <button className="clear-btn" onClick={clearFilters}>Clear All Filters</button>
+          {(searchTerm ||
+            selectedSpec ||
+            selectedDist ||
+            selectedSkill ||
+            selectedDate) && (
+            <button className="clear-btn" onClick={clearFilters}>
+              Clear All Filters
+            </button>
           )}
         </div>
       </div>
@@ -447,7 +484,12 @@ export default function PublicDirectory() {
       <div className="filter-meta">
         <span className="fmc">
           Showing <strong>{filtered.length}</strong> technicians
-          {selectedDate && <> on <strong>{selectedDate}</strong></>}
+          {selectedDate && (
+            <>
+              {" "}
+              on <strong>{selectedDate}</strong>
+            </>
+          )}
         </span>
       </div>
 
@@ -574,10 +616,10 @@ export default function PublicDirectory() {
                               <span
                                 key={star}
                                 className={
-                                  ratingData && ratingData.avg >= star 
-                                    ? "star-full" 
-                                    : ratingData && ratingData.avg >= star - 0.5 
-                                      ? "star-half" 
+                                  ratingData && ratingData.avg >= star
+                                    ? "star-full"
+                                    : ratingData && ratingData.avg >= star - 0.5
+                                      ? "star-half"
                                       : "star-empty"
                                 }
                               >
@@ -589,10 +631,10 @@ export default function PublicDirectory() {
                             {!ratingData ? "..." : ratingData.avg.toFixed(1)}
                           </span>
                           <span className="rating-count">
-                            {!ratingData 
-                              ? "" 
-                              : ratingData.count > 0 
-                                ? `(${ratingData.count} review${ratingData.count !== 1 ? "s" : ""})` 
+                            {!ratingData
+                              ? ""
+                              : ratingData.count > 0
+                                ? `(${ratingData.count} review${ratingData.count !== 1 ? "s" : ""})`
                                 : "(No reviews)"}
                           </span>
                           {ratingData && ratingData.count > 0 && (
@@ -610,29 +652,73 @@ export default function PublicDirectory() {
                     <div className="info-grid">
                       <div className="info-row">
                         <div className="info-icon">
-                          <svg width="14" height="14" fill="none" stroke="var(--p1)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                          <svg
+                            width="14"
+                            height="14"
+                            fill="none"
+                            stroke="var(--p1)"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 6v6l4 2" />
+                          </svg>
                         </div>
                         <div>
                           <div className="info-label">Experience</div>
-                          <div className="info-val">{tech.yearsOfExperience || 0} years</div>
+                          <div className="info-val">
+                            {tech.yearsOfExperience || 0} years
+                          </div>
                         </div>
                       </div>
                       <div className="info-row">
                         <div className="info-icon">
-                          <svg width="14" height="14" fill="none" stroke="var(--p1)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                          <svg
+                            width="14"
+                            height="14"
+                            fill="none"
+                            stroke="var(--p1)"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                            <circle cx="12" cy="10" r="3" />
+                          </svg>
                         </div>
                         <div>
                           <div className="info-label">District</div>
-                          <div className="info-val">{tech.district || "N/A"}</div>
+                          <div className="info-val">
+                            {tech.district || "N/A"}
+                          </div>
                         </div>
                       </div>
-                      <div className="info-row" style={{ gridColumn: '1 / -1' }}>
+                      <div
+                        className="info-row"
+                        style={{ gridColumn: "1 / -1" }}
+                      >
                         <div className="info-icon">
-                          <svg width="14" height="14" fill="none" stroke="var(--p1)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.05 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                          <svg
+                            width="14"
+                            height="14"
+                            fill="none"
+                            stroke="var(--p1)"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.05 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+                          </svg>
                         </div>
                         <div>
                           <div className="info-label">Contact</div>
-                          <div className="info-val">{tech.phoneNumber || "Not available"}</div>
+                          <div className="info-val">
+                            {tech.phoneNumber || "Not available"}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -663,15 +749,44 @@ export default function PublicDirectory() {
                         onClick={() => handleSlotsClick(tech.id)}
                         disabled={isFetching}
                       >
-                        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                        {isFetching ? "Loading…" : hasFetchError ? "Retry" : isCached ? `${slotCount} Slots` : "View Slots"}
+                        <svg
+                          width="13"
+                          height="13"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          viewBox="0 0 24 24"
+                        >
+                          <rect x="3" y="4" width="18" height="18" rx="2" />
+                          <path d="M16 2v4M8 2v4M3 10h18" />
+                        </svg>
+                        {isFetching
+                          ? "Loading…"
+                          : hasFetchError
+                            ? "Retry"
+                            : isCached
+                              ? `${slotCount} Slots`
+                              : "View Slots"}
                       </button>
                       <button
                         className="btn-book"
                         onClick={() => router.push(`/public/book/${tech.id}`)}
                       >
                         Book Now
-                        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        <svg
+                          width="13"
+                          height="13"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
                       </button>
                     </div>
                   </div>
@@ -682,11 +797,20 @@ export default function PublicDirectory() {
         ) : (
           <div className="empty">
             <div className="empty-icon">
-              <svg width="24" height="24" fill="none" stroke="var(--p2)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M16 16s-1.5-2-4-2-4 2-4 2"/>
-                <line x1="9" y1="9" x2="9.01" y2="9"/>
-                <line x1="15" y1="9" x2="15.01" y2="9"/>
+              <svg
+                width="24"
+                height="24"
+                fill="none"
+                stroke="var(--p2)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                viewBox="0 0 24 24"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M16 16s-1.5-2-4-2-4 2-4 2" />
+                <line x1="9" y1="9" x2="9.01" y2="9" />
+                <line x1="15" y1="9" x2="15.01" y2="9" />
               </svg>
             </div>
             <h3>No technicians found</h3>
@@ -699,7 +823,7 @@ export default function PublicDirectory() {
       </main>
 
       {reviewsModalTech && (
-        <ReviewsModal 
+        <ReviewsModal
           technicianId={reviewsModalTech.id}
           technicianName={`${reviewsModalTech.firstName} ${reviewsModalTech.lastName}`}
           onClose={() => setReviewsModalTech(null)}
@@ -735,7 +859,8 @@ export default function PublicDirectory() {
       )}
 
       <footer className="footer">
-        © {new Date().getFullYear()} RMIS · Ministry of Environment · All rights reserved
+        © {new Date().getFullYear()} RMIS · Ministry of Environment · All rights
+        reserved
       </footer>
 
       <style jsx global>
@@ -744,7 +869,6 @@ export default function PublicDirectory() {
     </div>
   );
 }
-
 
 const globalStyles = `
   :root {
@@ -1047,4 +1171,3 @@ const globalStyles = `
     .card{border-radius:14px}
   }
 `;
-

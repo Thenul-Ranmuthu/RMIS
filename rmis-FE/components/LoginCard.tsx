@@ -492,14 +492,14 @@ export default function LoginCard() {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5055";
     switch (role) {
       case "Technician":
-        return "https://www.rmis.space/api/auth/technician/login";
+        return "http://localhost:5050/auth/technician/login";
       case "Company":
-        return "https://www.rmis.space/api/auth/company/login";
+        return "http://localhost:5050/auth/company/login";
       case "Public User":
         // Return a placeholder - you'll need to implement this endpoint
-        return "https://www.rmis.space/api/auth/user/login";
+        return "http://localhost:5050/auth/user/login";
       default:
-        return "https://www.rmis.space/api/auth/technician/login";
+        return "http://localhost:5050/auth/technician/login";
     }
   };
 
@@ -628,10 +628,11 @@ export default function LoginCard() {
               setRole(item);
               setError(""); // Clear error when switching roles
             }}
-            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${role === item
-              ? "bg-white shadow text-gray-900"
-              : "text-gray-500 hover:text-gray-700"
-              }`}
+            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+              role === item
+                ? "bg-white shadow text-gray-900"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
           >
             {item}
           </button>
@@ -777,10 +778,11 @@ export default function LoginCard() {
           <button
             type="button"
             onClick={() => !isLoading && setRememberMe(!rememberMe)}
-            className={`h-4.5 w-4.5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${rememberMe
-              ? "bg-emerald-600 border-emerald-600"
-              : "border-gray-300 bg-white"
-              } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`h-4.5 w-4.5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+              rememberMe
+                ? "bg-emerald-600 border-emerald-600"
+                : "border-gray-300 bg-white"
+            } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
             style={{ height: "18px", width: "18px" }}
             disabled={isLoading}
           >

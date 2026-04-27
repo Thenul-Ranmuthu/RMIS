@@ -1,6 +1,6 @@
 // // RMIS/files/services/authService.ts
 
-// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 // // ─── Interfaces ───────────────────────────────────────────────
 
@@ -118,8 +118,7 @@
 // export const loginCompany = (email: string, password: string) =>
 //   post(`${API_BASE_URL}/auth/company/login`, { email, password });
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 // ─── Interfaces ───────────────────────────────────────────────
 
@@ -189,8 +188,7 @@ export const getRole = (): string | null => {
 export const getToken = (): string | null => {
   if (typeof window === "undefined") return null;
   return (
-    localStorage.getItem("accessToken") || 
-    sessionStorage.getItem("accessToken")
+    localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")
   );
 };
 
@@ -240,8 +238,7 @@ export const loginCompany = (email: string, password: string) =>
 
 // ─── Technician Admin API ─────────────────────────────────────
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 const authFetch = (url: string, options: RequestInit = {}) => {
   const token = getToken();

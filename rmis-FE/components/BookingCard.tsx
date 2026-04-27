@@ -105,7 +105,7 @@ export function BookingCard({ ticket, onCancel, onRatingSuccess }: BookingCardPr
                             <div className="flex gap-1 text-emerald-400">
                                 {[1, 2, 3, 4, 5].map((s) => (
                                     <span key={s} className="material-symbols-outlined text-xl">
-                                        {ticket.isRated ? "star" : "star_outline"}
+                                        {ticket.rated ? "star" : "star_outline"}
                                     </span>
                                 ))}
                             </div>

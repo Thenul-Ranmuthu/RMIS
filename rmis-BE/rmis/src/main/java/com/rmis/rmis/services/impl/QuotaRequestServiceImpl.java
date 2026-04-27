@@ -8,13 +8,11 @@ import com.rmis.rmis.domain.entities.Company;
 import com.rmis.rmis.domain.entities.QuotaRequest;
 import com.rmis.rmis.enums.QuotaRequestStatus;
 import com.rmis.rmis.repositories.CompanyRepository;
-import com.rmis.rmis.repositories.MinistryOfficerRepository;
 import com.rmis.rmis.exceptions.QuotaRequestNotFoundException;
 import com.rmis.rmis.repositories.QuotaRequestRepository;
 import com.rmis.rmis.services.QuotaRequestsSpecification;
 import com.rmis.rmis.services.interfaces.EmailService;
 import com.rmis.rmis.services.interfaces.QuotaRequestService;
-import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -160,13 +158,45 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
         quotaRequestRepository.save(entity);
         
         // Ensure the notification uses the authenticated company's email
-        quotaRequestHeaderDto.setCompanyEmail(company.getEmail());
+        quotaRequestAddQuotaDto.setCompanyEmail(company.getEmail());
         
-        // Notify officers ONLY after successful save
-        emailService.sendNotificationNewRequestSubmission(quotaRequestHeaderDto);
+        // // Notify officers ONLY after successful save
+        emailService.sendNotificationNewRequestSubmission(quotaRequestAddQuotaDto);
         
         return "Quota saved succefully!!";
     }
+
+//      public String addQuotaRequest(QuotaRequestAddQuotaDto quotaRequestHeaderDto) {
+//         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//         String email = auth.getName();
+
+//         Company company = companyRepository.findByEmail(email)
+//             .orElseThrow(() -> new RuntimeException("Company not found with email: " + email));
+
+//         if(quotaRequestHeaderDto.getRequestedQuota().compareTo(company.getQuota()) > 0){
+//             return "Error: Insuffitient quota balance!!";
+//         }
+
+//         boolean hasPending = quotaRequestRepository.existsByCompanyAndStatus(
+//                 company, QuotaRequestStatus.PENDING);
+//         if (hasPending) {
+//             return "Error: You already have a pending quota request!!";
+//         }
+
+//         QuotaRequest entity = new QuotaRequest();
+
+//         entity.setCompany(company);
+//         entity.setRequestedQuota(quotaRequestHeaderDto.getRequestedQuota());
+//         entity.setCompanyName(company.getName());
+//         entity.setUpdatedAt(LocalDateTime.now());
+
+//         long nextNumber = quotaRequestRepository.count() + 1;
+//         entity.setRequestNumber(nextNumber);
+        
+
+//         quotaRequestRepository.save(entity);
+//         return "Quota saved succefully!!";
+//     }
 
     public QuotaRequestDetailDto getRequestById(UUID requestId) {
         QuotaRequest entity = quotaRequestRepository.findById(requestId)

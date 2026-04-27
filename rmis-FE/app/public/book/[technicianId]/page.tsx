@@ -7,8 +7,7 @@ import {
   raiseTicketAsCompany,
 } from "@/services/serviceTicketService";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 interface AvailabilitySlot {
   id: number;
@@ -317,7 +316,9 @@ export default function BookTechnicianPage() {
       <div className="book-layout">
         <div className="layout-header">
           <button className="back-btn" onClick={() => router.back()}>
-            <span className="material-symbols-outlined text-sm">arrow_back</span>
+            <span className="material-symbols-outlined text-sm">
+              arrow_back
+            </span>
             Back
           </button>
         </div>
@@ -436,7 +437,8 @@ export default function BookTechnicianPage() {
                             className={`slot-chip${selectedSlot?.id === slot.id ? " slot-chip-selected" : ""}`}
                             onClick={() => setSelectedSlot(slot)}
                           >
-                            {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+                            {formatTime(slot.startTime)} –{" "}
+                            {formatTime(slot.endTime)}
                           </button>
                         ))}
                       </div>
@@ -448,7 +450,8 @@ export default function BookTechnicianPage() {
               {selectedSlot && (
                 <div className="selected-slot-badge">
                   ✓ Selected: {formatDate(selectedSlot.date)} ·{" "}
-                  {formatTime(selectedSlot.startTime)} – {formatTime(selectedSlot.endTime)}
+                  {formatTime(selectedSlot.startTime)} –{" "}
+                  {formatTime(selectedSlot.endTime)}
                 </div>
               )}
             </div>
@@ -468,7 +471,9 @@ export default function BookTechnicianPage() {
                   required
                   className="form-select"
                 >
-                  <option value="" disabled>Choose a service</option>
+                  <option value="" disabled>
+                    Choose a service
+                  </option>
                   {SERVICE_TYPES.map((t) => (
                     <option key={t} value={t}>
                       {t}
@@ -513,16 +518,32 @@ export default function BookTechnicianPage() {
                     d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "4px",
+                  }}
+                >
                   <span>{submitError}</span>
-                  <button 
+                  <button
                     type="button"
                     onClick={() => {
-                        localStorage.clear();
-                        sessionStorage.clear();
-                        window.location.href = '/login';
+                      localStorage.clear();
+                      sessionStorage.clear();
+                      window.location.href = "/login";
                     }}
-                    style={{ background: 'none', border: 'none', padding: 0, color: '#f87171', textDecoration: 'underline', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold', textAlign: 'left' }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      color: "#f87171",
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                      fontSize: "11px",
+                      fontWeight: "bold",
+                      textAlign: "left",
+                    }}
                   >
                     Session Expired? Click here to Log In Again
                   </button>
@@ -545,8 +566,19 @@ export default function BookTechnicianPage() {
               ) : (
                 <>
                   Confirm & Book Appointment
-                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  <svg
+                    width="18"
+                    height="18"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </>
               )}

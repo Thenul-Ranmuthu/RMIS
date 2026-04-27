@@ -5,8 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getToken, getRole } from "@/services/authService";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 interface BookingDetail {
   id: number;
@@ -55,11 +54,46 @@ function formatTime(t: string) {
 
 function statusMeta(status: string) {
   switch (status) {
-    case 'PENDING': return { label: 'Pending', color: '#b45309', bg: '#fff7ed', border: '#fed7aa', icon: '⏳' };
-    case 'ACCEPTED': return { label: 'Accepted', color: '#047857', bg: '#ecfdf5', border: '#a7f3d0', icon: '✅' };
-    case 'COMPLETED': return { label: 'Completed', color: '#047857', bg: '#ecfdf5', border: '#a7f3d0', icon: '✓' };
-    case 'CANCELLED': return { label: 'Cancelled', color: '#dc2626', bg: '#fef2f2', border: '#fecaca', icon: '✕' };
-    default: return { label: status, color: '#475569', bg: '#f8fafc', border: '#e2e8f0', icon: '•' };
+    case "PENDING":
+      return {
+        label: "Pending",
+        color: "#b45309",
+        bg: "#fff7ed",
+        border: "#fed7aa",
+        icon: "⏳",
+      };
+    case "ACCEPTED":
+      return {
+        label: "Accepted",
+        color: "#047857",
+        bg: "#ecfdf5",
+        border: "#a7f3d0",
+        icon: "✅",
+      };
+    case "COMPLETED":
+      return {
+        label: "Completed",
+        color: "#047857",
+        bg: "#ecfdf5",
+        border: "#a7f3d0",
+        icon: "✓",
+      };
+    case "CANCELLED":
+      return {
+        label: "Cancelled",
+        color: "#dc2626",
+        bg: "#fef2f2",
+        border: "#fecaca",
+        icon: "✕",
+      };
+    default:
+      return {
+        label: status,
+        color: "#475569",
+        bg: "#f8fafc",
+        border: "#e2e8f0",
+        icon: "•",
+      };
   }
 }
 
@@ -98,9 +132,14 @@ export default function BookingDetailPage() {
   useEffect(() => {
     const token = getToken();
     const role = getRole();
-    if (!token) { router.push('/login'); return; }
-    if (role !== 'ROLE_TECHNICIAN' && role !== 'TECHNICIAN') {
-      setError('Access denied.'); setIsLoading(false); return;
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+    if (role !== "ROLE_TECHNICIAN" && role !== "TECHNICIAN") {
+      setError("Access denied.");
+      setIsLoading(false);
+      return;
     }
     fetchBooking();
   }, [id, router]);
@@ -386,8 +425,17 @@ export default function BookingDetailPage() {
             <div style={s.divider} />
             <div style={s.customerGrid}>
               <DetailRow label="Name" value={booking.customerName} highlight />
-              <DetailRow label="Type" value={booking.customerType === 'COMPANY' ? 'Company' : 'Individual'} />
-              <DetailRow label="Email" value={booking.customerEmail} isLink={`mailto:${booking.customerEmail}`} />
+              <DetailRow
+                label="Type"
+                value={
+                  booking.customerType === "COMPANY" ? "Company" : "Individual"
+                }
+              />
+              <DetailRow
+                label="Email"
+                value={booking.customerEmail}
+                isLink={`mailto:${booking.customerEmail}`}
+              />
               <DetailRow
                 label="Phone"
                 value={booking.customerPhone || "Not provided"}
@@ -504,11 +552,13 @@ function DetailRow({
           {value}
         </a>
       ) : (
-        <div style={{
-          ...s.detailVal,
-          ...(highlight ? { color: '#0f172a', fontWeight: 700 } : {}),
-          ...(muted ? { color: '#94a3b8', fontStyle: 'italic' } : {}),
-        }}>
+        <div
+          style={{
+            ...s.detailVal,
+            ...(highlight ? { color: "#0f172a", fontWeight: 700 } : {}),
+            ...(muted ? { color: "#94a3b8", fontStyle: "italic" } : {}),
+          }}
+        >
           {value}
         </div>
       )}

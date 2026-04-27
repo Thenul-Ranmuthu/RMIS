@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://www.rmis.space/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 type Status = "idle" | "loading" | "success" | "error";
 
