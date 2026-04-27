@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.rmis.rmis.domain.entities.AnnualQuotaDistribution;
 import com.rmis.rmis.domain.entities.MinistryOfficer;
 import com.rmis.rmis.repositories.AnnualQuotaDistributionRepository;
 import com.rmis.rmis.repositories.QuotaRequestAnalyticsRepository;

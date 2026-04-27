@@ -51,7 +51,7 @@ public class CompanyServiceImpl implements CompanyService{
                 spliterator(), false)
             .collect(Collectors.toList());
 
-        BigDecimal available = company.getQuota(); 
+        // BigDecimal available = company.getQuota(); 
         BigDecimal used = BigDecimal.ZERO;
         
         for(QuotaRequest q: qoutas){
