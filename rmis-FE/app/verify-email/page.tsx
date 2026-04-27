@@ -72,20 +72,30 @@ export default function VerifyEmailPage() {
         formDataObj.append("district", userData.district || "");
         formDataObj.append("specialization", userData.specialization || "");
         if (userData.yearsOfExperience != null) {
-          formDataObj.append("yearsOfExperience", userData.yearsOfExperience.toString());
+          formDataObj.append(
+            "yearsOfExperience",
+            userData.yearsOfExperience.toString(),
+          );
         }
-
 
         // SAFETY CHECK: If files were lost from memory (due to refresh), show a clear error
         if (pendingCertifications.length === 0) {
-          setError("Your certification files were lost. Please go back and re-upload them.");
+          setError(
+            "Your certification files were lost. Please go back and re-upload them.",
+          );
           setIsLoading(false);
           return;
         }
 
         pendingCertifications.forEach((cert: any, index: number) => {
-          formDataObj.append(`certifications[${index}].certificationName`, cert.certificationName);
-          formDataObj.append(`certifications[${index}].issuingAuthority`, cert.issuingAuthority || "");
+          formDataObj.append(
+            `certifications[${index}].certificationName`,
+            cert.certificationName,
+          );
+          formDataObj.append(
+            `certifications[${index}].issuingAuthority`,
+            cert.issuingAuthority || "",
+          );
           formDataObj.append(`certifications[${index}].file`, cert.file);
         });
 
@@ -127,11 +137,13 @@ export default function VerifyEmailPage() {
       if (storedRole === "Company") {
         router.push("/company/dashboard");
       } else if (storedRole === "Technician") {
-        alert("Registration successful! Your account is pending admin approval.");
-        router.push("/");
+        alert(
+          "Registration successful! Your account is pending admin approval.",
+        );
+        router.push("/login");
       } else {
         alert("Registration successful! Please log in.");
-        router.push("/");
+        router.push("/login");
       }
     } catch (err) {
       setError(
@@ -164,8 +176,8 @@ export default function VerifyEmailPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100 p-8">
-      <div className="bg-white rounded-3xl shadow-2xl w-[420px] p-10">
+    <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4 sm:p-8">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[420px] p-6 sm:p-10">
         {/* Icon */}
         <div className="flex justify-center mb-4">
           <div className="bg-emerald-100 rounded-full p-4">

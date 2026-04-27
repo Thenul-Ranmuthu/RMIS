@@ -51,7 +51,7 @@ public class CompanyServiceImpl implements CompanyService{
                 spliterator(), false)
             .collect(Collectors.toList());
 
-        BigDecimal available = company.getQuota(); 
+        // BigDecimal available = company.getQuota(); 
         BigDecimal used = BigDecimal.ZERO;
         
         for(QuotaRequest q: qoutas){
@@ -61,8 +61,8 @@ public class CompanyServiceImpl implements CompanyService{
         }
 
         QuotaDetailsResponseDto dto = new QuotaDetailsResponseDto();
-        dto.setRemainingQuota(available);
-        dto.setQuota(available.add(used));
+        dto.setQuota(company.getQuota());
+        dto.setRemainingQuota(company.getRemainingQuota());
         return dto;
     }
 

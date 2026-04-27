@@ -1,7 +1,9 @@
 package com.rmis.rmis.controllers;
 
+import com.rmis.rmis.domain.dtos.ServiceRatingResponseDto;
 import com.rmis.rmis.domain.dtos.TechnicianResponseDto;
 import com.rmis.rmis.domain.enums.SkillLevel;
+import com.rmis.rmis.services.interfaces.ServiceTicketService;
 import com.rmis.rmis.services.interfaces.TechnicianAuthService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,7 @@ import java.util.Map;
 public class PublicDirectoryController {
 
     private final TechnicianAuthService technicianAuthService;
+    private final ServiceTicketService serviceTicketService;
 
     @GetMapping("/technicians/active")
     public ResponseEntity<?> getActiveTechnicians() {
@@ -67,6 +70,19 @@ public class PublicDirectoryController {
         } catch (Exception e) {
             log.error("Error fetching technician profile", e);
             return new ResponseEntity<>(Map.of("error", "Technician not found"), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/technicians/{id}/feedbacks")
+    public ResponseEntity<?> getTechnicianFeedbacks(@PathVariable Long id) {
+        log.info("Public user fetching feedbacks for technician: {}", id);
+        try {
+            List<ServiceRatingResponseDto> feedbacks = serviceTicketService.getTechnicianFeedbacks(id);
+            return ResponseEntity.ok(feedbacks);
+        } catch (Exception e) {
+            log.error("Error fetching feedbacks for technician: {}", id, e);
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Failed to fetch feedbacks"));
         }
     }
 }

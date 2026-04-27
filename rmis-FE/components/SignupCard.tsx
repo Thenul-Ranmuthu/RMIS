@@ -395,7 +395,7 @@ export default function SignupCard() {
         // Store certifications separately since they contain File objects
         // which can't be serialized to sessionStorage
         // We'll keep them in a module-level variable temporarily
-        // ✅ FIX 
+        // ✅ FIX
         // Store files in module-level variable (survives router.push soft navigation)
         pendingCertifications.length = 0;
         formData.certifications.forEach((cert) => {
@@ -1324,7 +1324,7 @@ export default function SignupCard() {
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-2xl w-[550px] p-10 py-8">
+    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[550px] p-6 sm:p-10 sm:py-8">
       {renderHeader()}
 
       <div className="flex bg-gray-100 rounded-xl p-1 mb-6 gap-1">
@@ -1337,10 +1337,11 @@ export default function SignupCard() {
               setVerificationCode("");
               setCodeSent(false);
             }}
-            className={`flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${role === item
+            className={`flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+              role === item
                 ? "bg-white shadow text-gray-900"
                 : "text-gray-500 hover:text-gray-700"
-              }`}
+            }`}
           >
             {item}
           </button>
@@ -1509,10 +1510,11 @@ export default function SignupCard() {
             <button
               type="button"
               onClick={() => setAgreeTerms(!agreeTerms)}
-              className={`h-5 w-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 mt-0.5 ${agreeTerms
+              className={`h-5 w-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 mt-0.5 ${
+                agreeTerms
                   ? "bg-emerald-600 border-emerald-600"
                   : "border-gray-300 bg-white"
-                }`}
+              }`}
             >
               {agreeTerms && (
                 <svg
@@ -1591,7 +1593,7 @@ export default function SignupCard() {
           <p className="text-center text-sm text-gray-500 pb-2">
             Already have an account?{" "}
             <Link
-              href="/"
+              href="/login"
               className="text-emerald-500 font-bold hover:text-emerald-600 transition inline-flex items-center gap-1"
             >
               Sign In →

@@ -86,7 +86,7 @@ export default function MinistryLoginCard() {
     };
 
     return (
-        <div className="bg-white rounded-3xl shadow-2xl w-[460px] p-10">
+        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[460px] p-6 sm:p-10">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
                 <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-emerald-50">
@@ -240,7 +240,7 @@ export default function MinistryLoginCard() {
 
                 <p className="text-center text-sm text-gray-500 mt-3">
                     Not a ministry officer?{" "}
-                    <Link href="/" className="text-gray-400 font-medium hover:text-gray-600 transition">
+                    <Link href="/login" className="text-gray-400 font-medium hover:text-gray-600 transition">
                         Back to main login
                     </Link>
                 </p>

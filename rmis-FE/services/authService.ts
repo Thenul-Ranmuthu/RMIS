@@ -1,6 +1,6 @@
 // // RMIS/files/services/authService.ts
 
-// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://rmis-backend.malaysiawest.azurecontainer.io:5050";
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 // // ─── Interfaces ───────────────────────────────────────────────
 
@@ -118,9 +118,7 @@
 // export const loginCompany = (email: string, password: string) =>
 //   post(`${API_BASE_URL}/auth/company/login`, { email, password });
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://rmis-backend.malaysiawest.azurecontainer.io:5050";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 // ─── Interfaces ───────────────────────────────────────────────
 
@@ -190,8 +188,7 @@ export const getRole = (): string | null => {
 export const getToken = (): string | null => {
   if (typeof window === "undefined") return null;
   return (
-    localStorage.getItem("accessToken") || 
-    sessionStorage.getItem("accessToken")
+    localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")
   );
 };
 
@@ -241,9 +238,7 @@ export const loginCompany = (email: string, password: string) =>
 
 // ─── Technician Admin API ─────────────────────────────────────
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://rmis-backend.malaysiawest.azurecontainer.io:5050";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 const authFetch = (url: string, options: RequestInit = {}) => {
   const token = getToken();
@@ -266,8 +261,8 @@ export const getTechniciansByStatus = (
 export const getTechnicianById = (id: number) =>
   authFetch(`${API_BASE}/admin/user-verification/${id}`).then((r) => r.json());
 
-export const approveTechnician = (id: number, skillLevel: string) =>
-  authFetch(`${API_BASE}/admin/user-verification/${id}/approve?skillLevel=${skillLevel}`, {
+export const approveTechnician = (id: number) =>
+  authFetch(`${API_BASE}/admin/technicians/${id}/approve`, {
     method: "POST",
   }).then((r) => r.json());
 

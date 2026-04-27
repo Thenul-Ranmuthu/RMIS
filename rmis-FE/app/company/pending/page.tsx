@@ -11,7 +11,7 @@ export default function CompanyPendingPage() {
   useEffect(() => {
     const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
     if (!raw) {
-      router.push("/");
+      router.push("/login");
       return;
     }
     try {
@@ -24,7 +24,7 @@ export default function CompanyPendingPage() {
       setStatus(parsed.status ?? "PENDING");
       setEmail(parsed.email ?? "");
     } catch {
-      router.push("/");
+      router.push("/login");
     }
   }, [router]);
 
@@ -33,7 +33,7 @@ export default function CompanyPendingPage() {
       localStorage.removeItem(key);
       sessionStorage.removeItem(key);
     });
-    router.push("/");
+    router.push("/login");
   };
 
   const isPending = status.toUpperCase() === "PENDING";
@@ -50,7 +50,7 @@ export default function CompanyPendingPage() {
     >
       <div className="absolute inset-0 bg-black/50" />
 
-      <div className="relative bg-white/95 backdrop-blur-sm p-10 rounded-2xl shadow-2xl max-w-lg w-full text-center">
+      <div className="relative bg-white/95 backdrop-blur-sm p-6 sm:p-10 rounded-2xl shadow-2xl max-w-lg w-full text-center">
         {/* Icon */}
         <div className="flex justify-center mb-6">
           <div

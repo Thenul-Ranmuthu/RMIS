@@ -2,17 +2,16 @@ package com.rmis.rmis.services.impl;
 
 import com.rmis.rmis.domain.dtos.PagedResponseDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestDetailDto;
-import com.rmis.rmis.domain.dtos.QuotaRequestHeaderDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestAddQuotaDto;
 import com.rmis.rmis.domain.dtos.QuotaRequestResponseDto;
 import com.rmis.rmis.domain.entities.Company;
 import com.rmis.rmis.domain.entities.QuotaRequest;
 import com.rmis.rmis.enums.QuotaRequestStatus;
 import com.rmis.rmis.repositories.CompanyRepository;
-import com.rmis.rmis.repositories.MinistryOfficerRepository;
 import com.rmis.rmis.exceptions.QuotaRequestNotFoundException;
 import com.rmis.rmis.repositories.QuotaRequestRepository;
 import com.rmis.rmis.services.QuotaRequestsSpecification;
+import com.rmis.rmis.services.interfaces.EmailService;
 import com.rmis.rmis.services.interfaces.QuotaRequestService;
 
 import org.springframework.data.domain.Page;
@@ -35,15 +34,14 @@ import java.util.stream.Collectors;
 public class QuotaRequestServiceImpl implements QuotaRequestService {
     private final QuotaRequestRepository quotaRequestRepository;
     private final CompanyRepository companyRepository;
-//     private final MinistryOfficerRepository ministryOfficerRepository;
-    
-//     @Value("${app.mail.resend.api}")
-//     private String resendApiKey;
+    private final EmailService emailService;
 
-    public QuotaRequestServiceImpl(QuotaRequestRepository quotaRequestRepository, CompanyRepository companyRepository, MinistryOfficerRepository ministryOfficerRepository) {
+    public QuotaRequestServiceImpl(QuotaRequestRepository quotaRequestRepository, 
+                                   CompanyRepository companyRepository, 
+                                   EmailService emailService) {
         this.quotaRequestRepository = quotaRequestRepository;
         this.companyRepository = companyRepository;
-        // this.ministryOfficerRepository = ministryOfficerRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -128,14 +126,14 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
      }
 
     @Override
-    public String addQuotaRequest(QuotaRequestAddQuotaDto quotaRequestHeaderDto) {
+    public String addQuotaRequest(QuotaRequestAddQuotaDto quotaRequestAddQuotaDto) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
 
         Company company = companyRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Company not found with email: " + email));
 
-        if(quotaRequestHeaderDto.getRequestedQuota().compareTo(company.getQuota()) > 0){
+        if(quotaRequestAddQuotaDto.getRequestedQuota().compareTo(company.getRemainingQuota()) > 0){
             return "Error: Insuffitient quota balance!!";
         }
 
@@ -148,17 +146,57 @@ public class QuotaRequestServiceImpl implements QuotaRequestService {
         QuotaRequest entity = new QuotaRequest();
 
         entity.setCompany(company);
-        entity.setRequestedQuota(quotaRequestHeaderDto.getRequestedQuota());
+        entity.setRequestedQuota(quotaRequestAddQuotaDto.getRequestedQuota());
         entity.setCompanyName(company.getName());
         entity.setUpdatedAt(LocalDateTime.now());
+        entity.setRequestReason(quotaRequestAddQuotaDto.getRequestReason());
 
         long nextNumber = quotaRequestRepository.count() + 1;
         entity.setRequestNumber(nextNumber);
         
 
         quotaRequestRepository.save(entity);
+        
+        // Ensure the notification uses the authenticated company's email
+        quotaRequestAddQuotaDto.setCompanyEmail(company.getEmail());
+        
+        // // Notify officers ONLY after successful save
+        emailService.sendNotificationNewRequestSubmission(quotaRequestAddQuotaDto);
+        
         return "Quota saved succefully!!";
     }
+
+//      public String addQuotaRequest(QuotaRequestAddQuotaDto quotaRequestHeaderDto) {
+//         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//         String email = auth.getName();
+
+//         Company company = companyRepository.findByEmail(email)
+//             .orElseThrow(() -> new RuntimeException("Company not found with email: " + email));
+
+//         if(quotaRequestHeaderDto.getRequestedQuota().compareTo(company.getQuota()) > 0){
+//             return "Error: Insuffitient quota balance!!";
+//         }
+
+//         boolean hasPending = quotaRequestRepository.existsByCompanyAndStatus(
+//                 company, QuotaRequestStatus.PENDING);
+//         if (hasPending) {
+//             return "Error: You already have a pending quota request!!";
+//         }
+
+//         QuotaRequest entity = new QuotaRequest();
+
+//         entity.setCompany(company);
+//         entity.setRequestedQuota(quotaRequestHeaderDto.getRequestedQuota());
+//         entity.setCompanyName(company.getName());
+//         entity.setUpdatedAt(LocalDateTime.now());
+
+//         long nextNumber = quotaRequestRepository.count() + 1;
+//         entity.setRequestNumber(nextNumber);
+        
+
+//         quotaRequestRepository.save(entity);
+//         return "Quota saved succefully!!";
+//     }
 
     public QuotaRequestDetailDto getRequestById(UUID requestId) {
         QuotaRequest entity = quotaRequestRepository.findById(requestId)

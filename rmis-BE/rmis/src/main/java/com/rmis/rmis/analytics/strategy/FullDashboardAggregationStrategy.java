@@ -11,7 +11,6 @@ import com.rmis.rmis.enums.CompanyStatus;
 import com.rmis.rmis.enums.QuotaRequestStatus;
 import com.rmis.rmis.repositories.AnnualQuotaDistributionRepository;
 import com.rmis.rmis.repositories.CompanyAnalyticsRepository;
-import com.rmis.rmis.repositories.CompanyRepository;
 import com.rmis.rmis.repositories.QuotaRequestAnalyticsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -29,7 +28,6 @@ public class FullDashboardAggregationStrategy implements QuotaAggregationStrateg
     private final QuotaRequestAnalyticsRepository requestRepo;
     private final AnnualQuotaDistributionRepository annualQuotaRepo; // replaces allocationRepo
     private final CompanyAnalyticsRepository companyRepo;
-    private final CompanyRepository companyRepo2;
 
     @Override
     public AnalyticsDashboardDto aggregate() {
@@ -79,7 +77,7 @@ public class FullDashboardAggregationStrategy implements QuotaAggregationStrateg
          * here with that company-specific figure to get a more precise remainingQuota.
          */
         List<Object[]> rows = requestRepo.findApprovedUsedAmountGroupedByCompany();
-        long totalCompanies = companyRepo.countByStatus(CompanyStatus.ACTIVE);
+        // long totalCompanies = companyRepo.countByStatus(CompanyStatus.ACTIVE);
 
 
         return rows.stream()

@@ -3,6 +3,9 @@ rmis-BE/uploads/
 
 # Compressed logs
 *.gz
+*.tar
+*.zip
+*.7z
 
 # --- OS & IDE ---
 .vscode/
@@ -21,10 +24,12 @@ logs/
 **/yarn-debug.log*
 **/yarn-error.log*
 .pnpm-debug.log*
+rmis-BE/rmis/*.log
+rmis-BE/rmis/*.txt
+rmis-BE/rmis/startup_log*.txt
 
 # --- Backend (Spring Boot / Maven) ---
 **/target/
-rmis-BE/rmis/target/
 .mvn/
 rmis-BE/rmis/.mvn/wrapper/maven-wrapper.jar
 *.class
@@ -43,7 +48,6 @@ rmis-FE/.env*
 
 # --- Frontend (Node.js / Next.js) ---
 **/node_modules/
-rmis-FE/node_modules/
 .next/
 rmis-FE/.next/
 out/
@@ -51,15 +55,40 @@ rmis-FE/out/
 build/
 rmis-FE/build/
 .next-env.d.ts
+next-env.d.ts
+rmis-FE/next-env.d.ts
 .vercel/
 .turbo/
 dist/
+rmis-FE/mnt/
+rmis-FE/*.html
+rmis-FE/tsconfig.tsbuildinfo
 
 # --- General ---
 /tmp/
 .gemini/
 .antigravity/
+**/uploads/
+rmis-BE/uploads/
 
 # --- Temp/debug scripts ---
 rmis-FE/replace.js
 rmis-FE/backup/
+rmis-FE/public-*-example.html
+scratch/
+*.tsbuildinfo
+
+# Local dev seeders
+rmis-BE/rmis/src/main/java/com/rmis/rmis/config/UserSeeder.java
+
+# Maven wrapper files (optional to ignore, usually kept but some prefer not to)
+.mvn/
+rmis-BE/rmis/.mvn/
+
+
+rmis-BE/rmis/src/main/java/com/rmis/rmis/uploads
+
+
+rmis-FE/.env
+
+rmis-FE/node_modules

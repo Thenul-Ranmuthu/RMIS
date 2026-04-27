@@ -1,5 +1,7 @@
 package com.rmis.rmis.controllers;
 
+import com.rmis.rmis.domain.dtos.ServiceRatingRequestDto;
+import com.rmis.rmis.domain.dtos.ServiceRatingResponseDto;
 import com.rmis.rmis.domain.dtos.ServiceTicketRequestDto;
 import com.rmis.rmis.domain.dtos.ServiceTicketResponseDto;
 import com.rmis.rmis.services.interfaces.ServiceTicketService;
@@ -26,7 +28,6 @@ public class ServiceTicketController {
 
 
     @PostMapping("/user")
-    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<?> raiseTicketAsUser(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody ServiceTicketRequestDto requestDto) {
@@ -49,7 +50,6 @@ public class ServiceTicketController {
     }
 
     @GetMapping("/user/my")
-    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<List<ServiceTicketResponseDto>> getMyTicketsAsUser(
             @AuthenticationPrincipal UserDetails userDetails) {
 
@@ -137,6 +137,25 @@ public class ServiceTicketController {
         } catch (Exception e) {
             log.error("Error fetching all bookings for admin", e);
             return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "An unexpected error occurred"));
+        }
+    }
+
+    @PostMapping("/{id}/rating")
+    @PreAuthorize("hasAnyRole('CUSTOMER','COMPANY')")
+    public ResponseEntity<?> submitRating(@PathVariable Long id,
+                                          @Valid @RequestBody ServiceRatingRequestDto ratingDto,
+                                          @AuthenticationPrincipal UserDetails userDetails) {
+        log.info("User {} submitting rating for ticket {}", userDetails.getUsername(), id);
+        try {
+            ServiceRatingResponseDto response = serviceTicketService.submitRating(id, userDetails.getUsername(), ratingDto);
+            return ResponseEntity.ok(response);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error submitting rating", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "An unexpected error occurred"));
         }
     }

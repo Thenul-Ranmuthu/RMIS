@@ -8,9 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 public interface QuotaRequestAnalyticsRepository
-        extends JpaRepository<QuotaRequest, Long> {
+        extends JpaRepository<QuotaRequest, UUID> {
 
     /**
      * SYSTEM-WIDE used quota.

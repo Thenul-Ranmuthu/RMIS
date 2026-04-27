@@ -111,7 +111,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         if (overlap) {
             // If updating, allow the slot with excludeId — refetch and compare
             if (excludeId != null) {
-                Availability existing = availabilityRepository.findById(excludeId).orElse(null);
+                // Availability existing = availabilityRepository.findById(excludeId).orElse(null);
                 // If the overlap is only with itself, it's fine — but our query includes it,
                 // so we re-check by looking for any OTHER overlapping slot.
                 // Simple approach: fetch future slots and check manually
