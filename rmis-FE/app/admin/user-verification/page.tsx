@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getToken } from '@/services/authService';
+import { getToken, getTechniciansByStatus, getCompaniesByStatus, approveCompany, rejectCompany, allocateCompanyQuota } from '@/services/authService';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
 
@@ -45,20 +45,22 @@ export default function AdminTechnicianPage() {
   const [rejectingId, setRejectingId] = useState<number | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [selectedSkillLevel, setSelectedSkillLevel] = useState('');
+  const [quotaAmount, setQuotaAmount] = useState('');
 
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const token = getToken();
-      const endpoint = userCategory === 'TECHNICIANS' ? 'technicians' : 'companies';
-      const res = await fetch(`${API_BASE}/admin/${endpoint}/${activeTab.toLowerCase()}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error('Failed to fetch');
-      setTechnicians(await res.json());
+      let data;
+      if (userCategory === 'TECHNICIANS') {
+        data = await getTechniciansByStatus(activeTab);
+      } else {
+        data = await getCompaniesByStatus(activeTab);
+      }
+      console.log(`Fetched ${userCategory}:`, data);
+      setTechnicians(data || []);
     } catch (err) {
-      console.error(err);
+      console.error('Fetch error:', err);
       setTechnicians([]);
     } finally {
       setIsLoading(false);
@@ -71,23 +73,33 @@ export default function AdminTechnicianPage() {
 
 
   const handleApprove = async (id: number) => {
-    if (!selectedSkillLevel) {
-      alert('Please select a skill level before approving');
-      return;
-    }
     setActionLoading(true);
     try {
-      const token = getToken();
-      const endpoint = userCategory === 'TECHNICIANS' ? 'technicians' : 'companies';
-      const res = await fetch(
-        `${API_BASE}/admin/${endpoint}/${id}/approve?skillLevel=${selectedSkillLevel}`,
-        { method: 'POST', headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (!res.ok) throw new Error('Approval failed');
+      if (userCategory === 'COMPANIES') {
+        // For companies, allocate quota first
+        if (!quotaAmount || parseInt(quotaAmount) <= 0) {
+          alert('Please enter a valid quota amount');
+          setActionLoading(false);
+          return;
+        }
+        await allocateCompanyQuota(selectedTechnician?.email || '', parseInt(quotaAmount));
+        // Then approve the company
+        await approveCompany(id);
+      } else {
+        // For technicians, just approve directly
+        const token = getToken();
+        await fetch(
+          `${API_BASE}/admin/user-verification/${id}/approve`,
+          { method: 'POST', headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+      
       setSelectedTechnician(null);
       setSelectedSkillLevel('');
+      setQuotaAmount('');
       fetchData();
     } catch (err) {
+      console.error('Approval error:', err);
       alert(`Failed to approve ${userCategory === 'TECHNICIANS' ? 'technician' : 'company'}`);
     } finally {
       setActionLoading(false);
@@ -100,19 +112,22 @@ export default function AdminTechnicianPage() {
     if (rejectingId == null) return;
     setActionLoading(true);
     try {
-      const token = getToken();
-      const endpoint = userCategory === 'TECHNICIANS' ? 'technicians' : 'companies';
-      const res = await fetch(
-        `${API_BASE}/admin/${endpoint}/${rejectingId}/reject?reason=${encodeURIComponent(rejectReason)}`,
-        { method: 'POST', headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (!res.ok) throw new Error('Rejection failed');
+      if (userCategory === 'COMPANIES') {
+        await rejectCompany(rejectingId, rejectReason);
+      } else {
+        const token = getToken();
+        await fetch(
+          `${API_BASE}/admin/user-verification/${rejectingId}/reject?reason=${encodeURIComponent(rejectReason)}`,
+          { method: 'POST', headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
       setShowRejectModal(false);
       setRejectReason('');
       setRejectingId(null);
       setSelectedTechnician(null);
       fetchData();
-    } catch {
+    } catch (err) {
+      console.error('Rejection error:', err);
       alert(`Failed to reject ${userCategory === 'TECHNICIANS' ? 'technician' : 'company'}`);
     } finally {
       setActionLoading(false);
@@ -279,7 +294,7 @@ export default function AdminTechnicianPage() {
           <div className="master-table-card" style={{ width: '600px', background: 'white', padding: '32px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
               <h3>{userCategory === 'TECHNICIANS' ? 'Technician' : 'Company'} Profile: {userCategory === 'TECHNICIANS' ? `${selectedTechnician.firstName} ${selectedTechnician.lastName}` : (selectedTechnician as any).companyName}</h3>
-              <button onClick={() => { setSelectedTechnician(null); setSelectedSkillLevel(''); }} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>
+              <button onClick={() => { setSelectedTechnician(null); setSelectedSkillLevel(''); setQuotaAmount(''); }} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>
 
                 <span className="material-symbols-outlined">close</span>
               </button>
@@ -295,20 +310,29 @@ export default function AdminTechnicianPage() {
             {selectedTechnician.status === 'PENDING' && (
               <div style={{ padding: '20px', background: '#f8fafc', borderRadius: '12px', marginBottom: '24px' }}>
                 <p style={{ marginBottom: '12px', fontWeight: 600 }}>Approval Action</p>
-                <div className="filter-group" style={{ marginBottom: '16px' }}>
-                  <label>Assign Skill Level</label>
-                  <div className="filter-input" style={{ width: '100%' }}>
-                    <select value={selectedSkillLevel} onChange={(e) => setSelectedSkillLevel(e.target.value)}>
-                      <option value="">Select level...</option>
-                      <option value="JUNIOR">Junior</option>
-                      <option value="INTERMEDIATE">Intermediate</option>
-                      <option value="SENIOR">Senior</option>
-                    </select>
+                
+                {userCategory === 'COMPANIES' && (
+                  <div className="filter-group" style={{ marginBottom: '16px' }}>
+                    <label>Allocate Quota Amount</label>
+                    <div className="filter-input" style={{ width: '100%' }}>
+                      <input 
+                        type="number" 
+                        placeholder="Enter quota amount..." 
+                        value={quotaAmount}
+                        onChange={(e) => setQuotaAmount(e.target.value)}
+                        min="1"
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
+                
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <button onClick={() => handleApprove(selectedTechnician.id)} className="btn-primary" disabled={actionLoading || !selectedSkillLevel}>
-                    {actionLoading ? 'Processing...' : 'Approve Application'}
+                  <button 
+                    onClick={() => handleApprove(selectedTechnician.id)} 
+                    className="btn-primary" 
+                    disabled={actionLoading || (userCategory === 'COMPANIES' && (!quotaAmount || parseInt(quotaAmount) <= 0))}
+                  >
+                    {actionLoading ? 'Processing...' : userCategory === 'COMPANIES' ? 'Approve & Allocate Quota' : 'Approve Application'}
                   </button>
                   <button onClick={() => { setRejectingId(selectedTechnician.id); setShowRejectModal(true); }} className="btn-primary" style={{ backgroundColor: '#dc2626' }}>
                     Reject

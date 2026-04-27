@@ -83,3 +83,6 @@ export const cancelCompanyTicket = (id: number, reason: string): Promise<Service
     method: "PUT",
     body: JSON.stringify({ reason }),
   });
+
+export const getAllTickets = (): Promise<ServiceTicketResponse[]> =>
+  authFetch(`${API_BASE_URL}/api/service-tickets/admin/all`);
