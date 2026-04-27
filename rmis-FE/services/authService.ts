@@ -254,12 +254,12 @@ const authFetch = (url: string, options: RequestInit = {}) => {
 export const getTechniciansByStatus = (
   status: "PENDING" | "ACTIVE" | "REJECTED",
 ) =>
-  authFetch(`${API_BASE}/admin/technicians/${status.toLowerCase()}`).then((r) =>
+  authFetch(`${API_BASE}/admin/user-verification/${status.toLowerCase()}`).then((r) =>
     r.json(),
   );
 
 export const getTechnicianById = (id: number) =>
-  authFetch(`${API_BASE}/admin/technicians/${id}`).then((r) => r.json());
+  authFetch(`${API_BASE}/admin/user-verification/${id}`).then((r) => r.json());
 
 export const approveTechnician = (id: number) =>
   authFetch(`${API_BASE}/admin/technicians/${id}/approve`, {
@@ -268,11 +268,28 @@ export const approveTechnician = (id: number) =>
 
 export const rejectTechnician = (id: number, reason: string) =>
   authFetch(
-    `${API_BASE}/admin/technicians/${id}/reject?reason=${encodeURIComponent(reason)}`,
+    `${API_BASE}/admin/user-verification/${id}/reject?reason=${encodeURIComponent(reason)}`,
     { method: "POST" },
   ).then((r) => r.json());
 
 export const deleteTechnician = (id: number) =>
-  authFetch(`${API_BASE}/admin/technicians/${id}`, { method: "DELETE" }).then(
+  authFetch(`${API_BASE}/admin/user-verification/${id}`, { method: "DELETE" }).then(
     (r) => r.json(),
   );
+
+// ─── Company Admin API ─────────────────────────────────────────
+
+export const getCompaniesByStatus = (status: "PENDING" | "ACTIVE" | "REJECTED") =>
+  authFetch(`${API_BASE}/admin/companies/${status.toLowerCase()}`).then((r) => r.json());
+
+export const getCompanyById = (id: number) =>
+  authFetch(`${API_BASE}/admin/companies/${id}`).then((r) => r.json());
+
+export const approveCompany = (id: number) =>
+  authFetch(`${API_BASE}/admin/companies/${id}/approve`, { method: "POST" }).then((r) => r.json());
+
+export const rejectCompany = (id: number, reason: string) =>
+  authFetch(`${API_BASE}/admin/companies/${id}/reject?reason=${encodeURIComponent(reason)}`, { method: "POST" }).then((r) => r.json());
+
+export const allocateCompanyQuota = (email: string, quota: number) =>
+  authFetch(`${API_BASE}/admin/companyQuota/${email}/${quota}`, { method: "POST" }).then((r) => r.json());

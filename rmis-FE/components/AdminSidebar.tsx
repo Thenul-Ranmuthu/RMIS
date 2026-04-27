@@ -6,7 +6,7 @@ import { logout } from '@/services/authService';
 
 const navItems = [
   { href: '/admin/dashboard', icon: 'grid_view', label: 'Dashboard' },
-  { href: '/admin/technicians', icon: 'verified_user', label: 'User Verification' },
+  { href: '/admin/user-verification', icon: 'verified_user', label: 'User Verification' },
   { href: '/admin/bookings', icon: 'event_note', label: 'Bookings' },
   { href: '/admin/analytics', icon: 'monitoring', label: 'Analytics' },
   { href: '/admin/audit-log', icon: 'description', label: 'Audit Logs' },
