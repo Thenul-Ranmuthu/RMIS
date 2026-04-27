@@ -48,7 +48,7 @@ export default function MinistryLoginCard() {
 
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/ministry/auth/login`,
+                `http://localhost:8080/ministry/auth/login`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

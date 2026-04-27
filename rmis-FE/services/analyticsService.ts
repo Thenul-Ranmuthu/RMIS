@@ -8,7 +8,7 @@
 
 import type { AnalyticsDashboardData } from "@/types/analytics";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5050";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
 // ── Custom typed errors ───────────────────────────────────────
 

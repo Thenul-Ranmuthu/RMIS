@@ -48,7 +48,7 @@ export default function MinistryRegisterCard() {
 
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/ministry/auth/register`,
+                `http://localhost:8080/ministry/auth/register`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

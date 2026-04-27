@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getToken, getRole } from "@/services/authService";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 interface BookingDetail {
   id: number;

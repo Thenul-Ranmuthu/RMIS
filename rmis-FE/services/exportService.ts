@@ -18,7 +18,7 @@ export class ExportError extends Error {
     }
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5050";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
 /**
  * Fetches the export file from the backend and triggers a browser download.

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getToken, getRole } from "@/services/authService";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 interface Booking {
   id: number;
@@ -177,38 +177,6 @@ export default function TechnicianBookingsPage() {
   return (
     <div style={s.page}>
       {/* ── Header ── */}
-      <header style={s.header}>
-        <div style={s.headerInner}>
-          <div style={s.headerLeft}>
-            <div style={s.logoBox}>🛠️</div>
-            <div>
-              <div style={s.logoTitle}>RMIS</div>
-              <div style={s.logoSub}>Technician Portal</div>
-            </div>
-            <div style={s.breadcrumb}>
-              <span style={s.breadcrumbSep}>•</span>
-              <Link href="/technician/dashboard" style={s.breadcrumbLink}>
-                Dashboard
-              </Link>
-              <span style={s.breadcrumbSep}>•</span>
-              <Link href="/technician/availability" style={s.breadcrumbLink}>
-                Availability
-              </Link>
-              <span style={s.breadcrumbSep}>•</span>
-              <span style={s.breadcrumbActive}>Bookings</span>
-            </div>
-          </div>
-          <button
-            style={s.signOutBtn}
-            onClick={() => {
-              localStorage.removeItem("accessToken");
-              router.push("/login");
-            }}
-          >
-            Sign Out
-          </button>
-        </div>
-      </header>
 
       <main style={s.main}>
         {/* ── Hero ── */}

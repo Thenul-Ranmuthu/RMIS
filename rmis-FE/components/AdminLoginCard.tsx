@@ -48,7 +48,7 @@ export default function AdminLoginCard() {
 
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/admin/auth/login`,
+                `http://localhost:8080/admin/auth/login`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
