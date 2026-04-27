@@ -3,18 +3,25 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getAuditLogs } from '@/services/auditLogService';
+import { getAllTickets } from '@/services/serviceTicketService';
 import { AuditLog } from '@/types/auditLog';
+import { ServiceTicketResponse } from '@/services/serviceTicketService';
 
 export default function AdminDashboardPage() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [tickets, setTickets] = useState<ServiceTicketResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       setIsLoading(true);
       try {
-        const result = await getAuditLogs({ from: '', to: '' });
-        setAuditLogs(result);
+        const [logsResult, ticketsResult] = await Promise.all([
+          getAuditLogs({ from: '', to: '' }),
+          getAllTickets(),
+        ]);
+        setAuditLogs(logsResult);
+        setTickets(ticketsResult);
       } catch (err) {
         console.error(err);
       } finally {
@@ -26,6 +33,12 @@ export default function AdminDashboardPage() {
 
   const approvedCount = auditLogs.filter(l => l.action_type === 'APPROVED').length;
   const rejectedCount = auditLogs.filter(l => l.action_type === 'REJECTED').length;
+
+  // Get today's date in YYYY-MM-DD format for comparison
+  const today = new Date().toISOString().split('T')[0];
+  const todayBookingsCount = tickets.filter(t => 
+    t.scheduledDate === today && t.status !== 'CANCELLED'
+  ).length;
 
   return (
     <>
@@ -51,12 +64,12 @@ export default function AdminDashboardPage() {
             <h3>Verified Users</h3>
             <div className="summary-value">
               {isLoading ? '—' : approvedCount}
-              <span>approved</span>
+              <span> approved</span>
             </div>
           </div>
         </div>
 
-        <div className="summary-card">
+        {/* <div className="summary-card">
           <div className="summary-icon yellow" style={{ backgroundColor: '#fff7ed', color: '#ea580c' }}>
             <span className="material-symbols-outlined">pending_actions</span>
           </div>
@@ -64,10 +77,10 @@ export default function AdminDashboardPage() {
             <h3>Pending Tasks</h3>
             <div className="summary-value">
               12
-              <span>requests</span>
+              <span> requests</span>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="summary-card">
           <div className="summary-icon" style={{ backgroundColor: '#f0f9ff', color: '#0369a1' }}>
@@ -76,8 +89,8 @@ export default function AdminDashboardPage() {
           <div className="summary-info">
             <h3>Daily Bookings</h3>
             <div className="summary-value">
-              8
-              <span>scheduled</span>
+              {isLoading ? '—' : todayBookingsCount}
+              <span> scheduled</span>
             </div>
           </div>
         </div>
@@ -90,7 +103,7 @@ export default function AdminDashboardPage() {
             <h3>Rejections</h3>
             <div className="summary-value">
               {isLoading ? '—' : rejectedCount}
-              <span>actions</span>
+              <span> actions</span>
             </div>
           </div>
         </div>
@@ -143,7 +156,7 @@ export default function AdminDashboardPage() {
           <div className="master-table-card" style={{ margin: 0, padding: '24px' }}>
             <h4 style={{ marginBottom: '16px', fontWeight: 800, fontSize: '14px', textTransform: 'uppercase', color: '#1a4a38' }}>Quick Shortcuts</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <Link href="/admin/technicians" className="page-btn" style={{ justifyContent: 'start', textDecoration: 'none' }}>
+              <Link href="/admin/user-verification" className="page-btn" style={{ justifyContent: 'start', textDecoration: 'none' }}>
                 <span className="material-symbols-outlined">add_moderator</span> Verify New Users
               </Link>
               <Link href="/admin/analytics" className="page-btn" style={{ justifyContent: 'start', textDecoration: 'none' }}>

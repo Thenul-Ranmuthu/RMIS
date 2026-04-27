@@ -107,6 +107,8 @@ export const cancelCompanyTicket = (
     body: JSON.stringify({ reason }),
   });
 
+export const getAllTickets = (): Promise<ServiceTicketResponse[]> =>
+  authFetch(`${API_BASE_URL}/api/service-tickets/admin/all`);
 export const submitRating = (
   ticketId: number,
   rating: number,
