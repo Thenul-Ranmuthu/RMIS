@@ -89,7 +89,7 @@ public class EmailServiceImpl implements EmailService {
                             <p style="font-size: 12px; color: #777;">RMIS Team</p>
                         </div>
                     """
-                    .formatted(quotaRequestHeaderDto.getCompanyEmail(),"http://rmis-backend.malaysiawest.azurecontainer.io:3000")
+                    .formatted(quotaRequestHeaderDto.getCompanyEmail(),"https://www.rmis.space")
                 ).build();
 
             // Fixed
@@ -126,7 +126,7 @@ public class EmailServiceImpl implements EmailService {
                         <p style="font-size: 12px; color: #777;">RMIS Team</p>
                     </div>
                     """
-                .formatted(quotaRequest.getRequestId(), "http://rmis-backend.malaysiawest.azurecontainer.io:3000"))
+                .formatted(quotaRequest.getRequestId(), "https://www.rmis.space"))
         .build();
 
         try {
@@ -163,7 +163,7 @@ public class EmailServiceImpl implements EmailService {
                     <p style="font-size: 12px; color: #777;">RMIS Team</p>
                 </div>
                 """
-            .formatted(quotaRequest.getRequestId(), "http://rmis-backend.malaysiawest.azurecontainer.io:3000"))
+            .formatted(quotaRequest.getRequestId(), "https://www.rmis.space"))
         .build();
 
         try {
@@ -369,7 +369,7 @@ public class EmailServiceImpl implements EmailService {
                         </tr>
                     </table>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="http://rmis-backend.malaysiawest.azurecontainer.io:3000" style="background-color: #047857; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">View My Bookings</a>
+                        <a href="https://www.rmis.space" style="background-color: #047857; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">View My Bookings</a>
                     </div>
                     <p>You will receive further updates as the technician processes your request.</p>
                     <hr style="border:none; border-top:1px solid #eee; margin:20px 0;">

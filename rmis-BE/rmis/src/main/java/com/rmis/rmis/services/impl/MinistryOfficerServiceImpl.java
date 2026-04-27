@@ -42,31 +42,23 @@ public class MinistryOfficerServiceImpl implements MinistryOfficerService{
                 .orElseThrow(() -> new RuntimeException("No Company found!!"));
 
 
-        // "Total approved quota" = ministry's annual budget from AnnualQuotaDistribution
-        BigDecimal totalApproved  = annualQuotaRepo.sumAnnualQuota();
+        System.out.println("remaining: " + company.getRemainingQuota().subtract(quotaRequest.getRequestedQuota()).signum());
+        if(company.getRemainingQuota().subtract(quotaRequest.getRequestedQuota()).signum() == 1 || company.getRemainingQuota().subtract(quotaRequest.getRequestedQuota()).signum() == 0){
+            company.setRemainingQuota(company.getRemainingQuota().subtract(quotaRequest.getRequestedQuota()));
+            companyRepository.save(company);
 
-        // "Total used quota" = sum of approvedAmount on APPROVED QuotaRequests
-        BigDecimal totalUsed      = requestRepo.sumApprovedUsedAmount();
+            quotaRequest.setStatus(QuotaRequestStatus.APPROVED);
+            quotaRequest.setReviewedBy(officer);
+            quotaRequest.setReviewedAt(LocalDateTime.now());
+            quotaRequestRepository.save(quotaRequest);
+            auditLogService.logApproval(officer, quotaRequest);
+            quotaRequest.setApprovedAmount(quotaRequest.getRequestedQuota());
 
-        // "Total remaining" = ministry budget minus what companies have consumed
-        BigDecimal totalRemaining = totalApproved.subtract(totalUsed);
-
-        if(quotaRequest.getRequestedQuota().compareTo(totalRemaining) > 0 ) {
+            return "Status set to APPROVED";
+        }else{
             return "Insufficient quota remaining. Failed to approve quota.";
         }
-
-        quotaRequest.setStatus(QuotaRequestStatus.APPROVED);
-        quotaRequest.setReviewedBy(officer);
-        quotaRequest.setReviewedAt(LocalDateTime.now());
-        quotaRequestRepository.save(quotaRequest);
-        auditLogService.logApproval(officer, quotaRequest);
-        quotaRequest.setApprovedAmount(quotaRequest.getRequestedQuota());
-
-        company.setRemainingQuota(company.getRemainingQuota().subtract(quotaRequest.getRequestedQuota()));
-
-        companyRepository.save(company);
-
-        return "Status set to APPROVED";
+        
     }
 
     @Override
