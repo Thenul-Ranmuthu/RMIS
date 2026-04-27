@@ -2,7 +2,11 @@ package com.rmis.rmis.services.impl;
 
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
+import com.rmis.rmis.domain.dtos.CompanyDetailsDto;
 import com.rmis.rmis.domain.entities.AnnualQuotaDistribution;
 import com.rmis.rmis.repositories.AnnualQuotaDistributionRepository;
 import org.springframework.stereotype.Service;
@@ -64,6 +68,20 @@ public class AdminServiceImpl implements AdminService{
         annualQuotaDistributionRepository.save(entity);
 
         return "Yearly Approved Quota Amount set to: " + quota;
+    }
+
+    @Override
+    public List<CompanyDetailsDto> getPendingCompanies() {
+        List<CompanyDetailsDto> companies = companyRepository.findAll()
+        .stream()
+        .map(company -> new CompanyDetailsDto(
+            company.getName(),
+            company.getEmail(),
+            company.getStatus()
+        ))
+        .collect(Collectors.toList());
+
+        return companies;
     }
 
 }
