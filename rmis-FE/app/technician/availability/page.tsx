@@ -308,46 +308,6 @@ export default function TechnicianAvailabilityPage() {
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(4,120,87,0.16),transparent_32%),radial-gradient(circle_at_top_right,rgba(15,23,42,0.08),transparent_28%),linear-gradient(to_bottom,#f8fafc,#f1f5f9)]" />
 
-      <header className="sticky top-0 z-20 border-b border-white/70 bg-white/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-lg text-emerald-700 ring-1 ring-emerald-100">
-              🛠️
-            </div>
-            <div>
-              <div className="text-sm font-extrabold tracking-wide text-slate-900">
-                RMIS
-              </div>
-              <div className="text-xs text-slate-500">
-                Technician Availability
-              </div>
-            </div>
-            <div className="hidden items-center gap-2 text-sm text-slate-400 md:flex">
-              <span>•</span>
-              <Link
-                href="/technician/dashboard"
-                className="font-medium text-slate-500 transition hover:text-emerald-700"
-              >
-                Dashboard
-              </Link>
-              <span>•</span>
-              <span className="font-semibold text-emerald-700">
-                Availability
-              </span>
-            </div>
-          </div>
-
-          <button
-            onClick={() => {
-              localStorage.removeItem("accessToken");
-              router.push("/login");
-            }}
-            className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600 shadow-sm transition hover:border-rose-200 hover:bg-rose-50"
-          >
-            Sign Out
-          </button>
-        </div>
-      </header>
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <section className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-slate-900 shadow-[0_30px_80px_rgba(15,23,42,0.18)]">

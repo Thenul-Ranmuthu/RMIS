@@ -212,7 +212,6 @@ export default function AdminTechnicianPage() {
             alignItems: "center",
           }}
         >
-          {/* User Category Tabs on Left */}
           <div style={{ display: "flex", gap: "8px" }}>
             <button
               onClick={() => setUserCategory("TECHNICIANS")}
@@ -248,7 +247,6 @@ export default function AdminTechnicianPage() {
             </button>
           </div>
 
-          {/* Status Filter on Right */}
           <div className="filters-grid" style={{ margin: 0 }}>
             <div
               className="filter-group"
@@ -346,7 +344,6 @@ export default function AdminTechnicianPage() {
                         : t.email}
                     </td>
                     <td>{formatDate(t.registrationDate)}</td>
-
                     <td>
                       <span
                         className={`status-badge ${
@@ -391,7 +388,13 @@ export default function AdminTechnicianPage() {
         >
           <div
             className="master-table-card"
-            style={{ width: "600px", background: "white", padding: "32px" }}
+            style={{
+              width: "600px",
+              background: "white",
+              padding: "32px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+            }}
           >
             <div
               style={{
@@ -444,6 +447,96 @@ export default function AdminTechnicianPage() {
                 <strong>Status:</strong> {selectedTechnician.status}
               </p>
             </div>
+
+            {/* ── Certifications Section ── */}
+            {selectedTechnician.certifications &&
+              selectedTechnician.certifications.length > 0 && (
+                <div
+                  style={{
+                    padding: "20px",
+                    background: "#f8fafc",
+                    borderRadius: "12px",
+                    marginBottom: "24px",
+                  }}
+                >
+                  <p style={{ marginBottom: "12px", fontWeight: 600 }}>
+                    Certifications ({selectedTechnician.certifications.length})
+                  </p>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "10px",
+                    }}
+                  >
+                    {selectedTechnician.certifications.map((cert) => (
+                      <div
+                        key={cert.id}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          padding: "10px 14px",
+                          background: "white",
+                          borderRadius: "8px",
+                          border: "1px solid #e5e7eb",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                          }}
+                        >
+                          <span
+                            className="material-symbols-outlined"
+                            style={{ color: "#1a4a38", fontSize: "20px" }}
+                          >
+                            description
+                          </span>
+                          <div>
+                            <div style={{ fontWeight: 600, fontSize: "13px" }}>
+                              {cert.certificationName}
+                            </div>
+                            <div style={{ fontSize: "11px", opacity: 0.6 }}>
+                              {cert.originalFileName} &middot;{" "}
+                              {cert.fileType.toUpperCase()}
+                            </div>
+                          </div>
+                        </div>
+                        
+                          <a
+                            href={`${API_BASE}${cert.fileUrl.replace(/\\/g, "/")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              fontSize: "12px",
+                              fontWeight: 600,
+                              color: "#1a4a38",
+                              textDecoration: "none",
+                              padding: "6px 12px",
+                              border: "1px solid #1a4a38",
+                              borderRadius: "6px",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            <span
+                              className="material-symbols-outlined"
+                              style={{ fontSize: "16px" }}
+                            >
+                              open_in_new
+                            </span>
+                            View
+                          </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
             {selectedTechnician.status === "PENDING" && (
               <div
